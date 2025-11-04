@@ -163,7 +163,6 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
 
 
               if (homeScreenState.isLoading) {
-                // 👇 Show shimmer when loading
                 return Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: buildProductShimmer(),
@@ -189,13 +188,11 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                     crossAxisSpacing: 12,
                     childAspectRatio: 0.60,
                   ),
-                  itemCount: homeScreenState.productList.length +
-                      (homeScreenState.isLoading ? 1 : 0),
+                  itemCount: homeScreenState.productList.length + (homeScreenState.isLoading ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index == homeScreenState.productList.length) {
                       return const Center(child: CupertinoActivityIndicator());
                     }
-
                     final product = homeScreenState.productList[index];
                     return _buildProductCard(product, index, homeScreenNotifier);
                   },
@@ -219,6 +216,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
 
     return GestureDetector(
       onTap: () {
+        savedProductDetails = ProductDetailStatus(productID: product.productId, coverImage: product.coverImage, inCart: product.inCart, isWishlisted: product.isWishlisted);
           ref.watch(MainScreenGlobalStateProvider.notifier).callNavigation(
               ScreenName.productDetail);
 
@@ -305,7 +303,6 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                                   if (product.isWishlisted == 1 ){
                                     notifier.callRemoveFromWishList(context, product.productId, index);
                                   } else {
-
                                     notifier.callAddToWishList(context, product.productId, index);
                                     _animateToWishlist(context, wishButtonKey, sourceKey);
                                   }
