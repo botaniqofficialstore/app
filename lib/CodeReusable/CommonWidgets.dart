@@ -78,6 +78,7 @@ class CommonWidgets {
         fontFamily: family,
         fontSize: size.dp,
         color: color,
+          decoration: TextDecoration.none
       ),
     );
   }

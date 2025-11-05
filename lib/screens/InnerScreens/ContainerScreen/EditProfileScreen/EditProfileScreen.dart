@@ -1,8 +1,11 @@
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import 'package:lottie/lottie.dart';
+import '../../../../Utility/PreferencesManager.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../../../constants/Constants.dart';
 import '../../../commonViews/CommonWidgets.dart';
@@ -27,6 +30,7 @@ class EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       profilrScreenNotifier.updateUserDetails();
     });
   }
+
 
   @override
   Widget build(BuildContext context) {

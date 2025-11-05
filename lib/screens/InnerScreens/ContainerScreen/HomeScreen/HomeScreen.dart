@@ -37,6 +37,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
       if (isConnected) {
         Future.microtask(() {
           CommonAPI().callUserProfileAPI();
+          ref.watch(MainScreenGlobalStateProvider.notifier).callFooterCountGETAPI();
           final cartScreenNotifier = ref.read(
               HomeScreenGlobalStateProvider.notifier);
           cartScreenNotifier.callProductListGepAPI(context);
@@ -160,9 +161,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
         child:  Consumer(
             builder: (context, ref, _) {
 
-
-
-              if (homeScreenState.isLoading) {
+              if (homeScreenState.isLoading && homeScreenState.productList.isEmpty) {
                 return Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: buildProductShimmer(),
@@ -390,7 +389,8 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                     onPressed: () {
                       setState(() {
                         if (product.inCart == 0){
-                          notifier.callAddToCartAPI(context, product.productId, index);
+                          var mainNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
+                          notifier.callAddToCartAPI(context, product.productId, index, mainNotifier);
                         }else{
                           ref.watch(MainScreenGlobalStateProvider.notifier).callNavigation(
                               ScreenName.cart);

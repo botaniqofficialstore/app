@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../API/CommonAPI.dart';
 import '../../../../CodeReusable/CodeReusability.dart';
 import '../../../../CodeReusable/CommonWidgets.dart';
 import '../../../../Utility/Logger.dart';
 import '../../../../Utility/PreferencesManager.dart';
 import '../../../../constants/Constants.dart';
 import '../../../commonViews/CustomToast.dart';
+import '../../MainScreen/MainScreenState.dart';
 import '../CartScreen/CartModel.dart';
 import '../WishListScreen/WishListModel.dart';
 import '../WishListScreen/WishListRepository.dart';
@@ -182,7 +184,7 @@ class ProductDetailScreenGlobalStateNotifier
 
 
   ///This method is used to add product to Cart POST API
-  void callAddToCartAPI(BuildContext context, String productID) {
+  void callAddToCartAPI(BuildContext context, String productID, MainScreenGlobalStateNotifier notifier) {
     if (!context.mounted) return;
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
       if (isConnected) {
@@ -203,6 +205,7 @@ class ProductDetailScreenGlobalStateNotifier
           if (statusCode == 200) {
             state = state.copyWith(inCart: 1);
             CustomToast.show(context, "${state.productData?.productName} added to cart successfully!");
+            notifier.callFooterCountGETAPI();
           } else {
             CodeReusability().showAlert(context, addToCartResponse.message ?? "something Went Wrong");
           }

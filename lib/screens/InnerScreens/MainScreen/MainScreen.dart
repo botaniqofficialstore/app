@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
-import 'package:notification_center/notification_center.dart';
+import '../../../Utility/PreferencesManager.dart';
 import '../../../constants/Constants.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/MainScreen/MainScreenState.dart';
 
@@ -24,17 +24,18 @@ class MainScreenState extends ConsumerState<MainScreen> {
   void initState() {
     super.initState();
     BackButtonInterceptor.add(mainInterceptor);
-  }
 
+    //Fetch count data when app starts
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(MainScreenGlobalStateProvider.notifier).backgroundRefreshForAPI(context);
+    });
+  }
 
   @override
   void dispose() {
     BackButtonInterceptor.remove(mainInterceptor);
-    NotificationCenter().unsubscribe(NotificationCenterId.updateUserProfile);
     super.dispose();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -50,50 +51,62 @@ class MainScreenState extends ConsumerState<MainScreen> {
           key: _scaffoldKey,
           backgroundColor: objConstantColor.white,
 
-          // ✅ Keep main content here
           body: Center(
             child: userScreenNotifier.getChildContainer(),
           ),
 
-          // ✅ Footer placed correctly
-          bottomNavigationBar:  (userScreenState.currentModule != ScreenName.reels) ? UserFooterView(
+          // UPDATED: Footer shows live cart & wishlist count
+          bottomNavigationBar: (userScreenState.currentModule != ScreenName.reels)
+              ? UserFooterView(
             currentModule: userScreenState.currentModule,
+            cartCount: userScreenState.cartCount,
+            wishlistCount: userScreenState.wishlistCount,
             selectedFooterIndex: (index) {
-              // handle tab change
               userScreenNotifier.setFooterSelection(index);
             },
-          ) : const SizedBox.shrink(),
+          )
+              : const SizedBox.shrink(),
         ),
       ),
     );
-
   }
-
 
   bool mainInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     if (kDebugMode) {
       print("Back button intercepted!");
     }
-
     var state = ref.watch(MainScreenGlobalStateProvider);
     var userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
-    userScreenNotifier.callBackNavigation(context, state.currentModule);
 
+    PreferencesManager.getInstance().then((prefs) {
+      if (prefs.getBooleanValue(PreferenceKeys.isDialogOpened) == true) {
+        return false;
+      }
+      if (_scaffoldKey.currentState?.isDrawerOpen ?? false == true) {
+        _scaffoldKey.currentState?.closeDrawer();
+        return false;
+      } else if (prefs.getBooleanValue(PreferenceKeys.isLoadingBarStarted) ==
+          true) {
+        return false;
+      } else {
+        userScreenNotifier.callBackNavigation(context, state.currentModule);
+      }
+    });
     return true;
   }
-
 }
-
-
-
 
 class UserFooterView extends ConsumerStatefulWidget {
   final ScreenName currentModule;
+  final int cartCount;
+  final int wishlistCount;
   final Function(int) selectedFooterIndex;
 
   const UserFooterView({
     required this.currentModule,
     required this.selectedFooterIndex,
+    this.cartCount = 0,
+    this.wishlistCount = 0,
     super.key,
   });
 
@@ -123,19 +136,15 @@ class UserFooterViewState extends ConsumerState<UserFooterView> {
     if (widget.currentModule == ScreenName.orders) return 1;
     if (widget.currentModule == ScreenName.reels) return 2;
     if (widget.currentModule == ScreenName.cart) return 3;
-    if (widget.currentModule == ScreenName.profile || widget.currentModule == ScreenName.editProfile) return 4;
+    if (widget.currentModule == ScreenName.profile ||
+        widget.currentModule == ScreenName.editProfile) return 4;
     return 5;
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    double screenWidth = MediaQuery.of(context).size.width;
     double tabWidth = screenWidth / inactiveIcons.length;
-
-    // Indicator width (smaller than tab)
     double indicatorWidth = 20.dp;
 
     return Container(
@@ -149,36 +158,34 @@ class UserFooterViewState extends ConsumerState<UserFooterView> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-
-          if (widget.currentModule == ScreenName.home || widget.currentModule == ScreenName.orders || widget.currentModule == ScreenName.reels || widget.currentModule == ScreenName.cart || widget.currentModule == ScreenName.profile)
-            // 🔹 Animated Indicator Bar
+          if (widget.currentModule == ScreenName.home ||
+              widget.currentModule == ScreenName.orders ||
+              widget.currentModule == ScreenName.reels ||
+              widget.currentModule == ScreenName.cart ||
+              widget.currentModule == ScreenName.profile)
             AnimatedPositioned(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
               top: 10.dp,
-              // keep near top of footer
               left: currentIndex * tabWidth + (tabWidth - indicatorWidth) / 2,
               child: Container(
                 height: 4.dp,
                 width: indicatorWidth,
                 decoration: BoxDecoration(
                   color: objConstantColor.navyBlue,
-                  borderRadius: BorderRadius.circular(8.dp), // rounded corners
+                  borderRadius: BorderRadius.circular(8.dp),
                 ),
               ),
             ),
-
-
-          // 🔹 Footer Items
 
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: List.generate(inactiveIcons.length, (index) {
               final isSelected = currentIndex == index;
               return Stack(
-                  children: [
-
-                    CupertinoButton(
+                clipBehavior: Clip.none,
+                children: [
+                  CupertinoButton(
                     onPressed: () => widget.selectedFooterIndex(index),
                     padding: EdgeInsets.zero,
                     child: Image.asset(
@@ -188,41 +195,34 @@ class UserFooterViewState extends ConsumerState<UserFooterView> {
                     ),
                   ),
 
-                  ]
+                  //Badge for Cart
+                  if (index == 3 && widget.cartCount > 0)
+                    Positioned(
+                      right: 1.dp,
+                      top: 2.dp,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                            vertical: 0.8.dp, horizontal: 5.dp),
+                        decoration: BoxDecoration(
+                          color: objConstantColor.redd,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          '${widget.cartCount}',
+                          style: TextStyle(
+                            fontSize: 10.dp,
+                            color: Colors.white,
+                            fontFamily: objConstantFonts.montserratBold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               );
             }),
           ),
-
-         if (cartList.isNotEmpty)
-          Positioned(
-            top: 10.dp,
-            right: 85.dp,
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                  vertical: 0.8.dp,
-                  horizontal: 5.dp),
-              decoration: BoxDecoration(
-                  color: objConstantColor.redd,
-                  borderRadius: const BorderRadius.horizontal(
-                      left: Radius.circular(20),
-                      right: Radius.circular(20))),
-              child: Text('${cartList.length}',
-                style: TextStyle(
-                    fontSize: 12.dp,
-                    color: objConstantColor.white,
-                    fontFamily: objConstantFonts.montserratBold),
-              ),
-            ),
-          )
         ],
       ),
     );
   }
 }
-
-
-
-
-
-
-

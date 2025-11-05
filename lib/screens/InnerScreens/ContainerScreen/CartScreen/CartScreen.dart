@@ -344,7 +344,8 @@ class CartScreenState extends ConsumerState<CartScreen> {
                   CupertinoButton(
                     onPressed: () {
                       setState(() {
-                        notifier.callRemoveFromCart(context, productID, index); // Remove Product
+                        var mainNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
+                        notifier.callRemoveFromCart(context, productID, index, mainNotifier); // Remove Product
                       });
                     },
                     padding: EdgeInsets.zero,
