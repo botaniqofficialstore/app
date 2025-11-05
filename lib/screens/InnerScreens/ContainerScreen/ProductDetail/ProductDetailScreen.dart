@@ -410,7 +410,8 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       child: CupertinoButton(
                         padding: EdgeInsets.zero,
                         onPressed: () {
-                          detailsScreenNotifier.callAddToCartAPI(context, '${detailsScreenState.productData?.productId}');
+                          var mainNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
+                          detailsScreenNotifier.callAddToCartAPI(context, '${detailsScreenState.productData?.productId}', mainNotifier);
                         },
                         child: Container(
                           padding: EdgeInsets.symmetric(horizontal: 20.dp,

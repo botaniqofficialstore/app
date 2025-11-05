@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../API/CommonAPI.dart';
 import '../../../../CodeReusable/CodeReusability.dart';
 import '../../../../CodeReusable/CommonWidgets.dart';
 import '../../../../Utility/Logger.dart';
 import '../../../../Utility/PreferencesManager.dart';
 import '../../../../constants/Constants.dart';
 import '../../../commonViews/CustomToast.dart';
+import '../../MainScreen/MainScreenState.dart';
 import '../CartScreen/CartModel.dart';
 import '../WishListScreen/WishListModel.dart';
 import '../WishListScreen/WishListRepository.dart';
@@ -162,7 +164,7 @@ class HomeScreenGlobalStateNotifier extends StateNotifier<HomeScreenGlobalState>
   }
 
   ///This method is used to add product to Cart POST API
-  void callAddToCartAPI(BuildContext context, String productID, int index) {
+  void callAddToCartAPI(BuildContext context, String productID, int index, MainScreenGlobalStateNotifier notifier) {
     if (!context.mounted) return;
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
       if (isConnected) {
@@ -180,8 +182,8 @@ class HomeScreenGlobalStateNotifier extends StateNotifier<HomeScreenGlobalState>
             responseBody) async {
           final addToCartResponse = AddToCartResponse.fromJson(responseBody);
           if (statusCode == 200) {
-
             updateCartListStatus(context, index, 1);
+            notifier.callFooterCountGETAPI();
           }
 
           else {

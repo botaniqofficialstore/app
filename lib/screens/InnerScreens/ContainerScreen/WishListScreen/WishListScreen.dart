@@ -332,9 +332,6 @@ class WishListScreenState extends ConsumerState<WishListScreen> {
     ]);
   }
 
-  bool isInCart(int productID){
-    return cartList.any((item) => item["id"] == productID);
-  }
 
 
 }

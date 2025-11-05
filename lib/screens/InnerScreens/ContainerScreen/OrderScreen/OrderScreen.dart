@@ -149,8 +149,7 @@ class OrderScreenState extends ConsumerState<OrderScreen> {
   }
 
   Widget orderListWidget(BuildContext context, OrderDataList order, MainScreenGlobalStateNotifier notifier) {
-    final orderScreenNotifier = ref.read(
-        OrderScreenGlobalStateProvider.notifier);
+    final orderScreenNotifier = ref.read(OrderScreenGlobalStateProvider.notifier);
     bool isExpanded = _expandedMap[order.orderId] ?? false;
 
     return Container(
@@ -193,7 +192,7 @@ class OrderScreenState extends ConsumerState<OrderScreen> {
                             padding: EdgeInsets.symmetric(horizontal: 5.dp),
                             child: objCommonWidgets.customText(
                               context,
-                              'Order placed',
+                              (order.currentOrderStatus == 5) ? 'Delivered' : 'Order placed' ,
                               18,
                               objConstantColor.navyBlue,
                               ConstantAssests.montserratSemiBold,
@@ -211,7 +210,7 @@ class OrderScreenState extends ConsumerState<OrderScreen> {
                             },
                               padding: EdgeInsets.zero, child: Container(
                                 decoration: BoxDecoration(
-                                  color: objConstantColor.green,
+                                  color: (order.currentOrderStatus == 5) ? objConstantColor.navyBlue : objConstantColor.green,
                                   borderRadius: BorderRadius.circular(2.5.dp),
                                   border: Border.all(
                                     color: objConstantColor.navyBlue,
@@ -222,7 +221,7 @@ class OrderScreenState extends ConsumerState<OrderScreen> {
                                     vertical: 5.dp, horizontal: 8.dp),
                                 child: objCommonWidgets.customText(
                                   context,
-                                  'Track order',
+                                  (order.currentOrderStatus == 5) ? 'View details' : 'Track order' ,
                                   11.5,
                                   objConstantColor.white,
                                   ConstantAssests.montserratBold,
@@ -264,7 +263,7 @@ class OrderScreenState extends ConsumerState<OrderScreen> {
                           ConstantAssests.montserratBold),
                       titleAndValueRow(
                           context,
-                          'Payable Amount :',
+                          (order.currentOrderStatus == 5) ? 'Paid Amount :' : 'Payable Amount :',
                           '₹${order.orderTotalAmount}/_',
                           objConstantColor.navyBlue,
                           objConstantColor.green,

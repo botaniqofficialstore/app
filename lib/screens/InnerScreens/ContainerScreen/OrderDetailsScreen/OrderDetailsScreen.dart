@@ -256,9 +256,9 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                           ),
                           child: Padding(
                             padding: EdgeInsets.symmetric(
-                                vertical: 10.dp, horizontal: 10.dp),
+                                vertical: 12.dp, horizontal: 13.dp),
                             child: objCommonWidgets.customText(
-                                context, 'Cancel Order', 18,
+                                context, 'Cancel Order', 15,
                                 objConstantColor.white,
                                 objConstantFonts.montserratSemiBold),
                           ),

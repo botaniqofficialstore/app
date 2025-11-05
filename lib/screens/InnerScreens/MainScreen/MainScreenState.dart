@@ -1,4 +1,3 @@
-
 import 'package:botaniqmicrogreens/screens/Authentication/CreateAccount/CreateAccountScreen.dart';
 import 'package:botaniqmicrogreens/screens/Authentication/ForgotPasswordScreen/ForgotPasswordScreen.dart';
 import 'package:botaniqmicrogreens/screens/Authentication/LoginScreen/LoginScreen.dart';
@@ -13,26 +12,43 @@ import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/ProfileS
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/WishListScreen/WishListScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../API/CommonAPI.dart';
-import '../../../CodeReusable/CodeReusability.dart';
-import '../../../constants/Constants.dart';
+import 'package:botaniqmicrogreens/API/CommonAPI.dart';
+import 'package:botaniqmicrogreens/CodeReusable/CodeReusability.dart';
+import 'package:botaniqmicrogreens/constants/Constants.dart';
+import '../../../API/APIService.dart';
+import '../../../API/CommonModel.dart';
+import '../../../Utility/Logger.dart';
+import '../../../Utility/PreferencesManager.dart';
 import '../../commonViews/LocationPickerScreen.dart';
 import '../ContainerScreen/OrderScreen/OrderScreen.dart';
 import '../ContainerScreen/ReelsScreen/ReelsScreen.dart';
 
-
 class MainScreenGlobalState {
   final ScreenName currentModule;
 
+  // ✅ NEW: Added count fields
+  final int cartCount;
+  final int wishlistCount;
+  final int totalCount;
+
   MainScreenGlobalState({
     this.currentModule = ScreenName.home,
+    this.cartCount = 0, // ✅ NEW
+    this.wishlistCount = 0, // ✅ NEW
+    this.totalCount = 0, // ✅ NEW
   });
 
   MainScreenGlobalState copyWith({
     ScreenName? currentModule,
+    int? cartCount, // ✅ NEW
+    int? wishlistCount, // ✅ NEW
+    int? totalCount, // ✅ NEW
   }) {
     return MainScreenGlobalState(
       currentModule: currentModule ?? this.currentModule,
+      cartCount: cartCount ?? this.cartCount, // ✅ NEW
+      wishlistCount: wishlistCount ?? this.wishlistCount, // ✅ NEW
+      totalCount: totalCount ?? this.totalCount, // ✅ NEW
     );
   }
 }
@@ -46,7 +62,6 @@ class MainScreenGlobalStateNotifier
     super.dispose();
   }
 
-
   ///MARK: - METHODS
   ///This method used to clear state
   void clearStates() {
@@ -54,8 +69,6 @@ class MainScreenGlobalStateNotifier
   }
 
   ///This method used to handle footer selection
-  ///
-  /// [index] - This param used to pass the selected index
   void setFooterSelection(int index) {
     ScreenName selectedModule;
     if (index == 1) {
@@ -73,9 +86,8 @@ class MainScreenGlobalStateNotifier
     }
     state = state.copyWith(currentModule: selectedModule);
   }
+
   /// This Method to used to change screenName
-  ///
-  /// [selectedScreen] - This param used to pass the selected ScreenName
   void callNavigation(ScreenName selectedScreen) {
     state = state.copyWith(currentModule: selectedScreen);
   }
@@ -89,24 +101,24 @@ class MainScreenGlobalStateNotifier
     } else if (state.currentModule == ScreenName.cart) {
       return const CartScreen();
     } else if (state.currentModule == ScreenName.profile) {
-      return const ProfileScreen(); //const LocationPickerScreen();//
+      return const ProfileScreen();
     } else if (state.currentModule == ScreenName.wishList) {
       return const WishListScreen();
     } else if (state.currentModule == ScreenName.productDetail) {
-      return  ProductDetailScreen();
+      return ProductDetailScreen();
     } else if (state.currentModule == ScreenName.orderSummary) {
-      return  const OrderSummaryScreen();
+      return const OrderSummaryScreen();
     } else if (state.currentModule == ScreenName.editProfile) {
       return const EditProfileScreen();
-    } else if (state.currentModule == ScreenName.login){
+    } else if (state.currentModule == ScreenName.login) {
       return const LoginScreen();
-    } else if (state.currentModule == ScreenName.otp){
+    } else if (state.currentModule == ScreenName.otp) {
       return const OtpScreen();
-    } else if (state.currentModule == ScreenName.forgotPassword){
+    } else if (state.currentModule == ScreenName.forgotPassword) {
       return const ForgotPasswordScreen();
-    } else if (state.currentModule == ScreenName.createAccount){
+    } else if (state.currentModule == ScreenName.createAccount) {
       return const CreateAccountScreen();
-    } else if (state.currentModule == ScreenName.orderDetails){
+    } else if (state.currentModule == ScreenName.orderDetails) {
       return const OrderDetailsScreen();
     } else {
       return const HomeScreen();
@@ -114,9 +126,8 @@ class MainScreenGlobalStateNotifier
   }
 
   ///This method used to handle back navigation
-  ///
-  /// [module] - This param used to pass the current module
-  Future<void> callBackNavigation(BuildContext context, ScreenName module) async {
+  Future<void> callBackNavigation(
+      BuildContext context, ScreenName module) async {
     if (!context.mounted) return;
     ScreenName onScreen = state.currentModule;
 
@@ -128,35 +139,46 @@ class MainScreenGlobalStateNotifier
         module == ScreenName.wishList ||
         module == ScreenName.login) {
       onScreen = ScreenName.home;
-    } else if (module == ScreenName.editProfile){
+    } else if (module == ScreenName.editProfile) {
       onScreen = ScreenName.profile;
-    } else if (module == ScreenName.orderSummary){
+    } else if (module == ScreenName.orderSummary) {
       onScreen = ScreenName.cart;
     }
 
     state = state.copyWith(currentModule: onScreen);
   }
 
-
-
   ///This method is used to GET Api for refresh token api response as success
   void backgroundRefreshForAPI(data) {
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
       if (isConnected) {
         CommonAPI().callUserProfileAPI();
+        callFooterCountGETAPI();
       }
     });
   }
 
 
+  Future <void> callFooterCountGETAPI() async {
+    var prefs = await PreferencesManager.getInstance();
+    String userID = prefs.getStringValue(PreferenceKeys.userID) ?? '';
+    await APIService().callCommonGETApi('${ConstantURLs.countUrl}$userID', isAccessTokenNeeded: false,
+            (statusCode, response) async {
+          if (statusCode == 200) {
+            Logger().log('###---> Footer count API Response: $response');
+            final userResponse = CountResponse.fromJson(response);
+            state = state.copyWith(wishlistCount: userResponse.wishlistCount, cartCount: userResponse.cartCount);
+          } else {
+            Logger().log('###---> Response: $response');
+          }
+        });
+  }
+
 
 }
-
-
 
 final MainScreenGlobalStateProvider = StateNotifierProvider.autoDispose<
     MainScreenGlobalStateNotifier, MainScreenGlobalState>((ref) {
   var notifier = MainScreenGlobalStateNotifier();
   return notifier;
 });
-

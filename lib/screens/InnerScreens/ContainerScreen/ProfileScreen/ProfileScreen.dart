@@ -1,9 +1,14 @@
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
+import '../../../../Utility/PreferencesManager.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../../../constants/Constants.dart';
+import '../../../Authentication/LoginScreen/LoginScreen.dart';
+import '../../../commonViews/LogoutPopup.dart';
 import '../../MainScreen/MainScreenState.dart';
 import 'ProfileScreenState.dart';
 
@@ -28,6 +33,7 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,150 +48,170 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
 
 
   ///Profile Screen
-Widget profileView(BuildContext context){
+Widget profileView(BuildContext context) {
   final screenState = ref.watch(ProfileScreenGlobalStateProvider);
   final screenNotifier = ref.read(ProfileScreenGlobalStateProvider.notifier);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        /// Header
-        Stack(
-          children: [
-            Image.asset(
-              objConstantAssest.addImage6,
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: 180.dp,
-            ),
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
 
-            Positioned(
-              left: 15.dp,
-              bottom: 10.dp,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  objCommonWidgets.customText(
-                    context,
-                    'Welcome',
-                    40,
-                    objConstantColor.white,
-                    objConstantFonts.montserratBold,
+      /// Header
+      Stack(
+        children: [
+          Image.asset(
+            objConstantAssest.addImage6,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: 180.dp,
+          ),
+
+          Positioned(
+            left: 15.dp,
+            bottom: 10.dp,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                objCommonWidgets.customText(
+                  context,
+                  'Welcome',
+                  40,
+                  objConstantColor.white,
+                  objConstantFonts.montserratBold,
+                ),
+                objCommonWidgets.customText(
+                  context,
+                  '${screenState.firstName} ${screenState.lastName}',
+                  30,
+                  objConstantColor.white,
+                  objConstantFonts.montserratSemiBold,
+                ),
+              ],
+            ),
+          ),
+
+          /// Back Button
+          Positioned(
+            top: 10.dp,
+            left: 15.dp,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: CupertinoButton(
+                padding: EdgeInsets.all(4.dp),
+                minSize: 35.dp,
+                borderRadius: BorderRadius.circular(30),
+                child: Image.asset(
+                  objConstantAssest.backIcon,
+                  color: objConstantColor.white,
+                  width: 25.dp,
+                ),
+                onPressed: () {
+                  ref.watch(MainScreenGlobalStateProvider.notifier)
+                      .callNavigation(ScreenName.home);
+                },
+              ),
+            ),
+          ),
+
+          /// Logout Button
+          Positioned(
+            top: 10.dp,
+            right: 15.dp,
+            child: Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  objCommonWidgets.customText(
+                  child: Stack(
+                    children: [
+                      CupertinoButton(
+                        padding: EdgeInsets.all(4.dp),
+                        minSize: 35.dp,
+                        borderRadius: BorderRadius.circular(30),
+                        child: Image.asset(
+                          objConstantAssest.logout,
+                          color: objConstantColor.white,
+                          width: 18.dp,
+                        ),
+                        onPressed: () async {
+                          final pref = await PreferencesManager.getInstance();
+                          pref.setBooleanValue(PreferenceKeys.isDialogOpened, true);
+                          LogoutPopup.showLogoutPopup(
+                            context: context,
+                            onConfirm: () async {
+                              // 🔹 Clear user session
+                              pref.removePref();
+                              pref.setBooleanValue(PreferenceKeys.isUserLogged, false);
+                              pref.setBooleanValue(PreferenceKeys.isDialogOpened, false);
+                              Navigator.pushReplacement(context,
+                                MaterialPageRoute(builder: (context) => const LoginScreen()),
+                              );
+                            },
+                          );
+                        },
+                      ),
+
+                    ],
+                  ),
+                ),
+
+              ],
+            ),
+          )
+        ],
+      ),
+
+      SizedBox(height: 20.dp),
+
+      /// Info Section
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15.dp),
+        child: Column(
+          children: [
+            buildInfoTile(context, "First Name", screenState.firstName,
+                screenState.firstName.isEmpty, '--'),
+            buildInfoTile(context, "Last Name", screenState.lastName,
+                screenState.lastName.isEmpty, '--'),
+            buildInfoTile(
+                context, "Email", screenState.email, screenState.email.isEmpty,
+                '--'),
+            buildInfoTile(context, "Mobile", "+91 ${screenState.mobileNumber}",
+                screenState.mobileNumber.isEmpty, '--'),
+            buildInfoTile(context, "Address", screenState.address,
+                screenState.address.isEmpty, '--'),
+
+            Padding(
+              padding: EdgeInsets.only(top: 10.dp, bottom: 20.dp),
+              child: SizedBox(
+                width: double.infinity,
+                child: CupertinoButton(
+                  padding: EdgeInsets.symmetric(vertical: 15.dp),
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(12.dp),
+                  onPressed: () {
+                    ref.watch(MainScreenGlobalStateProvider.notifier)
+                        .callNavigation(ScreenName.editProfile);
+                  },
+                  child: objCommonWidgets.customText(
                     context,
-                    '${screenState.firstName} ${screenState.lastName}',
-                    30,
+                    'Edit Profile',
+                    18,
                     objConstantColor.white,
                     objConstantFonts.montserratSemiBold,
                   ),
-                ],
-              ),
-            ),
-
-            /// Back Button
-            Positioned(
-              top: 10.dp,
-              left: 15.dp,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: CupertinoButton(
-                  padding: EdgeInsets.all(4.dp),
-                  minSize: 35.dp,
-                  borderRadius: BorderRadius.circular(30),
-                  child: Image.asset(
-                    objConstantAssest.backIcon,
-                    color: objConstantColor.white,
-                    width: 25.dp,
-                  ),
-                  onPressed: () {
-                    ref.watch(MainScreenGlobalStateProvider.notifier)
-                        .callNavigation(ScreenName.home);
-                  },
                 ),
               ),
             ),
-
-            /// Logout Button
-            Positioned(
-              top: 10.dp,
-              right: 15.dp,
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Stack(
-                      children: [
-                        CupertinoButton(
-                          padding: EdgeInsets.all(4.dp),
-                          minSize: 35.dp,
-                          borderRadius: BorderRadius.circular(30),
-                          child: Image.asset(
-                            objConstantAssest.logout,
-                            color: objConstantColor.white,
-                            width: 18.dp,
-                          ),
-                          onPressed: () {
-
-                          },
-                        ),
-
-                      ],
-                    ),
-                  ),
-
-                ],
-              ),
-            )
           ],
         ),
-
-        SizedBox(height: 20.dp),
-
-        /// Info Section
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15.dp),
-          child: Column(
-            children: [
-              buildInfoTile(context,"First Name", screenState.firstName, screenState.firstName.isEmpty, '--'),
-              buildInfoTile(context,"Last Name", screenState.lastName, screenState.lastName.isEmpty, '--'),
-              buildInfoTile(context,"Email", screenState.email, screenState.email.isEmpty, '--'),
-              buildInfoTile(context,"Mobile", "+91 ${screenState.mobileNumber}", screenState.mobileNumber.isEmpty, '--'),
-              buildInfoTile(context,"Address", screenState.address, screenState.address.isEmpty, '--'),
-
-              Padding(
-                padding: EdgeInsets.only(top: 10.dp, bottom: 20.dp),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: CupertinoButton(
-                    padding: EdgeInsets.symmetric(vertical: 15.dp),
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(12.dp),
-                    onPressed: () {
-                      ref.watch(MainScreenGlobalStateProvider.notifier)
-                          .callNavigation(ScreenName.editProfile);
-                    },
-                    child: objCommonWidgets.customText(
-                      context,
-                      'Edit Profile',
-                      18,
-                      objConstantColor.white,
-                      objConstantFonts.montserratSemiBold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+      ),
+    ],
+  );
 }
 
 

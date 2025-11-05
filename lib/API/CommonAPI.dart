@@ -6,6 +6,7 @@ import '../Utility/PreferencesManager.dart';
 import '../constants/Constants.dart';
 import '../screens/InnerScreens/ContainerScreen/ProfileScreen/ProfileModel.dart';
 import 'APIService.dart';
+import 'CommonModel.dart';
 
 class CommonAPI {
 
@@ -53,7 +54,7 @@ class CommonAPI {
             Logger().log('###---> Response: $response');
           }
         });
-
   }
+
 
 }

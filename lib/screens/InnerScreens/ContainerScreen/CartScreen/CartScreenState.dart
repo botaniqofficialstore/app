@@ -95,7 +95,7 @@ class CartScreenGlobalStateNotifier
   }
 
   ///This method used to call remove oriduct from cart API
-  void callRemoveFromCart(BuildContext context, String productID, int index){
+  void callRemoveFromCart(BuildContext context, String productID, int index, MainScreenGlobalStateNotifier notifier){
     if (!context.mounted) return;
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
       if (isConnected) {
@@ -114,10 +114,10 @@ class CartScreenGlobalStateNotifier
           if (statusCode == 200) {
 
             Logger().log('###---> Cart Remove API Response: $response');
-
             // ✅ Remove the item locally using the index
             final updatedList = List<CartItem>.from(state.cartItems);
             updatedList.removeAt(index);
+            notifier.callFooterCountGETAPI();
 
             // ✅ Update the state to refresh UI
             state = state.copyWith(cartItems: updatedList);
