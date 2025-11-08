@@ -2,10 +2,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-<<<<<<< HEAD
-=======
-const multer = require('multer');
->>>>>>> dfdff9d8cd23a9cdbbd4a1bc6a20349b46a4ff7a
 const path = require('path');
 const fs = require('fs');
 const admin = require('firebase-admin');
@@ -27,14 +23,11 @@ const countRoutes = require('./models/API/Count/Count');
 const serviceAccount = JSON.parse(fs.readFileSync('./serviceAccountKey.json', 'utf-8'));
 
 dotenv.config();
-<<<<<<< HEAD
 console.log('--- ENV CHECK ---');
 console.log('EMAIL_USER:', process.env.EMAIL_USER);
 console.log('EMAIL_PASS (Length):', process.env.EMAIL_PASS ? process.env.EMAIL_PASS.length : 'MISSING');
 console.log('-----------------');
 console.log("✅ ENV CHECK:", process.env.EMAIL_USER, process.env.EMAIL_PASS ? "PASS SET" : "PASS MISSING");
-=======
->>>>>>> dfdff9d8cd23a9cdbbd4a1bc6a20349b46a4ff7a
 const app = express();
 app.use(express.json());
 
