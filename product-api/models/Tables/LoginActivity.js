@@ -2,11 +2,7 @@ const mongoose = require('mongoose');
 
 const LoginActivitySchema = new mongoose.Schema({
   userId: { type: String, required: true },
-<<<<<<< HEAD
   loginType: { type: String, enum: ['manual', 'google', 'facebook', 'otp'], required: true },
-=======
-  loginType: { type: String, enum: ['manual', 'google', 'facebook'], required: true },
->>>>>>> dfdff9d8cd23a9cdbbd4a1bc6a20349b46a4ff7a
   loginDate: { type: Date, default: Date.now },
   logoutDate: { type: Date, default: null },
   deviceId: { type: String },
