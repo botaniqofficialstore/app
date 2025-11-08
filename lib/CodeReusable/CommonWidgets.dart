@@ -2,11 +2,8 @@ import 'package:botaniqmicrogreens/constants/ConstantVariables.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
-<<<<<<< HEAD
 import 'package:open_settings_plus/core/open_settings_plus.dart';
 import 'package:permission_handler/permission_handler.dart' as AppSettings;
-=======
->>>>>>> dfdff9d8cd23a9cdbbd4a1bc6a20349b46a4ff7a
 
 import '../Utility/LoadingBarOverlay.dart';
 
@@ -125,7 +122,6 @@ class CommonWidgets {
     }
   }
 
-<<<<<<< HEAD
 
 
   void showLocationSettingsAlert(BuildContext context,
@@ -198,6 +194,4 @@ class CommonWidgets {
     );
   }
 
-=======
->>>>>>> dfdff9d8cd23a9cdbbd4a1bc6a20349b46a4ff7a
 }
