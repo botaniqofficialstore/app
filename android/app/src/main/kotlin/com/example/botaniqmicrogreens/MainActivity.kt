@@ -1,4 +1,4 @@
-package com.example.botaniqmicrogreens
+package com.botaniq.microgreens
 
 import io.flutter.embedding.android.FlutterActivity
 

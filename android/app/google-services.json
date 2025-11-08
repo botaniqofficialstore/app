@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "584718244019",
+    "project_id": "botaniq-microgreens",
+    "storage_bucket": "botaniq-microgreens.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:584718244019:android:006899f927eee41e4178c6",
+        "android_client_info": {
+          "package_name": "com.botaniq.microgreens"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3u4Xx1Yr5ZSbQTuraMY-9o8X3LYku3c0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

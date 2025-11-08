@@ -74,7 +74,8 @@ enum ScreenName {
   otp,
   createAccount,
   forgotPassword,
-  orderDetails
+  orderDetails,
+  map
 }
 
 

@@ -56,7 +56,7 @@ class MainScreenState extends ConsumerState<MainScreen> {
           ),
 
           // UPDATED: Footer shows live cart & wishlist count
-          bottomNavigationBar: (userScreenState.currentModule != ScreenName.reels)
+          bottomNavigationBar: ((userScreenState.currentModule != ScreenName.reels) && (userScreenState.currentModule != ScreenName.map))
               ? UserFooterView(
             currentModule: userScreenState.currentModule,
             cartCount: userScreenState.cartCount,

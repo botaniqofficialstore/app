@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.botaniqmicrogreens"
+    namespace = "com.botaniq.microgreens"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -31,13 +31,15 @@ android {
         multiDexEnabled true
     }
 
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+    signingConfigs {
+        debug {
+            storeFile file("C:/Users/VIKAS/.android/debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
         }
     }
+
 }
 
 flutter {

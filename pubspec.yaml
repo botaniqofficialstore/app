@@ -37,7 +37,6 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_sizer: ^1.0.5
   widget_and_text_animator: ^1.1.5
-  #device_info_plus: ^12.2.0
   flutter_platform_alert: ^0.8.0
   internet_connection_checker: ^3.0.1
   video_player: ^2.9.5
@@ -52,17 +51,24 @@ dependencies:
   overlay_support: ^2.1.0
   google_sign_in: ^6.2.2
   flutter_facebook_auth: ^7.1.2
-  #google_maps_flutter: ^2.10.0
-  #geolocator: ^13.0.1
   back_button_interceptor: ^8.0.3
   internet_connection_checker_plus: ^2.7.0
   shared_preferences: ^2.3.5
-  http: ^1.3.0
   dio: ^5.7.0
   notification_center: ^1.0.2
   uuid: ^4.4.0
   loading_animation_widget: ^1.3.0
   #package_info_plus: ^9.0.0
+  #device_info_plus: ^12.2.0
+  google_maps_flutter: ^2.4.0
+  geolocator: ^9.0.2
+  http: ^1.5.0
+  google_places_flutter: ^2.1.1
+  permission_handler: ^12.0.1
+  open_settings_plus: ^0.4.0
+  geocoding: ^4.0.0
+
+
 
 dev_dependencies:
   flutter_test:

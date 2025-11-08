@@ -138,7 +138,9 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   CupertinoButton(
                     borderRadius: BorderRadius.circular(8.dp),
-                    onPressed: () {}, padding: EdgeInsets.zero,
+                    onPressed: () {
+                      userScreenNotifier.callNavigation(ScreenName.map);
+                    }, padding: EdgeInsets.zero,
                     child: Container(
                       padding: EdgeInsets.symmetric(
                           horizontal: 8.dp, vertical: 6.dp),
@@ -216,8 +218,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
     return GestureDetector(
       onTap: () {
         savedProductDetails = ProductDetailStatus(productID: product.productId, coverImage: product.coverImage, inCart: product.inCart, isWishlisted: product.isWishlisted);
-          ref.watch(MainScreenGlobalStateProvider.notifier).callNavigation(
-              ScreenName.productDetail);
+          ref.watch(MainScreenGlobalStateProvider.notifier).callNavigation(ScreenName.productDetail);
 
       },
       child: Stack(children: [
