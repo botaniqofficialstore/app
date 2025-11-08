@@ -10,6 +10,7 @@ import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/OrderSum
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/ProductDetail/ProductDetailScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/ProfileScreen/ProfileScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/WishListScreen/WishListScreen.dart';
+import 'package:botaniqmicrogreens/screens/commonViews/MapScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:botaniqmicrogreens/API/CommonAPI.dart';
@@ -120,6 +121,8 @@ class MainScreenGlobalStateNotifier
       return const CreateAccountScreen();
     } else if (state.currentModule == ScreenName.orderDetails) {
       return const OrderDetailsScreen();
+    } else if (state.currentModule == ScreenName.map) {
+      return const MapScreen();
     } else {
       return const HomeScreen();
     }

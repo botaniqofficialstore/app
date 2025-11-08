@@ -2,7 +2,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const admin = require('firebase-admin');
@@ -24,6 +23,11 @@ const countRoutes = require('./models/API/Count/Count');
 const serviceAccount = JSON.parse(fs.readFileSync('./serviceAccountKey.json', 'utf-8'));
 
 dotenv.config();
+console.log('--- ENV CHECK ---');
+console.log('EMAIL_USER:', process.env.EMAIL_USER);
+console.log('EMAIL_PASS (Length):', process.env.EMAIL_PASS ? process.env.EMAIL_PASS.length : 'MISSING');
+console.log('-----------------');
+console.log("✅ ENV CHECK:", process.env.EMAIL_USER, process.env.EMAIL_PASS ? "PASS SET" : "PASS MISSING");
 const app = express();
 app.use(express.json());
 

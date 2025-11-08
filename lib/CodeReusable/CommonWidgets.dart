@@ -2,6 +2,8 @@ import 'package:botaniqmicrogreens/constants/ConstantVariables.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
+import 'package:open_settings_plus/core/open_settings_plus.dart';
+import 'package:permission_handler/permission_handler.dart' as AppSettings;
 
 import '../Utility/LoadingBarOverlay.dart';
 
@@ -118,6 +120,78 @@ class CommonWidgets {
     } else {
       LoadingBarOverlay.hide();
     }
+  }
+
+
+
+  void showLocationSettingsAlert(BuildContext context,
+      {VoidCallback? onCancel, VoidCallback? openSettings}) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: objConstantColor.white,
+        title: objCommonWidgets.customText(context, 'Location Services Disabled', 17, objConstantColor.navyBlue, objConstantFonts.montserratBold),
+        content: objCommonWidgets.customText(context, 'Please enable location services in Settings.', 14, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Future.delayed(const Duration(milliseconds: 200), () {
+                Navigator.pop(context);
+                (OpenSettingsPlus.shared as OpenSettingsPlusIOS)
+                    .locationServices();
+              });
+
+              if (openSettings != null) {
+                openSettings();
+              }
+
+              /// Add a slight delay before dismissing the dialog
+            },
+            child: objCommonWidgets.customText(context, 'Open Settings', 14, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              if (onCancel != null) {
+                onCancel();
+              }
+            },
+            child: objCommonWidgets.customText(context, 'Cancel', 14, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  Future<void> showPermissionDialog(BuildContext context,
+      {VoidCallback? onOpenSettings}) async {
+    await showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: objConstantColor.white,
+        title: objCommonWidgets.customText(context, 'Location Permission Required', 20, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+        content: objCommonWidgets.customText(context, 'Please enable location permission in Settings', 15, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: objCommonWidgets.customText(context, 'Cancel', 14, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              if (onOpenSettings != null) {
+                onOpenSettings();
+              }
+              AppSettings.openAppSettings();
+            },
+            child: objCommonWidgets.customText(context, 'Open Settings', 14, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+          ),
+        ],
+      ),
+    );
   }
 
 }
