@@ -1,7 +1,12 @@
+<<<<<<< HEAD
 // utils/notification.js
 const nodemailer = require('nodemailer');
 const twilio = require('twilio');
 const path = require('path');
+=======
+const nodemailer = require('nodemailer');
+const twilio = require('twilio');
+>>>>>>> dfdff9d8cd23a9cdbbd4a1bc6a20349b46a4ff7a
 
 const emailTransporter = nodemailer.createTransport({
   service: 'gmail',
@@ -14,6 +19,7 @@ const emailTransporter = nodemailer.createTransport({
 const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 exports.sendEmailOTP = async (toEmail, otp) => {
+<<<<<<< HEAD
   const htmlTemplate = `
     <div style="font-family: Arial, sans-serif; padding: 0; background: #26323e; margin: 0;">
       <div style="max-width: 480px; margin: 40px auto; background: #26323e; padding: 80px 30px;">
@@ -134,6 +140,19 @@ exports.sendEmailOTP = async (toEmail, otp) => {
 exports.sendSMSOTP = async (toNumber, otp) => {
   await twilioClient.messages.create({
     body: `Your OTP code is ${otp}. It will expire in ${process.env.OTP_EXPIRES_MINUTES || 2} minutes.`,
+=======
+  await emailTransporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: toEmail,
+    subject: 'Your OTP Code',
+    text: `Your OTP code is ${otp}. It will expire in 2 minutes.`
+  });
+};
+
+exports.sendSMSOTP = async (toNumber, otp) => {
+  await twilioClient.messages.create({
+    body: `Your OTP code is ${otp}. It will expire in 2 minutes.`,
+>>>>>>> dfdff9d8cd23a9cdbbd4a1bc6a20349b46a4ff7a
     from: process.env.TWILIO_PHONE_NUMBER,
     to: toNumber
   });

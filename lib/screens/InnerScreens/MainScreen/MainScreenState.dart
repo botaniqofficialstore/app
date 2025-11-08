@@ -10,7 +10,10 @@ import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/OrderSum
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/ProductDetail/ProductDetailScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/ProfileScreen/ProfileScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/WishListScreen/WishListScreen.dart';
+<<<<<<< HEAD
 import 'package:botaniqmicrogreens/screens/commonViews/MapScreen.dart';
+=======
+>>>>>>> dfdff9d8cd23a9cdbbd4a1bc6a20349b46a4ff7a
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:botaniqmicrogreens/API/CommonAPI.dart';
@@ -121,8 +124,11 @@ class MainScreenGlobalStateNotifier
       return const CreateAccountScreen();
     } else if (state.currentModule == ScreenName.orderDetails) {
       return const OrderDetailsScreen();
+<<<<<<< HEAD
     } else if (state.currentModule == ScreenName.map) {
       return const MapScreen();
+=======
+>>>>>>> dfdff9d8cd23a9cdbbd4a1bc6a20349b46a4ff7a
     } else {
       return const HomeScreen();
     }

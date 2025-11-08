@@ -10,7 +10,10 @@ import facebook_auth_desktop
 import flutter_local_notifications
 import flutter_platform_alert
 import flutter_secure_storage_macos
+<<<<<<< HEAD
 import geolocator_apple
+=======
+>>>>>>> dfdff9d8cd23a9cdbbd4a1bc6a20349b46a4ff7a
 import google_sign_in_ios
 import package_info_plus
 import path_provider_foundation
@@ -25,7 +28,10 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   FlutterLocalNotificationsPlugin.register(with: registry.registrar(forPlugin: "FlutterLocalNotificationsPlugin"))
   FlutterPlatformAlertPlugin.register(with: registry.registrar(forPlugin: "FlutterPlatformAlertPlugin"))
   FlutterSecureStoragePlugin.register(with: registry.registrar(forPlugin: "FlutterSecureStoragePlugin"))
+<<<<<<< HEAD
   GeolocatorPlugin.register(with: registry.registrar(forPlugin: "GeolocatorPlugin"))
+=======
+>>>>>>> dfdff9d8cd23a9cdbbd4a1bc6a20349b46a4ff7a
   FLTGoogleSignInPlugin.register(with: registry.registrar(forPlugin: "FLTGoogleSignInPlugin"))
   FPPPackageInfoPlusPlugin.register(with: registry.registrar(forPlugin: "FPPPackageInfoPlusPlugin"))
   PathProviderPlugin.register(with: registry.registrar(forPlugin: "PathProviderPlugin"))
