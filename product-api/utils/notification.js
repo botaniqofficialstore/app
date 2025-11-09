@@ -46,7 +46,7 @@ exports.sendEmailOTP = async (toEmail, otp) => {
 
   try {
     await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'BotaniQ <onboarding@resend.dev>',
+      from: process.env.EMAIL_FROM || 'BotaniQ <botaniqofficialstore@gmail.com>',
       to: toEmail,
       subject: 'Your OTP Code – BotaniQ Verification',
       html: htmlTemplate
