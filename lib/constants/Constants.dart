@@ -5,7 +5,7 @@ import '../screens/InnerScreens/ContainerScreen/OrderScreen/OrderModel.dart';
 
 //MARK: - Class Declarations
 class ConstantURLs {
-  static String baseUrl = 'https://app-1q5g.onrender.com';//'http://192.168.43.216:5000'; //Local
+  static String baseUrl = 'https://app-1q5g.onrender.com'; //'http://192.168.43.216:5000'; //Local
 
   ///Authentication API URL's
   static String manualLoginUrl = "$baseUrl/api/login";
@@ -17,6 +17,10 @@ class ConstantURLs {
   static String verifyOtpUrl = "$baseUrl/api/verify-otp";
   static String logoutUrl = "$baseUrl/api/logout";
   static String refreshTokenUrl = "$baseUrl/api/refresh-token";
+
+  static String sendOTPUrl = "$baseUrl/api/send-otp";
+  static String verifyOTPUrl = "$baseUrl/api/verify-otp";
+  static String reSendOTPUrl = "$baseUrl/api/resend-otp";
 
   ///Customer API URL's
   static String createUser = "$baseUrl/api/users";

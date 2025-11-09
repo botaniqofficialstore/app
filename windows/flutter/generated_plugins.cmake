@@ -6,11 +6,8 @@ list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
   flutter_platform_alert
   flutter_secure_storage_windows
-<<<<<<< HEAD
   geolocator_windows
   permission_handler_windows
-=======
->>>>>>> dfdff9d8cd23a9cdbbd4a1bc6a20349b46a4ff7a
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

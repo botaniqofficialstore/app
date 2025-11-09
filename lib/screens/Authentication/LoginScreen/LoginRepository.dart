@@ -10,7 +10,7 @@ class LoginRepository {
   void callLoginApi(
       Map<String, dynamic> requestBody, ApiCompletionHandler completer) async {
     await APIService().callCommonPOSTApi(
-        ConstantURLs.manualLoginUrl,
+        ConstantURLs.sendOTPUrl,
         requestBody,
         isAccessTokenNeeded: false,
         completer);
