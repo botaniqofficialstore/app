@@ -1,5 +1,4 @@
 import 'package:back_button_interceptor/back_button_interceptor.dart';
-import 'package:botaniqmicrogreens/screens/Authentication/ForgotPasswordScreen/ForgotPasswordScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -122,55 +121,13 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                 },
               ),
 
-              SizedBox(height: 10.dp,),
-              objCommonWidgets.customText(
-                  context, 'Password', 16, objConstantColor.navyBlue,
-                  objConstantFonts.montserratSemiBold),
-              CommonTextField(
-                controller: loginState.passwordController,
-                placeholder: "Enter Your Password",
-                textSize: 15,
-                fontFamily: objConstantFonts.montserratMedium,
-                textColor: objConstantColor.navyBlue,
-                isNumber: false,
-                // alphabetic
-                onChanged: (value) {
-
-                },
-              ),
-
-              Row(
-                children: [
-                  const Spacer(),
-                  CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ForgotPasswordScreen()),
-                      );
-                    },
-                    child: objCommonWidgets.customText(
-                        context,
-                        'Forgot Password?',
-                        13,
-                        objConstantColor.orange,
-                        objConstantFonts.montserratSemiBold,
-                        textAlign: TextAlign.left
-                    ),
-                  ),
-                ],
-              ),
-
-
-              SizedBox(height: 5.dp,),
+              SizedBox(height: 15.dp,),
 
               SizedBox(
                 width: double.infinity,
                 child: CupertinoButton(
                   padding: EdgeInsets.symmetric(vertical: 15.dp),
-                  color: objConstantColor.navyBlue,
+                  color: objConstantColor.orange,
                   borderRadius: BorderRadius.circular(12.dp),
                   onPressed: () {
                     setState(() {
@@ -179,7 +136,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                   },
                   child: objCommonWidgets.customText(
                     context,
-                    'Login',
+                    'GET OTP',
                     18,
                     objConstantColor.white,
                     objConstantFonts.montserratSemiBold,

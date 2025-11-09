@@ -111,12 +111,6 @@ class MainScreenGlobalStateNotifier
       return const OrderSummaryScreen();
     } else if (state.currentModule == ScreenName.editProfile) {
       return const EditProfileScreen();
-    } else if (state.currentModule == ScreenName.login) {
-      return const LoginScreen();
-    } else if (state.currentModule == ScreenName.otp) {
-      return const OtpScreen();
-    } else if (state.currentModule == ScreenName.forgotPassword) {
-      return const ForgotPasswordScreen();
     } else if (state.currentModule == ScreenName.createAccount) {
       return const CreateAccountScreen();
     } else if (state.currentModule == ScreenName.orderDetails) {

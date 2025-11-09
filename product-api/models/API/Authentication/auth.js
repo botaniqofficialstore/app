@@ -12,23 +12,24 @@ const { sendEmailOTP, sendSMSOTP } = require('../../../utils/notification');
 router.post('/send-otp', async (req, res) => {
   try {
     const { emailOrMobile } = req.body;
-    if (!emailOrMobile) return res.status(400).json({ message: 'Email or mobile number is required' });
+    if (!emailOrMobile)
+      return res.status(400).json({ message: 'Email or mobile number is required' });
 
-    const user = await UserProfile.findOne({ 
-      $or: [{ email: emailOrMobile }, { mobileNumber: emailOrMobile }] 
+    const user = await UserProfile.findOne({
+      $or: [{ email: emailOrMobile }, { mobileNumber: emailOrMobile }]
     });
 
-    if (!user || !user.password)
+    // ✅ FIXED: Remove the password check
+    if (!user)
       return res.status(400).json({ message: 'User not found' });
 
     // Generate new OTP
     const { otp, expiresAt } = generateOTP();
 
-    // Store OTP (with resend count for debugging)
+    // Store OTP
     user.otp = {
       code: otp,
       expiresAt,
-      resendCount: (user.otp?.resendCount || 0)
     };
 
     await user.save();
@@ -45,6 +46,7 @@ router.post('/send-otp', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 
 //MARK:- Verify OTP (Step 2)

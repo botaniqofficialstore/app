@@ -71,6 +71,48 @@ class CodeReusability {
     }
   }
 
+
+  ///This method is used to check the string is valid mobile number
+  bool isEmail(String input) {
+    // Basic email regex
+    final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
+
+    // Check if input matches email pattern
+    if (emailRegex.hasMatch(input.trim())) {
+      return true; // It's an email
+    } else {
+      return false; // Not an email (assume mobile)
+    }
+  }
+
+///This method is used to mask the email or mobile number
+  String maskEmailOrMobile(String input) {
+    input = input.trim();
+
+    // Check if it's an email
+    final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
+    if (emailRegex.hasMatch(input)) {
+      // Email masking
+      int atIndex = input.indexOf('@');
+      if (atIndex <= 2) {
+        // If email username is too short, mask all except first char
+        return '${input[0]}${'*' * (atIndex - 1)}${input.substring(atIndex)}';
+      }
+      String visible = input.substring(atIndex - 2, input.length); // last 2 chars before @ and domain
+      String masked = '*' * (atIndex - 2);
+      return masked + visible;
+    } else {
+      // Assume mobile number masking
+      if (input.length <= 4) {
+        return '*' * (input.length - 1) + input.substring(input.length - 1);
+      }
+      String visible = input.substring(input.length - 5); // show last 5 digits
+      String masked = '*' * (input.length - visible.length);
+      return masked + visible;
+    }
+  }
+
+
   ///This function is used to check a string is valid mobile number
   ///
   ///[bool] - used to send valid or not.
