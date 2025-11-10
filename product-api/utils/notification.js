@@ -6,7 +6,7 @@ const path = require('path');
 const emailTransporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,     // smtp-relay.brevo.com
   port: process.env.EMAIL_PORT,     // 587
-  secure: false,                    // use STARTTLS, not SSL
+  secure: true,                    // use STARTTLS, not SSL
   auth: {
     user: process.env.EMAIL_USER,   // botaniqofficialstore@gmail.com
     pass: process.env.EMAIL_PASS    // your Brevo SMTP key
