@@ -4,17 +4,19 @@ const path = require('path');
 
 // ✅ Email Transporter (using Brevo SMTP)
 const emailTransporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,     // smtp-relay.brevo.com
-  port: process.env.EMAIL_PORT,     // 587
-  secure: true,                    // use STARTTLS, not SSL
+  host: process.env.EMAIL_HOST, // smtp-relay.brevo.com
+  port: process.env.EMAIL_PORT, // 587
+  secure: false, // TLS (STARTTLS), not SSL
   auth: {
-    user: process.env.EMAIL_USER,   // botaniqofficialstore@gmail.com
-    pass: process.env.EMAIL_PASS    // your Brevo SMTP key
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
   tls: {
-    rejectUnauthorized: false
-  }
+    ciphers: 'SSLv3',
+    rejectUnauthorized: false, // avoid Render’s self-signed SSL issues
+  },
 });
+
 
 // ✅ Twilio Client for SMS OTP
 const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
