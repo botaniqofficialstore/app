@@ -1,8 +1,5 @@
-// notification.js
-const axios = require('axios');
-const twilio = require('twilio');
-const path = require('path');
-const fs = require('fs');
+const axios = require("axios");
+const twilio = require("twilio");
 
 // ✅ Twilio Client (for SMS)
 const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
@@ -51,20 +48,20 @@ exports.sendEmailOTP = async (toEmail, otp) => {
       </div>
     `;
 
-    // ✅ Brevo API Request
+    // ✅ Brevo API Request (Render Safe)
     const response = await axios.post(
-      'https://api.brevo.com/v3/smtp/email',
+      "https://api.brevo.com/v3/smtp/email",
       {
-        sender: { name: 'BotaniQ', email: 'botaniqofficialstore@gmail.com' },
+        sender: { name: "BotaniQ", email: process.env.EMAIL_FROM },
         to: [{ email: toEmail }],
-        subject: 'Your OTP Code – BotaniQ Verification',
+        subject: "Your OTP Code – BotaniQ Verification",
         htmlContent: htmlTemplate,
       },
       {
         headers: {
-          'accept': 'application/json',
-          'content-type': 'application/json',
-          'api-key': process.env.BREVO_API_KEY,
+          "accept": "application/json",
+          "content-type": "application/json",
+          "api-key": process.env.BREVO_API_KEY, // ✅ must match Render environment key
         },
       }
     );
@@ -72,8 +69,8 @@ exports.sendEmailOTP = async (toEmail, otp) => {
     console.log(`[EMAIL SENT ✅] ${toEmail} → ${otp}`);
     return response.data;
   } catch (error) {
-    console.error('Send OTP Error (Email):', error.response?.data || error.message);
-    throw new Error('Failed to send OTP email');
+    console.error("Send OTP Error (Email):", error.response?.data || error.message);
+    throw new Error("Failed to send OTP email");
   }
 };
 
@@ -81,13 +78,15 @@ exports.sendEmailOTP = async (toEmail, otp) => {
 exports.sendSMSOTP = async (toNumber, otp) => {
   try {
     await twilioClient.messages.create({
-      body: `Your OTP code is ${otp}. It will expire in ${process.env.OTP_EXPIRES_MINUTES || 2} minutes.`,
+      body: `Your OTP code is ${otp}. It will expire in ${
+        process.env.OTP_EXPIRES_MINUTES || 2
+      } minutes.`,
       from: process.env.TWILIO_PHONE_NUMBER,
       to: toNumber,
     });
     console.log(`[SMS SENT ✅] ${toNumber} → ${otp}`);
   } catch (error) {
-    console.error('Send OTP Error (SMS):', error.message);
-    throw new Error('Failed to send OTP SMS');
+    console.error("Send OTP Error (SMS):", error.message);
+    throw new Error("Failed to send OTP SMS");
   }
 };
