@@ -138,19 +138,11 @@ Widget profileView(BuildContext context) {
                           color: objConstantColor.white,
                           width: 18.dp,
                         ),
-                        onPressed: () async {
-                          final pref = await PreferencesManager.getInstance();
-                          pref.setBooleanValue(PreferenceKeys.isDialogOpened, true);
+                        onPressed: () {
                           LogoutPopup.showLogoutPopup(
                             context: context,
-                            onConfirm: () async {
-                              // 🔹 Clear user session
-                              pref.removePref();
-                              pref.setBooleanValue(PreferenceKeys.isUserLogged, false);
-                              pref.setBooleanValue(PreferenceKeys.isDialogOpened, false);
-                              Navigator.pushReplacement(context,
-                                MaterialPageRoute(builder: (context) => const LoginScreen()),
-                              );
+                            onConfirm: () {
+                              screenNotifier.callLogoutAPI(context);
                             },
                           );
                         },

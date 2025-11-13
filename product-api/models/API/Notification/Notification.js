@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /* -------------------------------------------------------------------------- */
-/* 🔹 Device Register API */
+/* MARK:- Device Register API */
 /* -------------------------------------------------------------------------- */
 router.post('/notifications/register', async (req, res) => {
   try {
@@ -46,34 +46,9 @@ router.post('/notifications/register', async (req, res) => {
   }
 });
 
-/* -------------------------------------------------------------------------- */
-/* 🔹 Device Unregister API */
-/* -------------------------------------------------------------------------- */
-router.delete('/notifications/unregister', async (req, res) => {
-  try {
-    const { userId, fcmToken } = req.body;
-
-    if (!userId)
-      return res.status(400).json({ message: 'userId is required' });
-
-    const user = await UserProfile.findOne({ userId });
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
-    const query = fcmToken ? { userId, fcmToken } : { userId };
-    const deleted = await NotificationToken.deleteMany(query);
-
-    if (deleted.deletedCount > 0) {
-      res.json({ message: 'Device token(s) deleted successfully' });
-    } else {
-      res.status(404).json({ message: 'No matching tokens found' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: 'Error deleting device token', error: error.message });
-  }
-});
 
 /* -------------------------------------------------------------------------- */
-/* 🔹 Send Push Notification (Single User) */
+/* MARK:- Send Push Notification (Single User) */
 /* -------------------------------------------------------------------------- */
 router.post('/notifications/send', async (req, res) => {
   try {
@@ -111,7 +86,7 @@ router.post('/notifications/send', async (req, res) => {
 });
 
 /* -------------------------------------------------------------------------- */
-/* 🔹 Send Advertisement Notification (All Users — auto-expanded image) */
+/* MARK:- Send Advertisement Notification (All Users — auto-expanded image) */
 /* -------------------------------------------------------------------------- */
 router.post('/notifications/advertisement', upload.single('image'), async (req, res) => {
   try {

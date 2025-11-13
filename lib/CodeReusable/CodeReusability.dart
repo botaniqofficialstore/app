@@ -8,6 +8,7 @@ import 'package:flutter_platform_alert/flutter_platform_alert.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
+import '../Constants/Constants.dart';
 import '../Utility/PreferencesManager.dart';
 
 class CodeReusability {
@@ -218,6 +219,19 @@ class CodeReusability {
       print("Reverse geocoding error: $e");
       return '';
     }
+  }
+
+///This method is used to clear local variables
+  void clearLocalVariables() {
+    savedCartItems.clear();
+    savedOrderData = null;
+    savedProductDetails = null;
+    savedFooterCount = null;
+    userFrom = null;
+    exactAddress = '';
+
+    // Optional: You can log this for debugging
+    print('✅ Local saved data cleared successfully.');
   }
 
 

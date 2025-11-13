@@ -1,6 +1,13 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../CodeReusable/CodeReusability.dart';
+import '../../../../CodeReusable/CommonWidgets.dart';
 import '../../../../Utility/PreferencesManager.dart';
 import '../../../../constants/Constants.dart';
+import '../../../Authentication/LoginScreen/LoginScreen.dart';
+import 'ProfileModel.dart';
+import 'ProfileRepository.dart';
 
 class ProfileScreenGlobalState {
   final ScreenName currentModule;
@@ -68,6 +75,51 @@ class ProfileScreenGlobalStateNotifier
     final userAddress = exactAddress;
 
     state = state.copyWith(firstName: userFirstName, lastName: userLastName, email: userEmailID, mobileNumber: userMobileNumber, address: userAddress);
+  }
+
+
+  //This method is used to call user logout API
+  void callLogoutAPI(BuildContext context){
+    if (!context.mounted) return;
+    CodeReusability().isConnectedToNetwork().then((isConnected) async {
+      if (isConnected) {
+
+        CommonWidgets().showLoadingBar(true, context);
+        var prefs = await PreferencesManager.getInstance();
+        prefs.setBooleanValue(PreferenceKeys.isDialogOpened, true);
+        String userID = prefs.getStringValue(PreferenceKeys.userID) ?? '';
+        String loginID = prefs.getStringValue(PreferenceKeys.loginActivityId) ?? '';
+        String fcmToken = prefs.getStringValue(PreferenceKeys.fcmToken) ?? '';
+
+        Map<String, dynamic> requestBody = {
+          'userId': userID,
+          'loginActivityId': loginID,
+          'fcmToken': fcmToken,
+        };
+
+        ProfileRepository().callLogoutApi(requestBody, (statusCode, responseBody) async {
+          final cancelResponse = LogoutResponse.fromJson(responseBody);
+          CodeReusability().showAlert(context, cancelResponse.message ?? "something Went Wrong");
+          CommonWidgets().showLoadingBar(false, context);
+
+          if (statusCode == 200 || statusCode == 201){
+            // 🔹 Clear user session
+            prefs.removePref();
+            CodeReusability().clearLocalVariables();
+
+            prefs.setBooleanValue(PreferenceKeys.isUserLogged, false);
+            prefs.setBooleanValue(PreferenceKeys.isDialogOpened, false);
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()),
+            );
+          }else{
+            CodeReusability().showAlert(context, cancelResponse.message ?? "something Went Wrong");
+          }
+
+        });
+      } else {
+        CodeReusability().showAlert(context, 'Please Check Your Internet Connection');
+      }
+    });
   }
 
 }
