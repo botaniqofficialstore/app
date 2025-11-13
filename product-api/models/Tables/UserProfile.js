@@ -8,6 +8,7 @@ const UserProfileSchema = new mongoose.Schema({
   lastName: { type: String },
   email: { type: String, unique: true, sparse: true },
   mobileNumber: { type: String, unique: true, sparse: true },
+  address: { type: String },
   otp: {
     code: String,
     expiresAt: Date,

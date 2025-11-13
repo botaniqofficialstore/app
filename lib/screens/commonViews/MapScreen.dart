@@ -1,4 +1,3 @@
-// Updated MapScreen with reverse geocoding added
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
@@ -10,9 +9,14 @@ import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../CodeReusable/CodeReusability.dart';
 import '../../CodeReusable/CommonWidgets.dart';
-import '../../Constants/Constants.dart';
 import '../../../../constants/ConstantVariables.dart';
+import '../../Utility/Logger.dart';
+import '../../Utility/PreferencesManager.dart';
+import '../../constants/Constants.dart';
+import '../InnerScreens/ContainerScreen/EditProfileScreen/EditProfileModel.dart';
+import '../InnerScreens/ContainerScreen/EditProfileScreen/EditProfileRepository.dart';
 import '../InnerScreens/MainScreen/MainScreenState.dart';
 
 class MapScreen extends ConsumerStatefulWidget {
@@ -39,128 +43,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     super.initState();
   }
 
-  bool _isWithinAllowed(LatLng target) {
-    const earthRadius = 6371;
-    double dLat = _toRadians(target.latitude - _adminLocation.latitude);
-    double dLng = _toRadians(target.longitude - _adminLocation.longitude);
-    double a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(_toRadians(_adminLocation.latitude)) *
-            cos(_toRadians(target.latitude)) *
-            sin(dLng / 2) *
-            sin(dLng / 2);
-    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    double distance = earthRadius * c;
-    return distance <= _radiusKm;
-  }
-
-  double _toRadians(double deg) => deg * pi / 180;
-
-  void _showOutOfRangeAlert() {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Out of Delivery Range"),
-        content: const Text("Sorry, we can't deliver to this address. We will come to you soon!"),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK")),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _getAddressFromLatLng(LatLng position) async {
-    try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
-
-      if (placemarks.isNotEmpty) {
-        final place = placemarks.first;
-        setState(() {
-          final parts = [
-            place.name,
-            place.subLocality,
-            place.locality,
-            place.administrativeArea,
-            place.postalCode
-          ];
-
-          // remove null or empty values
-          final filtered = parts.where((e) => e != null && e.toString().trim().isNotEmpty).toList();
-
-          _selectedAddress = filtered.join(", ");
-        });
-      }
-    } catch (e) {
-      print("Reverse geocoding error: $e");
-    }
-  }
-
-  Future<void> _goToCurrentLocation(BuildContext context) async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      objCommonWidgets.showLocationSettingsAlert(context);
-      return;
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      await CommonWidgets().showPermissionDialog(context);
-      return;
-    }
-
-    if (permission != LocationPermission.always && permission != LocationPermission.whileInUse) {
-      return;
-    }
-
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-
-    LatLng current = LatLng(position.latitude, position.longitude);
-
-    if (!_isWithinAllowed(current)) {
-      _showOutOfRangeAlert();
-      return;
-    }
-
-    final controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newLatLngZoom(current, 15));
-
-    setState(() {
-      _selectedLocation = current;
-      _markers = {Marker(markerId: const MarkerId("current"), position: current)};
-    });
-
-    _getAddressFromLatLng(current);
-  }
-
-  void _placeSelectedMarker(LatLng pos, String? desc) {
-    setState(() {
-      _selectedLocation = pos;
-      _markers = {
-        Marker(
-          markerId: const MarkerId("selected"),
-          position: pos,
-          infoWindow: InfoWindow(title: desc ?? "Selected Location"),
-        ),
-      };
-    });
-
-    _getAddressFromLatLng(pos);
-  }
 
   @override
   Widget build(BuildContext context) {
+    final userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
+
     return Scaffold(
       backgroundColor: objConstantColor.white,
       body: Stack(
         children: [
           GoogleMap(
-            initialCameraPosition: CameraPosition(target: _adminLocation, zoom: 10),
+            initialCameraPosition: CameraPosition(target: _adminLocation, zoom: 15),
             myLocationEnabled: true,
             zoomControlsEnabled: false,
             onMapCreated: (GoogleMapController controller) {
@@ -202,7 +95,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   ),
                   child: CupertinoButton(
                     padding: EdgeInsets.zero,
-                    onPressed: () {},
+                    onPressed: () {
+                      if (userFrom == ScreenName.home){
+                        userScreenNotifier.callNavigation(ScreenName.home);
+                      }else{
+                        userScreenNotifier.callNavigation(ScreenName.editProfile);
+                      }
+                    },
                     child: Icon(Icons.arrow_back, color: objConstantColor.navyBlue, size: 24),
                   ),
                 ),
@@ -218,7 +117,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     ),
                     child: GooglePlaceAutoCompleteTextField(
                       textEditingController: _searchController,
-                      googleAPIKey: 'AIzaSyB_8QIhaq7Md4MpqnrBbdnd6r19ryjUfzg',
+                      googleAPIKey: 'AIzaSyBj448jygDcUrpUtXtmynTluoxWFbKP6Gk',
                       inputDecoration: InputDecoration(
                         hintText: "Search address",
                         border: InputBorder.none,
@@ -241,7 +140,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         _placeSelectedMarker(selected, prediction.description);
 
                         final controller = await _controller.future;
-                        controller.animateCamera(CameraUpdate.newLatLngZoom(selected, 14));
+                        controller.animateCamera(CameraUpdate.newLatLngZoom(selected, 19));
                       },
                     ),
                   ),
@@ -294,7 +193,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       SizedBox(width: 10.dp),
                       CupertinoButton(
                         padding: EdgeInsets.zero,
-                        onPressed: () {},
+                        onPressed: () {
+                          final screenNotifier = ref.read(MapScreenGlobalStateProvider.notifier);
+                          screenNotifier.callEditProfileAPI(context, userScreenNotifier, _selectedAddress, '${_selectedLocation?.latitude},${_selectedLocation?.longitude}');
+                        },
                         child: Container(
                           decoration: BoxDecoration(
                             color: objConstantColor.orange,
@@ -323,4 +225,205 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       ),
     );
   }
+
+  bool _isWithinAllowed(LatLng target) {
+    const earthRadius = 6371;
+    double dLat = _toRadians(target.latitude - _adminLocation.latitude);
+    double dLng = _toRadians(target.longitude - _adminLocation.longitude);
+    double a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(_toRadians(_adminLocation.latitude)) *
+            cos(_toRadians(target.latitude)) *
+            sin(dLng / 2) *
+            sin(dLng / 2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    double distance = earthRadius * c;
+    return distance <= _radiusKm;
+  }
+
+  double _toRadians(double deg) => deg * pi / 180;
+
+  void _showOutOfRangeAlert() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Out of Delivery Range"),
+        content: const Text("Sorry, we can't deliver to this address. We will come to you soon!"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK")),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _getAddressFromLatLng(LatLng position) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+        setState(() {
+          final parts = [
+            place.subLocality,
+            place.locality,
+            place.administrativeArea,
+            place.postalCode
+          ];
+
+          Logger().log('name:${place.name}, street:${place.street}, administrativeArea:${place.administrativeArea}, locality:${place.locality}, subLocality:${place.subLocality}, subThoroughfare:${place.subThoroughfare}');
+          Logger().log('$_selectedLocation');
+          // remove null or empty values
+          final filtered = parts.where((e) => e != null && e.toString().trim().isNotEmpty).toList();
+
+          _selectedAddress = filtered.join(", ");
+        });
+      }
+    } catch (e) {
+      print("Reverse geocoding error: $e");
+    }
+  }
+
+  Future<void> _goToCurrentLocation(BuildContext context) async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      objCommonWidgets.showLocationSettingsAlert(context);
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      await CommonWidgets().showPermissionDialog(context);
+      return;
+    }
+
+    if (permission != LocationPermission.always && permission != LocationPermission.whileInUse) {
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
+    LatLng current = LatLng(position.latitude, position.longitude);
+
+    if (!_isWithinAllowed(current)) {
+      _showOutOfRangeAlert();
+      return;
+    }
+
+    final controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newLatLngZoom(current, 19));
+
+    setState(() {
+      _selectedLocation = current;
+      _markers = {Marker(markerId: const MarkerId("current"), position: current)};
+    });
+
+    _getAddressFromLatLng(current);
+  }
+
+  void _placeSelectedMarker(LatLng pos, String? desc) {
+    setState(() {
+      _selectedLocation = pos;
+      _markers = {
+        Marker(
+          markerId: const MarkerId("selected"),
+          position: pos,
+          infoWindow: InfoWindow(title: desc ?? "Selected Location"),
+        ),
+      };
+    });
+
+    _getAddressFromLatLng(pos);
+  }
 }
+
+
+//Map Screen State
+class MapScreenGlobalState {
+  final ScreenName currentModule;
+
+  MapScreenGlobalState({
+    this.currentModule = ScreenName.home,
+  });
+
+  MapScreenGlobalState copyWith({
+    ScreenName? currentModule,
+  }) {
+    return MapScreenGlobalState(
+      currentModule: currentModule ?? this.currentModule,
+    );
+  }
+}
+
+class MapScreenGlobalStateNotifier extends StateNotifier<MapScreenGlobalState> {
+  MapScreenGlobalStateNotifier() : super(MapScreenGlobalState());
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+
+  ///This method used to call Edit Profile PUT API
+  void callEditProfileAPI(BuildContext context, MainScreenGlobalStateNotifier notifier, String address, String latLon) {
+    if (!context.mounted) return;
+
+    CodeReusability().isConnectedToNetwork().then((isConnected) async {
+      if (isConnected) {
+
+        Map<String, dynamic> requestBody = {
+          'address' : latLon
+        };
+
+        final manager = await PreferencesManager.getInstance();
+        String? userID = manager.getStringValue(PreferenceKeys.userID);
+        String url = '${ConstantURLs.updateCustomerUrl}$userID';
+
+        CommonWidgets().showLoadingBar(true, context); //  Loading bar is Enabled Here
+        EditProfileRepository().callEditProfileApi(url, requestBody, (statusCode, responseBody) async {
+          EditProfileResponse response = EditProfileResponse.fromJson(responseBody);
+
+          if (statusCode == 200 || statusCode == 201) {
+            exactAddress = address;
+            var prefs = await PreferencesManager.getInstance();
+            prefs.setStringValue(PreferenceKeys.userAddress, requestBody['address']);
+            CommonWidgets().showLoadingBar(false, context); //  Loading bar is disabled Here
+            callNavigation(context, notifier);
+          } else {
+            CommonWidgets().showLoadingBar(false, context);
+            CodeReusability().showAlert(context, response.message ?? "something Went Wrong");
+          }
+        });
+
+
+      } else {
+        CodeReusability().showAlert(
+            context, 'Please Check Your Internet Connection');
+      }
+    });
+
+  }
+
+  void callNavigation(BuildContext context, MainScreenGlobalStateNotifier notifier){
+    CodeReusability().showAlert(context, 'Delivery location updated successfully');
+    if (userFrom == ScreenName.home){
+      notifier.callNavigation(ScreenName.home);
+    }else{
+      notifier.callNavigation(ScreenName.editProfile);
+    }
+  }
+
+
+}
+
+
+final MapScreenGlobalStateProvider = StateNotifierProvider.autoDispose<
+    MapScreenGlobalStateNotifier, MapScreenGlobalState>((ref) {
+  var notifier = MapScreenGlobalStateNotifier();
+  return notifier;
+});

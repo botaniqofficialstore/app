@@ -69,6 +69,13 @@ class _SplashScreenState extends State<SplashScreen>
     PreferencesManager.getInstance().then((pref) async {
       bool isLoggedIn = pref.getBooleanValue(PreferenceKeys.isUserLogged);
 
+
+      /*pref.setStringValue(PreferenceKeys.userID, 'USER-1762509292801');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainScreen()),
+      );*/
+
       if (isLoggedIn){
         Navigator.pushReplacement(
           context,

@@ -133,13 +133,14 @@ class MainScreenGlobalStateNotifier
         module == ScreenName.orders ||
         module == ScreenName.profile ||
         module == ScreenName.productDetail ||
-        module == ScreenName.wishList ||
-        module == ScreenName.login) {
+        module == ScreenName.wishList ) {
       onScreen = ScreenName.home;
     } else if (module == ScreenName.editProfile) {
       onScreen = ScreenName.profile;
     } else if (module == ScreenName.orderSummary) {
       onScreen = ScreenName.cart;
+    } else if (module == ScreenName.orderDetails) {
+      onScreen = ScreenName.orders;
     }
 
     state = state.copyWith(currentModule: onScreen);

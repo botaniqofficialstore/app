@@ -1,3 +1,5 @@
+// OrderScreenState.dart
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../CodeReusable/CodeReusability.dart';
@@ -14,6 +16,7 @@ class OrderScreenGlobalState {
   final int currentPage;
   final bool isLoading;
   final bool hasMore;
+  final bool isInitialLoad; // 👈 new flag
   final List<OrderDataList> orderList;
 
   OrderScreenGlobalState({
@@ -21,6 +24,7 @@ class OrderScreenGlobalState {
     this.currentPage = 0,
     this.isLoading = false,
     this.hasMore = true,
+    this.isInitialLoad = true, // 👈 start true so shimmer shows immediately
     this.orderList = const [],
   });
 
@@ -29,6 +33,7 @@ class OrderScreenGlobalState {
     int? currentPage,
     bool? isLoading,
     bool? hasMore,
+    bool? isInitialLoad,
     List<OrderDataList>? orderList,
   }) {
     return OrderScreenGlobalState(
@@ -36,33 +41,33 @@ class OrderScreenGlobalState {
       currentPage: currentPage ?? this.currentPage,
       isLoading: isLoading ?? this.isLoading,
       hasMore: hasMore ?? this.hasMore,
+      isInitialLoad: isInitialLoad ?? this.isInitialLoad,
       orderList: orderList ?? this.orderList,
     );
   }
 }
 
-
 class OrderScreenGlobalStateNotifier
     extends StateNotifier<OrderScreenGlobalState> {
   OrderScreenGlobalStateNotifier() : super(OrderScreenGlobalState());
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  static const Duration _repoCallbackTimeout = Duration(seconds: 8);
 
-  void callNavigateToTrackOrder(MainScreenGlobalStateNotifier notifier){
+  void callNavigateToTrackOrder(MainScreenGlobalStateNotifier notifier) {
     notifier.callNavigation(ScreenName.orderDetails);
   }
 
-
-  /// This method is used to get Product List from GET API
   Future<void> callOrderListGepAPI(BuildContext context, {bool loadMore = false}) async {
-    if (state.isLoading || (!state.hasMore && loadMore)) return;
+    // Skip if already loading or no more data
+    if (state.isLoading || (!state.hasMore && loadMore)) {
+      Logger().log('callOrderListGepAPI skipped: isLoading=${state.isLoading}, hasMore=${state.hasMore}, loadMore=$loadMore');
+      return;
+    }
 
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, isInitialLoad: false); // 👈 mark initial load done
+    Logger().log('callOrderListGepAPI started (loadMore=$loadMore)');
+
     bool isConnected = await CodeReusability().isConnectedToNetwork();
-
     if (!isConnected) {
       CodeReusability().showAlert(context, 'Please Check Your Internet Connection');
       state = state.copyWith(isLoading: false);
@@ -71,6 +76,9 @@ class OrderScreenGlobalStateNotifier
 
     if (!loadMore) CommonWidgets().showLoadingBar(true, context);
 
+    Timer? fallbackTimer;
+    bool callbackInvoked = false;
+
     try {
       var prefs = await PreferencesManager.getInstance();
       String userID = prefs.getStringValue(PreferenceKeys.userID) ?? '';
@@ -78,45 +86,54 @@ class OrderScreenGlobalStateNotifier
       int nextPage = loadMore ? state.currentPage + 1 : 1;
       String url = '${ConstantURLs.orderListUrl}userId=$userID&page=$nextPage&limit=10';
 
-      await OrderListRepository().callOrderListGETApi(url, (statusCode, response) async {
-        final orderResponse = OrdersResponse.fromJson(response);
-
-        if (statusCode == 200) {
-          Logger().log('###---> Order List API Response Page $nextPage: $response');
-          Logger().log('###---> orderResponse data length: ${orderResponse.data?.length ?? 0}');
-
-          List<OrderDataList> updatedList = loadMore
-              ? [...state.orderList, ...orderResponse.data]
-              : orderResponse.data;
-
-          state = state.copyWith(
-            orderList: updatedList,
-            currentPage: nextPage,
-            hasMore: orderResponse.data.isNotEmpty,
-          );
-        } else {
-          CodeReusability().showAlert(context, orderResponse.message);
+      fallbackTimer = Timer(_repoCallbackTimeout, () {
+        if (!callbackInvoked) {
+          Logger().log('OrderListRepository callback TIMEOUT after ${_repoCallbackTimeout.inSeconds}s');
+          state = state.copyWith(isLoading: false);
+          CommonWidgets().showLoadingBar(false, context);
         }
       });
 
+      OrderListRepository().callOrderListGETApi(url, (statusCode, response) async {
+        callbackInvoked = true;
+        fallbackTimer?.cancel();
 
-    } catch (e) {
-      Logger().log("### Error in callOrderListGepAPI: $e");
-    } finally {
+        try {
+          final orderResponse = OrdersResponse.fromJson(response);
+          if (statusCode == 200) {
+            Logger().log('✅ Order List API Response Page $nextPage: ${orderResponse.data?.length ?? 0} items');
+
+            List<OrderDataList> updatedList = loadMore
+                ? [...state.orderList, ...orderResponse.data]
+                : orderResponse.data;
+
+            state = state.copyWith(
+              orderList: updatedList,
+              currentPage: nextPage,
+              hasMore: orderResponse.data.isNotEmpty,
+              isLoading: false,
+            );
+          } else {
+            Logger().log('❌ Non-200 response: $statusCode, message: ${orderResponse.message}');
+            CodeReusability().showAlert(context, orderResponse.message ?? "Something went wrong");
+            state = state.copyWith(isLoading: false);
+          }
+        } catch (e, st) {
+          Logger().log('⚠️ Error parsing OrderList response: $e\n$st');
+          state = state.copyWith(isLoading: false);
+        } finally {
+          CommonWidgets().showLoadingBar(false, context);
+        }
+      });
+    } catch (e, st) {
+      Logger().log('Exception in callOrderListGepAPI: $e\n$st');
       state = state.copyWith(isLoading: false);
-      if (!loadMore) CommonWidgets().showLoadingBar(false, context);
+      CommonWidgets().showLoadingBar(false, context);
+      fallbackTimer?.cancel();
     }
   }
-
-
-
 }
 
-
-
-final OrderScreenGlobalStateProvider = StateNotifierProvider.autoDispose<
-    OrderScreenGlobalStateNotifier, OrderScreenGlobalState>((ref) {
-  var notifier = OrderScreenGlobalStateNotifier();
-  return notifier;
-});
-
+final OrderScreenGlobalStateProvider =
+StateNotifierProvider.autoDispose<OrderScreenGlobalStateNotifier, OrderScreenGlobalState>(
+        (ref) => OrderScreenGlobalStateNotifier());

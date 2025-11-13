@@ -5,7 +5,7 @@ import '../screens/InnerScreens/ContainerScreen/OrderScreen/OrderModel.dart';
 
 //MARK: - Class Declarations
 class ConstantURLs {
-  static String baseUrl = 'https://app-1q5g.onrender.com'; //'http://192.168.43.216:5000'; //Local
+  static String baseUrl = 'http://192.168.43.216:5000'; //'https://app-1q5g.onrender.com'; //
 
   ///Authentication API URL's
   static String manualLoginUrl = "$baseUrl/api/login";
@@ -50,6 +50,10 @@ class ConstantURLs {
   ///Notification API URL
   static String deviceRegisterUrl = "$baseUrl/api/notifications/register";
   static String deviceUnregisterUrl = "$baseUrl/api/notifications/unregister";
+
+  ///Reels API URL
+  static String reelListUrl = '$baseUrl/api/reels/list';
+  static String reelLikeDislikeUrl = '$baseUrl/api/reels/like';
 
 
 }
@@ -101,6 +105,8 @@ List<CartItem> savedCartItems = [];
 OrderDataList? savedOrderData ;
 ProductDetailStatus? savedProductDetails;
 FooterCount ? savedFooterCount;
+ScreenName? userFrom;
+String exactAddress = '';
 
 
 //This Class is used to save Footer Count

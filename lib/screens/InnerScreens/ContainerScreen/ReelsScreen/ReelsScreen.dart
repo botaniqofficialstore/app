@@ -1,144 +1,226 @@
-import 'package:botaniqmicrogreens/constants/ConstantVariables.dart';
+import 'package:botaniqmicrogreens/Utility/Logger.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import 'package:video_player/video_player.dart';
+import '../../../../constants/ConstantVariables.dart';
+import '../../MainScreen/MainScreenState.dart';
+import 'ReelsModel.dart';
+import 'ReelsScreenState.dart';
+import '../../../../constants/Constants.dart';
 
-class ReelsScreen extends StatefulWidget {
+class ReelsScreen extends ConsumerStatefulWidget {
   const ReelsScreen({super.key});
 
   @override
-  State<ReelsScreen> createState() => _ReelsScreenState();
+  ReelsScreenState createState() => ReelsScreenState();
 }
 
-class _ReelsScreenState extends State<ReelsScreen>
+class ReelsScreenState extends ConsumerState<ReelsScreen>
     with SingleTickerProviderStateMixin {
   final PageController _pageController = PageController();
-
-  final List<String> reelsList = [
-    'https://res.cloudinary.com/dya1uuvah/video/upload/v1761138814/SnapInsta.to_AQMEqax1BBYme00g3Oilz6OfR0yauZcg-De76JVzGfzhmzXRoZzpvhqWGy9K_E3xI97wW83cKGrBgwSdEvCET5J5mIXr1BG9hE_Xh2o_ijsj79.mp4',
-    'https://res.cloudinary.com/dya1uuvah/video/upload/v1761138796/SnapInsta.to_AQPS9ds3-4d7WKpasvRKYAHJObMfSH_JHyDeW6Wc-34qzL93DNU1wfHMlRRpLfzby1xJJQAkC4NYxpvM85aOhiuPnBTbkftYD-lQVl4_vmt7cu.mp4',
-    'https://res.cloudinary.com/dya1uuvah/video/upload/v1761138792/SnapInsta.to_AQPyfoGS1yuPyVbgftcFiEHrg2aFc7cshSiKFe7EGn5CSKQLof-bMsm6z6nz8S3I6_zpCImPmcz17fkTSzC2xu0MtSz55Cc2sLkHE80_ounszk.mp4',
-    'https://res.cloudinary.com/dya1uuvah/video/upload/v1761138771/SnapInsta.to_AQPoGLAnqAl2aiYcWV_24tGgowtylD81l-utzuMmDIslGla8v3pCXJLmN3BnC_UuEXMTKbA1P-HZ-jlF8Qr3_F_Ga08syvLGZn7C0jI_isfnyr.mp4',
-    'https://res.cloudinary.com/dya1uuvah/video/upload/v1761138747/SnapInsta.to_AQPpZtQ7bKg2koYcilH1vUqdqu5SwE7yvrylBWK8QzvIbmCiLG567CIxzNVOEULRje8Kj6Bus4YQbEj7QQVrWSM5ACi6pcjIQS3mAFo_xukvql.mp4',
-    'https://res.cloudinary.com/dya1uuvah/video/upload/v1761138739/SnapInsta.to_AQOk0IcWRqTl3u_vSeoqrHhbOhFDG_WpWHNoATsWYJmT0eSgMMIBzo1UuQwBZuLRm5FDM4HWWPLkDNOFwTyH6AVBD8cdPEF7MXa6N3c_eeuhe1.mp4',
-    'https://res.cloudinary.com/dya1uuvah/video/upload/v1761138720/SnapInsta.to_AQOts8468lXOl27PrNJoK9VtNUvn-YVjowfVqJB6kfo1zFOGRqkU6ZUoFHufRpNkN2yNV8f4gaHu0-50iVane1jCO-wCX-zYlhwrNq0_yvbkyd.mp4',
-    'https://res.cloudinary.com/dya1uuvah/video/upload/v1761138705/SnapInsta.to_AQNNFZPoa4YLTl7YB-S1one5dPHJL7Q-wcEVUwou_yQsiEQuUFcd844X8M2d46p1_eRdj5NBQ1ZZJoPityhT_7zp34XBT-JhohFVFO0_qg1ibq.mp4',
-  ];
-
-  final List<VideoPlayerController> _controllers = [];
+  final Map<int, VideoPlayerController> _videoControllers = {};
   late AnimationController _likeAnimationController;
   late Animation<double> _likeAnimation;
+
   bool _showLike = false;
-  Offset? _tapPosition;
+  bool _heartAtCenter = false;
   bool _showReelsText = true;
-
-
+  bool _isPaginating = false;
+  bool _initialReelsLoaded = false; // ✅ New flag for fast-first-load
+  Offset? _tapPosition;
+  final Set<int> _expandedCaptions = {};
 
   @override
   void initState() {
     super.initState();
 
-    // Init all controllers
-    for (var url in reelsList) {
-      final controller = VideoPlayerController.network(url)
-        ..initialize().then((_) {
-          setState(() {});
-        });
-      _controllers.add(controller);
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(ReelsGlobalStateProvider.notifier).callReelsListAPI(context);
+    });
 
-    // Autoplay first video
-    if (_controllers.isNotEmpty) {
-      _controllers[0].play();
-      _controllers[0].setLooping(true);
-    }
-
-    // Heart animation
     _likeAnimationController = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
     _likeAnimation = Tween<double>(begin: 0.5, end: 1.5).animate(
-      CurvedAnimation(
-        parent: _likeAnimationController,
-        curve: Curves.elasticOut,
-      ),
+      CurvedAnimation(parent: _likeAnimationController, curve: Curves.elasticOut),
     );
   }
 
-
-
   @override
   void dispose() {
-    for (var c in _controllers) {
-      c.dispose();
+    for (var controller in _videoControllers.values) {
+      controller.dispose();
     }
     _pageController.dispose();
     _likeAnimationController.dispose();
     super.dispose();
   }
 
-  void _onSingleTap(VideoPlayerController controller) {
+  // ✅ Optimized video initialization (avoids duplicate loads)
+  Future<void> _initializeVideo(int index, String url) async {
+    if (_videoControllers.containsKey(index)) return;
+    try {
+      final controller = VideoPlayerController.networkUrl(Uri.parse(url));
+      await controller.initialize();
+      controller.setLooping(true);
+      _videoControllers[index] = controller;
+      if (mounted) setState(() {});
+    } catch (e) {
+      Logger().log("⚠️ Video init failed at index $index: $e");
+    }
+  }
+
+  // ✅ Preload first and next reel immediately after API data ready
+  void _initializeFirstReels(List<ReelData> reels) async {
+    if (_initialReelsLoaded || reels.isEmpty) return;
+    _initialReelsLoaded = true;
+
+    await _initializeVideo(0, reels[0].reelUrl);
+    _videoControllers[0]?.play();
+
+    // Preload next quietly
+    if (reels.length > 1) {
+      _initializeVideo(1, reels[1].reelUrl);
+    }
+  }
+
+  // ✅ Smooth page change handler
+  void _onPageChanged(int index, List<ReelData> reels) {
+    Logger().log('### Page changed to $index / total ${reels.length}');
+
+    // Pause all videos
+    for (var c in _videoControllers.values) {
+      c.pause();
+    }
+
+    // Play current
+    if (_videoControllers[index] != null) {
+      _videoControllers[index]?.play();
+    } else {
+      _initializeVideo(index, reels[index].reelUrl).then((_) {
+        _videoControllers[index]?.play();
+      });
+    }
+
+    // Preload next
+    if (index + 1 < reels.length) {
+      _initializeVideo(index + 1, reels[index + 1].reelUrl);
+    }
+
+    // ✅ Pagination trigger (only once per scroll)
+    if (!_isPaginating &&
+        index >= reels.length - 2 &&
+        ref.watch(ReelsGlobalStateProvider).hasMore) {
+      Logger().log('### Triggering pagination for next page...');
+      _isPaginating = true;
+      ref
+          .read(ReelsGlobalStateProvider.notifier)
+          .callReelsListAPI(context, loadMore: true)
+          .then((_) {
+        _isPaginating = false;
+      });
+    }
+
     setState(() {
-      if (controller.value.isPlaying) {
-        controller.pause();
-      } else {
-        controller.play();
-      }
+      _showReelsText = index == 0;
     });
   }
 
-  void _onDoubleTap({bool fromButton = false}) {
+  // ❤️ Like handling
+  void _handleLikeAction(ReelData reel, int index, {required bool fromButton}) {
+    final isLiked = reel.isLikedByUser;
+
+    if (fromButton) {
+      if (!isLiked) {
+        _showHeartAnimation(center: true);
+        ref
+            .read(ReelsGlobalStateProvider.notifier)
+            .callReelLikeAPI(context, reel.reelId, true, index);
+      } else {
+        ref
+            .read(ReelsGlobalStateProvider.notifier)
+            .callReelLikeAPI(context, reel.reelId, false, index);
+      }
+      return;
+    }
+
+    if (!isLiked) {
+      _showHeartAnimation(center: false);
+      ref
+          .read(ReelsGlobalStateProvider.notifier)
+          .callReelLikeAPI(context, reel.reelId, true, index);
+    } else {
+      _showHeartAnimation(center: false);
+    }
+  }
+
+  void _showHeartAnimation({required bool center}) {
     setState(() {
       _showLike = true;
-      if (fromButton) {
-        _tapPosition = null; // 👈 force center if from button
-      }
+      _heartAtCenter = center;
+      if (center) _tapPosition = null;
     });
 
     _likeAnimationController.forward(from: 0).then((_) {
       Future.delayed(const Duration(milliseconds: 400), () {
-        if (mounted) setState(() => _showLike = false);
+        if (mounted) {
+          setState(() {
+            _showLike = false;
+            _heartAtCenter = false;
+          });
+        }
       });
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(ReelsGlobalStateProvider);
+    final reels = state.reelsList;
+
+    // ✅ Initialize first and next reels after API load
+    if (reels.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _initializeFirstReels(reels);
+      });
+    }
+
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: PageView.builder(
+      backgroundColor: Colors.white,
+      body: state.isLoading && reels.isEmpty
+          ? Center(child: CircularProgressIndicator(color: objConstantColor.navyBlue))
+          : PageView.builder(
         controller: _pageController,
         scrollDirection: Axis.vertical,
-        itemCount: reelsList.length,
-        onPageChanged: (index) {
-          for (var c in _controllers) {
-            c.pause();
-          }
-          _controllers[index].play();
-          _controllers[index].setLooping(true);
-
-          // 👇 Hide the text after leaving first reel
-          setState(() {
-            _showReelsText = index == 0;
-          });
+        itemCount: reels.length,
+        onPageChanged: (i) {
+          if (i < reels.length) _onPageChanged(i, reels);
         },
         itemBuilder: (context, index) {
-          final controller = _controllers[index];
+          final reel = reels[index];
+          final controller = _videoControllers[index];
+
+          if (controller == null || !controller.value.isInitialized) {
+            return Center(
+              child: CircularProgressIndicator(color: objConstantColor.navyBlue),
+            );
+          }
 
           return GestureDetector(
-            onTap: () => _onSingleTap(controller),
-            onDoubleTap: _onDoubleTap,
-            onDoubleTapDown: (details) { // 👈 capture where double tap happened
+            behavior: HitTestBehavior.translucent,
+            onDoubleTapDown: (details) {
               _tapPosition = details.localPosition;
+            },
+            onDoubleTap: () {
+              _handleLikeAction(reel, index, fromButton: false);
             },
             child: Stack(
               children: [
-                // Background video
-                controller.value.isInitialized
-                    ? SizedBox.expand(
+                // 🎥 Video player
+                SizedBox.expand(
                   child: FittedBox(
                     fit: BoxFit.cover,
                     child: SizedBox(
@@ -147,22 +229,13 @@ class _ReelsScreenState extends State<ReelsScreen>
                       child: VideoPlayer(controller),
                     ),
                   ),
-                )
-                    : const Center(child: CircularProgressIndicator()),
+                ),
 
-                // Heart animation on double tap
+                // ❤️ Heart animation
                 if (_showLike)
-                  Positioned(
-                    left: _tapPosition?.dx != null
-                        ? _tapPosition!.dx - 40
-                        : null,
-                    // adjust offset
-                    top: _tapPosition?.dy != null
-                        ? _tapPosition!.dy - 40
-                        : null,
-                    right: _tapPosition == null ? 0 : null,
-                    bottom: _tapPosition == null ? 0 : null,
-                    child: Center( // only centers when from button
+                  (_heartAtCenter
+                      ? Positioned.fill(
+                    child: Center(
                       child: ScaleTransition(
                         scale: _likeAnimation,
                         child: ShaderMask(
@@ -180,33 +253,95 @@ class _ReelsScreenState extends State<ReelsScreen>
                         ),
                       ),
                     ),
-                  ),
-
-
-                // 'Reels' Text Animation (top-left)
-                AnimatedPositioned(
-                  duration: const Duration(milliseconds: 600),
-                  curve: Curves.easeInOut,
-                  top: _showReelsText ? 15.dp : -50.dp, // 👈 moves up to hide
-                  left: 15.dp,
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 500),
-                    opacity: _showReelsText ? 1 : 0, // 👈 fades out smoothly
-                    child: Text(
-                      'Reels',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 35.dp,
-                        fontFamily: objConstantFonts.montserratSemiBold,
-                        letterSpacing: 1,
+                  )
+                      : (_tapPosition != null
+                      ? Positioned(
+                    left: _tapPosition!.dx - 40,
+                    top: _tapPosition!.dy - 40,
+                    child: ScaleTransition(
+                      scale: _likeAnimation,
+                      child: ShaderMask(
+                        shaderCallback: (bounds) =>
+                            const LinearGradient(
+                              colors: [Colors.red, Colors.orange],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ).createShader(bounds),
+                        child: Icon(
+                          Icons.favorite,
+                          size: 80.dp,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
+                  )
+                      : Positioned.fill(
+                    child: Center(
+                      child: ScaleTransition(
+                        scale: _likeAnimation,
+                        child: ShaderMask(
+                          shaderCallback: (bounds) =>
+                              const LinearGradient(
+                                colors: [Colors.red, Colors.orange],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ).createShader(bounds),
+                          child: Icon(
+                            Icons.favorite,
+                            size: 80.dp,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ))),
+
+                // 🔹 Reels header
+                Positioned(
+                  top: 10.dp,
+                  left: _showReelsText ? 15.dp : 0.dp,
+                  child: Row(
+                    children: [
+                      if (!_showReelsText)
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          borderRadius: BorderRadius.circular(30),
+                          child: Image.asset(
+                            objConstantAssest.backIcon,
+                            color: objConstantColor.white,
+                            width: 25.dp,
+                          ),
+                          onPressed: () {
+                            ref
+                                .watch(MainScreenGlobalStateProvider.notifier)
+                                .callNavigation(ScreenName.home);
+                          },
+                        ),
+                      AnimatedPositioned(
+                        duration: const Duration(milliseconds: 600),
+                        curve: Curves.easeInOut,
+                        top: _showReelsText ? 15.dp : -50.dp,
+                        left: 15.dp,
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 500),
+                          opacity: _showReelsText ? 1 : 0,
+                          child: Text(
+                            'Reels',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 35.dp,
+                              fontFamily:
+                              objConstantFonts.montserratSemiBold,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
-
-
-                // Like & Share buttons
+                // 👉 Right side buttons (like/share)
                 Positioned(
                   right: 10,
                   bottom: 85,
@@ -216,15 +351,17 @@ class _ReelsScreenState extends State<ReelsScreen>
                       CupertinoButton(
                         padding: EdgeInsets.zero,
                         child: Image.asset(
-                          objConstantAssest.heartIcon,
+                          reel.isLikedByUser
+                              ? objConstantAssest.likedIcon
+                              : objConstantAssest.disLikedIcon,
                           width: 25.dp,
                         ),
                         onPressed: () {
-                          _onDoubleTap();
+                          _handleLikeAction(reel, index, fromButton: true);
                         },
                       ),
                       customeText(
-                        '1.2k',
+                        '${reel.totalLikes}',
                         13,
                         objConstantColor.white,
                         objConstantFonts.montserratSemiBold,
@@ -236,35 +373,17 @@ class _ReelsScreenState extends State<ReelsScreen>
                           objConstantAssest.shareIcon,
                           width: 25.dp,
                         ),
-                        onPressed: () {},
-                      ),
-                      customeText(
-                        '786',
-                        13,
-                        objConstantColor.white,
-                        objConstantFonts.montserratSemiBold,
-                      ),
-
-                      SizedBox(height: 15.dp),
-                      CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        child: Image.asset(
-                          objConstantAssest.chatIcon,
-                          width: 25.dp,
-                        ),
-                        onPressed: () {},
-                      ),
-                      customeText(
-                        '152',
-                        13,
-                        objConstantColor.white,
-                        objConstantFonts.montserratSemiBold,
+                        onPressed: () {
+                          ref
+                              .read(ReelsGlobalStateProvider.notifier)
+                              .shareReel(context, reel);
+                        },
                       ),
                     ],
                   ),
                 ),
 
-                // Profile bottom-left
+                // 👤 Profile & caption
                 Positioned(
                   left: 15,
                   bottom: 25,
@@ -279,25 +398,77 @@ class _ReelsScreenState extends State<ReelsScreen>
                         child: ClipOval(
                           child: Image.asset(
                             objConstantAssest.logo,
-                            width: 35.dp,
-                            height: 35.dp,
+                            width: 37.dp,
+                            height: 37.dp,
                             fit: BoxFit.fill,
                           ),
                         ),
                       ),
                       SizedBox(width: 10.dp),
-                      customeText(
-                        'BotaniQ',
-                        14,
-                        objConstantColor.white,
-                        objConstantFonts.montserratMedium,
-                      ),
-                      SizedBox(width: 2.dp),
-                      Image.asset(
-                        objConstantAssest.verifiedIcon,
-                        width: 15.dp,
-                        height: 15.dp,
-                        fit: BoxFit.fill,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              customeText(
+                                'BotaniQ',
+                                14,
+                                objConstantColor.white,
+                                objConstantFonts.montserratSemiBold,
+                              ),
+                              SizedBox(width: 2.dp),
+                              Image.asset(
+                                objConstantAssest.verifiedIcon,
+                                width: 15.dp,
+                                height: 15.dp,
+                                fit: BoxFit.fill,
+                              ),
+                            ],
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                if (_expandedCaptions.contains(index)) {
+                                  _expandedCaptions.remove(index);
+                                } else {
+                                  _expandedCaptions.add(index);
+                                }
+                              });
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              width: 65.w,
+                              constraints: const BoxConstraints(
+                                minHeight: 0,
+                                maxHeight: double.infinity,
+                              ),
+                              child: AnimatedSize(
+                                duration:
+                                const Duration(milliseconds: 250),
+                                curve: Curves.easeInOut,
+                                child: Text(
+                                  reel.caption,
+                                  softWrap: true,
+                                  overflow:
+                                  _expandedCaptions.contains(index)
+                                      ? TextOverflow.visible
+                                      : TextOverflow.ellipsis,
+                                  maxLines:
+                                  _expandedCaptions.contains(index)
+                                      ? null
+                                      : 1,
+                                  style: TextStyle(
+                                    color: objConstantColor.white,
+                                    fontSize: 12.dp,
+                                    fontFamily: objConstantFonts
+                                        .montserratMedium,
+                                    height: 1.3,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

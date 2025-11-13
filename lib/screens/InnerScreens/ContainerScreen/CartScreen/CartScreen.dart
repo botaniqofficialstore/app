@@ -1,4 +1,4 @@
-import 'package:dotted_line/dotted_line.dart';
+// CartScreen.dart
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,7 +21,6 @@ class CartScreen extends ConsumerStatefulWidget {
 class CartScreenState extends ConsumerState<CartScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-
   @override
   void initState() {
     super.initState();
@@ -43,47 +42,49 @@ class CartScreenState extends ConsumerState<CartScreen> {
       backgroundColor: objConstantColor.white,
       body: RefreshIndicator(
         onRefresh: () async {
-      await cartScreenNotifier.callCartListGepAPI(context);
-    },
-    color: objConstantColor.navyBlue,
-    backgroundColor: objConstantColor.white,
-    child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+          await cartScreenNotifier.callCartListGepAPI(context);
+        },
+        color: objConstantColor.navyBlue,
+        backgroundColor: objConstantColor.white,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
 
-          /// Header
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: objConstantColor.white,
-              boxShadow: const [
-                BoxShadow(
-                    color: Colors.black12, blurRadius: 8, spreadRadius: 1),
-              ],
-            ),
-            child: Padding(
-              padding: EdgeInsets.only(left: 2.dp, top: 5.dp, bottom: 5.dp),
-              child: Row(
-                children: [
-                  CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      child: Image.asset(objConstantAssest.backIcon, width: 25.dp,), onPressed: (){
-                    userScreenNotifier.callNavigation(ScreenName.home);
-                  }),
-                  customeText(
-                    'My Cart',
-                    23,
-                    objConstantColor.navyBlue,
-                    ConstantAssests.montserratBold,
-                  ),
+            /// Header
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: objConstantColor.white,
+                boxShadow: const [
+                  BoxShadow(
+                      color: Colors.black12, blurRadius: 8, spreadRadius: 1),
                 ],
               ),
+              child: Padding(
+                padding: EdgeInsets.only(left: 2.dp, top: 5.dp, bottom: 5.dp),
+                child: Row(
+                  children: [
+                    CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        child: Image.asset(objConstantAssest.backIcon, width: 25.dp,), onPressed: (){
+                      userScreenNotifier.callNavigation(ScreenName.home);
+                    }),
+                    customeText(
+                      'My Cart',
+                      23,
+                      objConstantColor.navyBlue,
+                      ConstantAssests.montserratBold,
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
 
-          /// Scroll content
-          Expanded(
-            child: Scrollbar(
+            /// Scroll content (shimmer while loading, else real content)
+            Expanded(
+              child: userScreenState.isLoading
+                  ? _buildShimmerPlaceholder() // show shimmer while loading
+                  : Scrollbar(
                 thumbVisibility: true,
                 thickness: 6,
                 radius: Radius.circular(10.dp),
@@ -103,6 +104,7 @@ class CartScreenState extends ConsumerState<CartScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Image.asset(objConstantAssest.emptyCartIcon, width: 70.dp),
+                                  SizedBox(height: 10.dp),
                                   Text(
                                     "Your cart is empty.",
                                     style: TextStyle(
@@ -140,14 +142,15 @@ class CartScreenState extends ConsumerState<CartScreen> {
                                 final details = item.productDetails!;
 
                                 return cell(
-                                  index,
-                                  details.productName,
-                                  details.productSellingPrice.toString(),
-                                  details.productPrice.toString(),
-                                  '${details.gram} gm',
-                                  item.productCount,
-                                  details.image, cartScreenNotifier,
-                                  details.productId
+                                    index,
+                                    details.productName,
+                                    details.productSellingPrice.toString(),
+                                    details.productPrice.toString(),
+                                    '${details.gram} gm',
+                                    item.productCount,
+                                    details.image,
+                                    cartScreenNotifier,
+                                    details.productId
                                 );
                               },
                             ),
@@ -171,78 +174,78 @@ class CartScreenState extends ConsumerState<CartScreen> {
               ),
             ),
 
-          /// Checkout
-          if(cartItems.isNotEmpty)
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: objConstantColor.white,
-              boxShadow: const [
-                BoxShadow(
-                    color: Colors.black12, blurRadius: 8, spreadRadius: 1),
-              ],
-            ),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(20.dp, 20.dp, 20.dp, 20.dp),
-              child: Row(
-                children: [
-
-                  Column(
+            /// Checkout (only when not loading and cart is not empty)
+            if (!userScreenState.isLoading && cartItems.isNotEmpty)
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: objConstantColor.white,
+                  boxShadow: const [
+                    BoxShadow(
+                        color: Colors.black12, blurRadius: 8, spreadRadius: 1),
+                  ],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(20.dp, 20.dp, 20.dp, 20.dp),
+                  child: Row(
                     children: [
-                      customeText(
-                        '₹${userScreenState.totalPayableAmount}/_',
-                        20,
-                        objConstantColor.navyBlue,
-                        ConstantAssests.montserratBold,
+
+                      Column(
+                        children: [
+                          customeText(
+                            '₹${userScreenState.totalPayableAmount}/_',
+                            20,
+                            objConstantColor.navyBlue,
+                            ConstantAssests.montserratBold,
+                          ),
+                          customeText(
+                            'Inc. of all taxes',
+                            10,
+                            objConstantColor.navyBlue,
+                            ConstantAssests.montserratMedium,
+                          )
+                        ],
                       ),
-                      customeText(
-                        'Inc. of all taxes',
-                        10,
-                        objConstantColor.navyBlue,
-                        ConstantAssests.montserratMedium,
-                      )
+
+                      const Spacer(),
+
+                      CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            cartScreenNotifier.callNavigateToSummary(userScreenNotifier);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(vertical: 8.dp, horizontal: 20.dp),
+                            decoration: BoxDecoration(
+                              color: objConstantColor.green,
+                              borderRadius: BorderRadius.circular(4.dp),
+                              border: Border.all(
+                                color: objConstantColor.navyBlue,
+                                width: 1.5,
+                              ),
+                            ),
+                            child:  Shimmer.fromColors(
+                              baseColor: objConstantColor.white,
+                              highlightColor: objConstantColor.black,
+                              child: customeText(
+                                'Checkout',
+                                20,
+                                objConstantColor.white,
+                                ConstantAssests.montserratBold,
+                              ),
+                            ),
+                          )
+                      ),
+
+
                     ],
                   ),
-
-                  const Spacer(),
-
-                  CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () {
-                      cartScreenNotifier.callNavigateToSummary(userScreenNotifier);
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 8.dp, horizontal: 20.dp),
-                      decoration: BoxDecoration(
-                        color: objConstantColor.green,
-                        borderRadius: BorderRadius.circular(4.dp),
-                        border: Border.all(
-                          color: objConstantColor.navyBlue,
-                          width: 1.5,
-                        ),
-                      ),
-                      child:  Shimmer.fromColors(
-                        baseColor: objConstantColor.white,
-                        highlightColor: objConstantColor.black,
-                        child: customeText(
-                        'Checkout',
-                        20,
-                        objConstantColor.white,
-                        ConstantAssests.montserratBold,
-                      ),
-                    ),
-                    )
-                  ),
-
-
-                ],
+                ),
               ),
-            ),
-          ),
 
-        ],
+          ],
+        ),
       ),
-      )
     );
   }
 
@@ -425,6 +428,123 @@ class CartScreenState extends ConsumerState<CartScreen> {
   }
 
 
+  /// Shimmer placeholder while cart loads
+  Widget _buildShimmerPlaceholder() {
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 14.dp, horizontal: 18.dp),
+        child: Column(
+          children: [
+            // title skeleton
+            Shimmer.fromColors(
+              baseColor: Colors.grey.shade300,
+              highlightColor: Colors.grey.shade100,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  width: 140.dp,
+                  height: 26.dp,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            SizedBox(height: 12.dp),
+
+            // multiple item skeletons
+            Column(
+              children: List.generate(3, (i) {
+                return Container(
+                  margin: EdgeInsets.only(bottom: 12.dp),
+                  padding: EdgeInsets.all(10.dp),
+                  decoration: BoxDecoration(
+                    color: objConstantColor.white,
+                    borderRadius: BorderRadius.circular(6.dp),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                        offset: const Offset(2, 2),
+                      ),
+                    ],
+                  ),
+                  child: Shimmer.fromColors(
+                    baseColor: Colors.grey.shade300,
+                    highlightColor: Colors.grey.shade100,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(width: 100.dp, height: 100.dp, color: Colors.white),
+                        SizedBox(width: 12.dp),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(width: double.infinity, height: 16.dp, color: Colors.white),
+                              SizedBox(height: 8.dp),
+                              Container(width: 120.dp, height: 14.dp, color: Colors.white),
+                              SizedBox(height: 8.dp),
+                              Container(width: 80.dp, height: 14.dp, color: Colors.white),
+                              SizedBox(height: 10.dp),
+                              Row(
+                                children: [
+                                  Container(width: 90.dp, height: 36.dp, color: Colors.white),
+                                  SizedBox(width: 10.dp),
+                                  Container(width: 70.dp, height: 36.dp, color: Colors.white),
+                                ],
+                              )
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ),
+
+            SizedBox(height: 8.dp),
+
+            // totals skeleton
+            Shimmer.fromColors(
+              baseColor: Colors.grey.shade300,
+              highlightColor: Colors.grey.shade100,
+              child: Column(
+                children: [
+                  Container(width: double.infinity, height: 14.dp, color: Colors.white),
+                  SizedBox(height: 8.dp),
+                  Container(width: double.infinity, height: 14.dp, color: Colors.white),
+                  SizedBox(height: 8.dp),
+                  Container(width: double.infinity, height: 14.dp, color: Colors.white),
+                  SizedBox(height: 12.dp),
+                  Container(width: 180.dp, height: 18.dp, color: Colors.white),
+                ],
+              ),
+            ),
+
+            SizedBox(height: 18.dp),
+
+            // checkout button skeleton
+            Shimmer.fromColors(
+              baseColor: Colors.grey.shade300,
+              highlightColor: Colors.grey.shade100,
+              child: Container(
+                width: double.infinity,
+                height: 54.dp,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(6.dp),
+                ),
+              ),
+            ),
+
+            SizedBox(height: 18.dp),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 
@@ -506,4 +626,3 @@ class QuantityCounter extends StatelessWidget {
     );
   }
 }
-

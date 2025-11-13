@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:geocoding/geocoding.dart';
 import 'package:intl/intl.dart';
 import 'package:botaniqmicrogreens/Utility/Logger.dart';
 import 'package:botaniqmicrogreens/constants/ConstantVariables.dart';
@@ -170,6 +171,52 @@ class CodeReusability {
     } catch (e) {
       // In case of invalid format
       return "";
+    }
+  }
+
+  Future<String> getAddressFromPosition(String position) async {
+    try {
+      // Split the string and extract latitude & longitude
+      final parts = position.split(',');
+      if (parts.length != 2) {
+        throw FormatException("Invalid position format. Expected 'lat, lng'");
+      }
+
+      final latitude = double.parse(parts[0].trim());
+      final longitude = double.parse(parts[1].trim());
+
+      // Perform reverse geocoding
+      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+
+        // Build address components
+        final addressParts = [
+          place.subLocality,
+          place.locality,
+          place.administrativeArea,
+          place.postalCode,
+        ];
+
+        // Log useful details
+        Logger().log(
+          'name:${place.name}, street:${place.street}, administrativeArea:${place.administrativeArea}, locality:${place.locality}, subLocality:${place.subLocality}, subThoroughfare:${place.subThoroughfare}',
+        );
+
+        // Filter null/empty and join with commas
+        final filtered = addressParts
+            .where((e) => e != null && e.toString().trim().isNotEmpty)
+            .toList();
+
+        final address = filtered.join(", ");
+        return address.isNotEmpty ? address : '';
+      } else {
+        return '';
+      }
+    } catch (e) {
+      print("Reverse geocoding error: $e");
+      return '';
     }
   }
 
