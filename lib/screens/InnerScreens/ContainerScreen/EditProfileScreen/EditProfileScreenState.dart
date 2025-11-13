@@ -115,7 +115,6 @@ class EditProfileScreenGlobalStateNotifier
           'lastName': state.lastNameController.text,
           'email': state.emailController.text,
           'mobileNumber': state.mobileNumberController.text,
-          'address': 'Chendrathil House Vadakkathara, Chittur, Palakkad, Kerala (P.O) 678101',
         };
 
         final manager = await PreferencesManager.getInstance();

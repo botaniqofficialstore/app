@@ -5,6 +5,7 @@ const router = express.Router();
 const LoginActivity = require('../../Tables/LoginActivity');
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../../../utils/jwt');
 const { sendEmailOTP, sendSMSOTP } = require('../../../utils/notification');
+const NotificationToken = require('../../Tables/NotificationToken');
 
 
 
@@ -179,10 +180,10 @@ router.post('/social-login', async (req, res) => {
 
 
 
-//MARK:- Logout API ------------------------------------->
+//MARK:- Logout API (Now also unregisters device) ------------------------------------->
 router.post('/logout', async (req, res) => {
   try {
-    const { userId, loginActivityId } = req.body;
+    const { userId, loginActivityId, fcmToken } = req.body;
 
     if (!userId || !loginActivityId)
       return res.status(400).json({ message: 'userId and loginActivityId are required' });
@@ -197,16 +198,30 @@ router.post('/logout', async (req, res) => {
     if (!loginActivity)
       return res.status(404).json({ message: 'Login session not found' });
 
-    // Update logout date and status
+    // ✅ 1. Update logout details
     loginActivity.logoutDate = new Date();
     loginActivity.activeStatus = 1; // inactive
     await loginActivity.save();
 
-    res.json({ message: 'Logout successful', data: loginActivity });
+    // ✅ 2. Unregister FCM token if provided
+    if (fcmToken) {
+      const deleted = await NotificationToken.deleteMany({ userId, fcmToken });
+      console.log(`🗑️ ${deleted.deletedCount} token(s) removed for ${userId}`);
+    } else {
+      console.log('⚠️ No fcmToken provided — skipping FCM token removal');
+    }
+
+    res.json({
+      message: 'Logout successful (device unregistered)',
+      data: loginActivity,
+    });
+
   } catch (error) {
+    console.error('Logout Error:', error);
     res.status(500).json({ message: error.message });
   }
 });
+
 
 
 

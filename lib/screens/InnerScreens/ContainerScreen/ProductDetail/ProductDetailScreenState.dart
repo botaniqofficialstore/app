@@ -1,3 +1,4 @@
+// ProductDetailScreenState.dart
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../API/CommonAPI.dart';
@@ -21,6 +22,7 @@ class ProductDetailScreenGlobalState {
   final int wishList;
   final int inCart;
   final int count;
+  final bool isLoading; // <- loading flag for shimmer
 
   ProductDetailScreenGlobalState({
     this.currentModule = ScreenName.home,
@@ -28,6 +30,7 @@ class ProductDetailScreenGlobalState {
     this.wishList = 0,
     this.inCart = 0,
     this.count = 1,
+    this.isLoading = true, // default true so shimmer shows initially
   });
 
   ProductDetailScreenGlobalState copyWith({
@@ -36,6 +39,7 @@ class ProductDetailScreenGlobalState {
     int? wishList,
     int? inCart,
     int? count,
+    bool? isLoading,
   }) {
     return ProductDetailScreenGlobalState(
       currentModule: currentModule ?? this.currentModule,
@@ -43,6 +47,7 @@ class ProductDetailScreenGlobalState {
       wishList: wishList ?? this.wishList,
       inCart: inCart ?? this.inCart,
       count: count ?? this.count,
+      isLoading: isLoading ?? this.isLoading,
     );
   }
 }
@@ -58,8 +63,12 @@ class ProductDetailScreenGlobalStateNotifier
     super.dispose();
   }
 
-  void fetchSavedData(){
-    state = state.copyWith(wishList: savedProductDetails?.isWishlisted, inCart: savedProductDetails?.inCart);
+  void fetchSavedData() {
+    // savedProductDetails is a global from your project (kept as-is)
+    state = state.copyWith(
+      wishList: savedProductDetails?.isWishlisted ?? 0,
+      inCart: savedProductDetails?.inCart ?? 0,
+    );
   }
 
   // 🔹 Increment count
@@ -79,12 +88,12 @@ class ProductDetailScreenGlobalStateNotifier
     final isConnected = await CodeReusability().isConnectedToNetwork();
 
     if (!isConnected) {
-      CodeReusability()
-          .showAlert(context, 'Please Check Your Internet Connection');
+      CodeReusability().showAlert(context, 'Please Check Your Internet Connection');
       return;
     }
 
-    CommonWidgets().showLoadingBar(true, context);
+    // show shimmer
+    state = state.copyWith(isLoading: true);
 
     try {
       var productId = savedProductDetails?.productID ?? '';
@@ -97,10 +106,15 @@ class ProductDetailScreenGlobalStateNotifier
           final detailsResponse = ProductDetailResponse.fromJson(response);
 
           if (statusCode == 200) {
-            /// ✅ Update state with API response data
-            state = state.copyWith(productData: detailsResponse.data);
-            Logger().log('###---> Product details stored in state: ${detailsResponse.data.productName}');
+            /// ✅ Update state with API response data and stop shimmer
+            state = state.copyWith(
+              productData: detailsResponse.data,
+              isLoading: false,
+            );
+            Logger().log(
+                '###---> Product details stored in state: ${detailsResponse.data.productName}');
           } else {
+            state = state.copyWith(isLoading: false);
             CodeReusability().showAlert(
               context,
               detailsResponse.message.isNotEmpty
@@ -108,24 +122,20 @@ class ProductDetailScreenGlobalStateNotifier
                   : "Something went wrong",
             );
           }
-
-          CommonWidgets().showLoadingBar(false, context);
         },
       );
     } catch (e) {
       Logger().log('###---> Error: $e');
-      CommonWidgets().showLoadingBar(false, context);
+      state = state.copyWith(isLoading: false);
       CodeReusability().showAlert(context, 'Something went wrong');
     }
   }
 
-
   ///This method used to call remove Product from WishList
-  void callRemoveFromWishList(BuildContext context, String productID){
+  void callRemoveFromWishList(BuildContext context, String productID) {
     if (!context.mounted) return;
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
       if (isConnected) {
-
         CommonWidgets().showLoadingBar(true, context);
         var prefs = await PreferencesManager.getInstance();
         String userID = prefs.getStringValue(PreferenceKeys.userID) ?? '';
@@ -135,28 +145,30 @@ class ProductDetailScreenGlobalStateNotifier
           'productId': productID,
         };
 
-        WishListRepository().callProductDeleteFromWishListApi(ConstantURLs.addRemoveWishListUrl, requestBody, (statusCode, responseBody) async {
-          final wishListResponse = WishListRemoveResponse.fromJson(responseBody);
-          if (statusCode == 200) {
-            Logger().log('###---> Product Remove WishList API: $wishListResponse');
-            state = state.copyWith(wishList: 0);
-          } else {
-            CodeReusability().showAlert(context, wishListResponse.message ?? "something Went Wrong");
-          }
-          CommonWidgets().showLoadingBar(false, context);
-        });
+        WishListRepository().callProductDeleteFromWishListApi(
+            ConstantURLs.addRemoveWishListUrl, requestBody,
+                (statusCode, responseBody) async {
+              final wishListResponse = WishListRemoveResponse.fromJson(responseBody);
+              if (statusCode == 200) {
+                Logger().log('###---> Product Remove WishList API: $wishListResponse');
+                state = state.copyWith(wishList: 0);
+              } else {
+                CodeReusability().showAlert(
+                    context, wishListResponse.message ?? "something Went Wrong");
+              }
+              CommonWidgets().showLoadingBar(false, context);
+            });
       } else {
         CodeReusability().showAlert(context, 'Please Check Your Internet Connection');
       }
     });
   }
 
-  ///This method used to call remove Product from WishList
-  void callAddToWishList(BuildContext context, String productID){
+  ///This method used to call add Product to WishList
+  void callAddToWishList(BuildContext context, String productID) {
     if (!context.mounted) return;
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
       if (isConnected) {
-
         CommonWidgets().showLoadingBar(true, context);
         var prefs = await PreferencesManager.getInstance();
         String userID = prefs.getStringValue(PreferenceKeys.userID) ?? '';
@@ -166,25 +178,28 @@ class ProductDetailScreenGlobalStateNotifier
           'productId': productID,
         };
 
-        WishListRepository().callAddToWishListApi(ConstantURLs.addRemoveWishListUrl, requestBody, (statusCode, responseBody) async {
-          final wishListResponse = AddToWishlistResponse.fromJson(responseBody);
-          if (statusCode == 200) {
-            Logger().log('###---> Product Add To WishList API: $wishListResponse');
-            state = state.copyWith(wishList: 1);
-          } else {
-            CodeReusability().showAlert(context, wishListResponse.message ?? "something Went Wrong");
-          }
-          CommonWidgets().showLoadingBar(false, context);
-        });
+        WishListRepository().callAddToWishListApi(
+            ConstantURLs.addRemoveWishListUrl, requestBody,
+                (statusCode, responseBody) async {
+              final wishListResponse = AddToWishlistResponse.fromJson(responseBody);
+              if (statusCode == 200) {
+                Logger().log('###---> Product Add To WishList API: $wishListResponse');
+                state = state.copyWith(wishList: 1);
+              } else {
+                CodeReusability().showAlert(
+                    context, wishListResponse.message ?? "something Went Wrong");
+              }
+              CommonWidgets().showLoadingBar(false, context);
+            });
       } else {
         CodeReusability().showAlert(context, 'Please Check Your Internet Connection');
       }
     });
   }
-
 
   ///This method is used to add product to Cart POST API
-  void callAddToCartAPI(BuildContext context, String productID, MainScreenGlobalStateNotifier notifier) {
+  void callAddToCartAPI(BuildContext context, String productID,
+      MainScreenGlobalStateNotifier notifier) {
     if (!context.mounted) return;
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
       if (isConnected) {
@@ -195,34 +210,34 @@ class ProductDetailScreenGlobalStateNotifier
         Map<String, dynamic> requestBody = {
           'userId': userID,
           'productId': productID,
-          'productCount' : state.count
+          'productCount': state.count
         };
 
         WishListRepository().callAddToCartApi(
-            ConstantURLs.addRemoveCountUpdateCartUrl, requestBody, (statusCode,
-            responseBody) async {
-          final addToCartResponse = AddToCartResponse.fromJson(responseBody);
-          if (statusCode == 200) {
-            state = state.copyWith(inCart: 1);
-            CustomToast.show(context, "${state.productData?.productName} added to cart successfully!");
-            notifier.callFooterCountGETAPI();
-          } else {
-            CodeReusability().showAlert(context, addToCartResponse.message ?? "something Went Wrong");
-          }
-          CommonWidgets().showLoadingBar(false, context);
-        });
+            ConstantURLs.addRemoveCountUpdateCartUrl, requestBody,
+                (statusCode, responseBody) async {
+              final addToCartResponse = AddToCartResponse.fromJson(responseBody);
+              if (statusCode == 200) {
+                state = state.copyWith(inCart: 1);
+                CustomToast.show(
+                    context, "${state.productData?.productName} added to cart successfully!");
+                notifier.callFooterCountGETAPI();
+              } else {
+                CodeReusability().showAlert(
+                    context, addToCartResponse.message ?? "something Went Wrong");
+              }
+              CommonWidgets().showLoadingBar(false, context);
+            });
       } else {
         CodeReusability().showAlert(context, 'Please Check Your Internet Connection');
       }
     });
   }
-
-
-
 }
 
 /// --- PROVIDER ---
-final productDetailScreenGlobalStateProvider = StateNotifierProvider.autoDispose<
-    ProductDetailScreenGlobalStateNotifier, ProductDetailScreenGlobalState>((ref) {
+final productDetailScreenGlobalStateProvider =
+StateNotifierProvider.autoDispose<ProductDetailScreenGlobalStateNotifier,
+    ProductDetailScreenGlobalState>((ref) {
   return ProductDetailScreenGlobalStateNotifier();
 });

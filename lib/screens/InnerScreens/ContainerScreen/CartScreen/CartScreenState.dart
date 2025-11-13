@@ -12,19 +12,23 @@ import 'CartRepository.dart';
 class CartScreenGlobalState {
   final ScreenName currentModule;
   final List<CartItem> cartItems;
+  final bool isLoading; // ✅ Added shimmer control flag
 
   CartScreenGlobalState({
     this.currentModule = ScreenName.home,
     this.cartItems = const [],
+    this.isLoading = true,
   });
 
   CartScreenGlobalState copyWith({
     ScreenName? currentModule,
     List<CartItem>? cartItems,
+    bool? isLoading,
   }) {
     return CartScreenGlobalState(
       currentModule: currentModule ?? this.currentModule,
       cartItems: cartItems ?? this.cartItems,
+      isLoading: isLoading ?? this.isLoading,
     );
   }
 
@@ -36,7 +40,6 @@ class CartScreenGlobalState {
     });
   }
 
-  /// Calculate payable amount (sum of each product's selling price × count)
   int get totalAmount {
     return cartItems.fold(0, (sum, item) {
       final price = item.productDetails?.productPrice ?? 0;
@@ -44,15 +47,12 @@ class CartScreenGlobalState {
     });
   }
 
-  /// Total discount = totalAmount - totalPayableAmount
   int get totalDiscount {
     return totalAmount - totalPayableAmount;
   }
 }
 
-
-class CartScreenGlobalStateNotifier
-    extends StateNotifier<CartScreenGlobalState> {
+class CartScreenGlobalStateNotifier extends StateNotifier<CartScreenGlobalState> {
   CartScreenGlobalStateNotifier() : super(CartScreenGlobalState());
 
   @override
@@ -60,46 +60,59 @@ class CartScreenGlobalStateNotifier
     super.dispose();
   }
 
-  void callNavigateToSummary(MainScreenGlobalStateNotifier notifier){
+  void callNavigateToSummary(MainScreenGlobalStateNotifier notifier) {
     savedCartItems = state.cartItems;
     notifier.callNavigation(ScreenName.orderSummary);
   }
 
-
-  ///This method is used to get cart list using GET API
+  /// 🧩 Get Cart List (with shimmer stop logic)
   Future<void> callCartListGepAPI(BuildContext context) async {
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
       if (isConnected) {
-        CommonWidgets().showLoadingBar(true, context);
+        // ✅ Start shimmer
+        state = state.copyWith(isLoading: true);
+
         var prefs = await PreferencesManager.getInstance();
         String userID = prefs.getStringValue(PreferenceKeys.userID) ?? '';
+
         CartRepository().callCartListApi(
-            '${ConstantURLs.cartListUrl}userId=$userID&page=1&limit=100', (
-            statusCode, response) async {
-          final cartResponse = CartResponse.fromJson(response);
-          if (statusCode == 200) {
-            Logger().log('###---> Cart List API Response: $response');
-            state = state.copyWith(cartItems: cartResponse.data);
-          } else {
-            Logger().log('###---> Response: $response');
-            CodeReusability().showAlert(
-                context, cartResponse.message ?? "something Went Wrong");
-          }
-          CommonWidgets().showLoadingBar(false, context);
-        });
+          '${ConstantURLs.cartListUrl}userId=$userID&page=1&limit=100',
+              (statusCode, response) async {
+            try {
+              final cartResponse = CartResponse.fromJson(response);
+              Logger().log('###---> Cart List API Response: $response');
+
+              if (statusCode == 200) {
+                // ✅ Even if list is empty, shimmer must stop
+                state = state.copyWith(
+                  cartItems: cartResponse.data,
+                  isLoading: false,
+                );
+              } else {
+                CodeReusability().showAlert(
+                    context, cartResponse.message ?? "Something went wrong");
+                state = state.copyWith(isLoading: false);
+              }
+            } catch (e) {
+              Logger().log('###---> Exception: $e');
+              state = state.copyWith(isLoading: false);
+            }
+          },
+        );
       } else {
-        CodeReusability().showAlert(
-            context, 'Please Check Your Internet Connection');
+        CodeReusability()
+            .showAlert(context, 'Please Check Your Internet Connection');
+        state = state.copyWith(isLoading: false); // ✅ Stop shimmer on error
       }
     });
   }
 
-  ///This method used to call remove oriduct from cart API
-  void callRemoveFromCart(BuildContext context, String productID, int index, MainScreenGlobalStateNotifier notifier){
+  /// 🗑️ Remove Product from Cart
+  void callRemoveFromCart(BuildContext context, String productID, int index,
+      MainScreenGlobalStateNotifier notifier) {
     if (!context.mounted) return;
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
       if (isConnected) {
-
         CommonWidgets().showLoadingBar(true, context);
         var prefs = await PreferencesManager.getInstance();
         String userID = prefs.getStringValue(PreferenceKeys.userID) ?? '';
@@ -109,38 +122,35 @@ class CartScreenGlobalStateNotifier
           'productId': productID,
         };
 
-        CartRepository().callProductDeleteFromCartApi(ConstantURLs.cartListUrl, requestBody, (statusCode, responseBody) async {
-          CartRemoveResponse response = CartRemoveResponse.fromJson(responseBody);
-          if (statusCode == 200) {
+        CartRepository().callProductDeleteFromCartApi(
+            ConstantURLs.cartListUrl, requestBody,
+                (statusCode, responseBody) async {
+              CartRemoveResponse response =
+              CartRemoveResponse.fromJson(responseBody);
+              if (statusCode == 200) {
+                final updatedList = List<CartItem>.from(state.cartItems);
+                updatedList.removeAt(index);
+                notifier.callFooterCountGETAPI();
 
-            Logger().log('###---> Cart Remove API Response: $response');
-            // ✅ Remove the item locally using the index
-            final updatedList = List<CartItem>.from(state.cartItems);
-            updatedList.removeAt(index);
-            notifier.callFooterCountGETAPI();
-
-            // ✅ Update the state to refresh UI
-            state = state.copyWith(cartItems: updatedList);
-
-          } else {
-            Logger().log('###---> Response: $response');
-          }
-          CommonWidgets().showLoadingBar(false, context);
-        });
+                state = state.copyWith(cartItems: updatedList);
+              } else {
+                Logger().log('###---> Response: $response');
+              }
+              CommonWidgets().showLoadingBar(false, context);
+            });
       } else {
-        CodeReusability().showAlert(
-            context, 'Please Check Your Internet Connection');
+        CodeReusability()
+            .showAlert(context, 'Please Check Your Internet Connection');
       }
     });
   }
 
-
-  ///This method used to call Update Count PUT API
-  void callUpdateCountAPI(BuildContext context, String productID, int index, int count) {
+  /// 🔄 Update Count
+  void callUpdateCountAPI(
+      BuildContext context, String productID, int index, int count) {
     if (!context.mounted) return;
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
       if (isConnected) {
-
         CommonWidgets().showLoadingBar(true, context);
         var prefs = await PreferencesManager.getInstance();
         String userID = prefs.getStringValue(PreferenceKeys.userID) ?? '';
@@ -151,40 +161,31 @@ class CartScreenGlobalStateNotifier
           'productCount': count,
         };
 
-        CartRepository().callProductCountUpdateApi(ConstantURLs.cartListUrl, requestBody, (statusCode, responseBody) async {
-          CartUpdateResponse response = CartUpdateResponse.fromJson(responseBody);
-          if (statusCode == 200) {
-            Logger().log('###---> Cart Count Updated API Response: $response');
+        CartRepository().callProductCountUpdateApi(
+            ConstantURLs.cartListUrl, requestBody,
+                (statusCode, responseBody) async {
+              CartUpdateResponse response =
+              CartUpdateResponse.fromJson(responseBody);
+              if (statusCode == 200) {
+                final updatedList = List<CartItem>.from(state.cartItems);
+                final updatedItem =
+                updatedList[index].copyWith(productCount: count);
+                updatedList[index] = updatedItem;
 
-            // ✅ Update the local list immutably
-            final updatedList = List<CartItem>.from(state.cartItems);
-            final updatedItem = updatedList[index].copyWith(productCount: count);
-            updatedList[index] = updatedItem;
-
-            // ✅ Update the state (this will rebuild UI)
-            state = state.copyWith(cartItems: updatedList);
-
-          } else {
-            Logger().log('###---> Response: $response');
-          }
-          CommonWidgets().showLoadingBar(false, context);
-        });
+                state = state.copyWith(cartItems: updatedList);
+              }
+              CommonWidgets().showLoadingBar(false, context);
+            });
       } else {
-        CodeReusability().showAlert(
-            context, 'Please Check Your Internet Connection');
+        CodeReusability()
+            .showAlert(context, 'Please Check Your Internet Connection');
       }
     });
-
   }
-
-
 }
-
-
 
 final cartScreenGlobalStateProvider = StateNotifierProvider.autoDispose<
     CartScreenGlobalStateNotifier, CartScreenGlobalState>((ref) {
   var notifier = CartScreenGlobalStateNotifier();
   return notifier;
 });
-

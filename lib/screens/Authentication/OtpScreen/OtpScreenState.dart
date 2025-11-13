@@ -138,6 +138,7 @@ class OtpScreenGlobalStateNotifier
 
               CommonWidgets().showLoadingBar(false, context); //  Loading bar is disabled Here
               CommonAPI().callUserProfileAPI();
+              CommonAPI().callDeviceRegisterAPI();
 
               //Call Navigation
               Navigator.pushReplacement(context,

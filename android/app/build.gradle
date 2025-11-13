@@ -3,6 +3,8 @@ plugins {
     id "kotlin-android"
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
+    // ✅ Google services plugin (for Firebase)
+    id "com.google.gms.google-services"
 }
 
 // 🔹 Load key.properties if present
@@ -23,7 +25,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = "1.8"
     }
 
     defaultConfig {
@@ -62,6 +64,16 @@ android {
             shrinkResources false
         }
     }
+}
+
+dependencies {
+    // ✅ Use Firebase BOM to manage all Firebase versions automatically
+    implementation platform('com.google.firebase:firebase-bom:33.2.0')
+    implementation 'com.google.firebase:firebase-messaging'
+
+    // Optional: For analytics or crashlytics (can be added later)
+    // implementation 'com.google.firebase:firebase-analytics'
+    // implementation 'com.google.firebase:firebase-crashlytics'
 }
 
 flutter {

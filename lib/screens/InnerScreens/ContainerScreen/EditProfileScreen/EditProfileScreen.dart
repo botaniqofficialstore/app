@@ -1,11 +1,8 @@
-import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import 'package:lottie/lottie.dart';
-import '../../../../Utility/PreferencesManager.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../../../constants/Constants.dart';
 import '../../../commonViews/CommonWidgets.dart';
@@ -217,7 +214,7 @@ class EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   SizedBox(height: 5.dp,),
 
                   Container(
-                    padding: EdgeInsets.symmetric(vertical: 10.dp,),
+                    padding: EdgeInsets.symmetric(vertical: 5.dp,),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
@@ -240,11 +237,14 @@ class EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         ),
                         /// Address Text
                         Expanded(
-                          child: objCommonWidgets.customText(context, 'Chendrathil House Vadakkathara, Chittur, Palakkad, Kerala (P.O) 678101', 13, objConstantColor.navyBlue, objConstantFonts.montserratMedium),
+                          child: objCommonWidgets.customText(context, (exactAddress.isEmpty ? 'Select delivery address' : exactAddress), 13, (exactAddress.isEmpty ? objConstantColor.gray : objConstantColor.navyBlue), objConstantFonts.montserratMedium),
                         ),
                         CupertinoButton(
                           borderRadius: BorderRadius.circular(8.dp),
-                          onPressed: (){}, padding: EdgeInsets.zero,
+                          onPressed: (){
+                            userFrom = ScreenName.editProfile;
+                            userScreenNotifier.callNavigation(ScreenName.map);
+                          }, padding: EdgeInsets.zero,
                           child: Container(
                             padding: EdgeInsets.symmetric(horizontal: 8.dp, vertical: 6.dp),
                             child: Image.asset(objConstantAssest.editImage, width: 20.dp,),

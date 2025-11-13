@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../API/CommonAPI.dart';
 import '../../../../CodeReusable/CodeReusability.dart';
 import '../../../../CodeReusable/CommonWidgets.dart';
 import '../../../../Utility/Logger.dart';

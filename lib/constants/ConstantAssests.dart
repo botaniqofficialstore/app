@@ -54,7 +54,8 @@ class ConstantAssests{
    String emptyCartIcon = '${cartScreenAssets}emptyCart.png';
 
    ///Reels Screen Icons
-   String heartIcon = '${reelsIconsAssets}heart.png';
+   String disLikedIcon = '${reelsIconsAssets}disLike.png';
+   String likedIcon = '${reelsIconsAssets}like.png';
    String shareIcon = '${reelsIconsAssets}send.png';
    String chatIcon = '${reelsIconsAssets}chat.png';
    String moreIcon = '${reelsIconsAssets}more.png';

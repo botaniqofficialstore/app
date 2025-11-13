@@ -1,17 +1,25 @@
 import 'package:botaniqmicrogreens/screens/Authentication/SplashScreen.dart';
-import 'package:botaniqmicrogreens/screens/commonViews/NotificationService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'Utility/Logger.dart';
+import 'Utility/PushNotificationService/NotificationService.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   await NotificationService.init();
+  FirebaseMessaging.onBackgroundMessage(_backgroundHandler);
+
   runApp(
-    const ProviderScope(
-      child: BotaniQ(),
-    ),
+    const ProviderScope(child: BotaniQ()),
   );
+}
+
+Future<void> _backgroundHandler(RemoteMessage message) async {
+  Logger().log('##_backgroundHandler ----> $message');
 }
 
 class BotaniQ extends StatelessWidget {
@@ -19,11 +27,12 @@ class BotaniQ extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlutterSizer(   // <-- Add this
+    return FlutterSizer(
       builder: (context, orientation, deviceType) {
-        return const MaterialApp(
+        return MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: SplashScreen(),
+          navigatorKey: navigatorKey,
+          home: const SplashScreen(),
         );
       },
     );

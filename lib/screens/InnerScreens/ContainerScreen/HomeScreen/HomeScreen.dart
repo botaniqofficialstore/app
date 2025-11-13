@@ -107,7 +107,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 15.dp),
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: 8.dp,),
+              padding: EdgeInsets.symmetric(vertical: 5.dp,),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12.dp),
@@ -131,14 +131,12 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
 
                   /// Address Text
                   Expanded(
-                    child: objCommonWidgets.customText(context,
-                        'Chendrathil House Vadakkathara, Chittur, Palakkad, Kerala',
-                        13, objConstantColor.navyBlue,
-                        objConstantFonts.montserratMedium),
+                    child: objCommonWidgets.customText(context, (exactAddress.isEmpty ? 'Select delivery address' : exactAddress), 13, (exactAddress.isEmpty ? objConstantColor.navyBlue : objConstantColor.orange), objConstantFonts.montserratMedium),
                   ),
                   CupertinoButton(
                     borderRadius: BorderRadius.circular(8.dp),
                     onPressed: () {
+                      userFrom = ScreenName.home;
                       userScreenNotifier.callNavigation(ScreenName.map);
                     }, padding: EdgeInsets.zero,
 

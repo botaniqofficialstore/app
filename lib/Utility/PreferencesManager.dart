@@ -81,5 +81,8 @@ class PreferenceKeys {
   static String isDialogOpened = 'isDialogOpened';
   static String isLoadingBarStarted = "isLoadingBarStarted";
 
+  //Device
+  static String fcmToken = 'fcmToken';
+
 
 }
