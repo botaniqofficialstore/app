@@ -212,8 +212,7 @@ router.post('/logout', async (req, res) => {
     }
 
     res.json({
-      message: 'Logout successful (device unregistered)',
-      data: loginActivity,
+      message: 'Logout successful',
     });
 
   } catch (error) {

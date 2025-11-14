@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">BotaniQ</string>
-    <string name="facebook_app_id">1775671039638458</string>
-    <string name="fb_login_protocol_scheme">1775671039638458</string>
+    <string name="facebook_app_id">1505242217135436</string>
+    <string name="fb_login_protocol_scheme">fb1505242217135436</string>
+    <string name="facebook_client_token">73b122fd95421da96bd78aac28b36627</string>
 </resources>

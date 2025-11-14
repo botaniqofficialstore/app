@@ -1,19 +1,28 @@
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FacebookSignInService {
-  static Future<Map<String, dynamic>?> signInWithFacebook() async {
+  static Future<User?> signInWithFacebook() async {
     try {
-      // Trigger the sign-in flow
-      final LoginResult result = await FacebookAuth.instance.login(
+      // Trigger the Facebook Login flow
+      final LoginResult fbResult = await FacebookAuth.instance.login(
         permissions: ['email', 'public_profile'],
       );
 
-      if (result.status == LoginStatus.success) {
-        // Get user data
-        final userData = await FacebookAuth.instance.getUserData();
-        return userData;
+      if (fbResult.status == LoginStatus.success) {
+        final AccessToken? accessToken = fbResult.accessToken;
+
+        // Convert to Firebase credential
+        final OAuthCredential credential =
+        FacebookAuthProvider.credential(accessToken!.tokenString);
+
+        // Login to Firebase
+        final UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithCredential(credential);
+
+        return userCredential.user;
       } else {
-        print("Facebook login failed: ${result.status}");
+        print("Facebook login failed: ${fbResult.status}");
         return null;
       }
     } catch (e) {
@@ -24,5 +33,6 @@ class FacebookSignInService {
 
   static Future<void> signOut() async {
     await FacebookAuth.instance.logOut();
+    await FirebaseAuth.instance.signOut();
   }
 }

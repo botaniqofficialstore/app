@@ -98,8 +98,8 @@ class ProfileScreenGlobalStateNotifier
         };
 
         ProfileRepository().callLogoutApi(requestBody, (statusCode, responseBody) async {
-          final cancelResponse = LogoutResponse.fromJson(responseBody);
-          CodeReusability().showAlert(context, cancelResponse.message ?? "something Went Wrong");
+          final logoutResponse = LogoutResponse.fromJson(responseBody);
+          CodeReusability().showAlert(context, logoutResponse.message ?? "something Went Wrong");
           CommonWidgets().showLoadingBar(false, context);
 
           if (statusCode == 200 || statusCode == 201){
@@ -112,7 +112,7 @@ class ProfileScreenGlobalStateNotifier
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()),
             );
           }else{
-            CodeReusability().showAlert(context, cancelResponse.message ?? "something Went Wrong");
+            CodeReusability().showAlert(context, logoutResponse.message ?? "something Went Wrong");
           }
 
         });

@@ -12,7 +12,20 @@
           "package_name": "com.botaniq.microgreens"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "584718244019-shis5jnrekf7ghr6s9k0230euvvjqbn3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.botaniq.microgreens",
+            "certificate_hash": "6233241beaf6e5c059dd2e805738b8660954e1cd"
+          }
+        },
+        {
+          "client_id": "584718244019-o9ibd3v46v1a7qhvos9q6j5ivd5fu6l4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDojJVX6eETQfmRlbOj0uINCfgNnk8yXsM"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "584718244019-o9ibd3v46v1a7qhvos9q6j5ivd5fu6l4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "584718244019-qb3334i05nr1jl50edgroakbmok7otnr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.botaniq.microgreens"
+              }
+            }
+          ]
         }
       }
     }

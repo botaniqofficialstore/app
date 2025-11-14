@@ -2,18 +2,15 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class GoogleSignInService {
   static final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: [
-      'email',
-      'https://www.googleapis.com/auth/userinfo.profile',
-    ],
+    scopes: ['email'],
   );
 
   static Future<GoogleSignInAccount?> signInWithGoogle() async {
     try {
       final account = await _googleSignIn.signIn();
-      return account; // returns null if user cancels
-    } catch (error) {
-      print("Google Sign-In error: $error");
+      return account;   // account has displayName, email, photoUrl
+    } catch (e) {
+      print("Google Error → $e");
       return null;
     }
   }
