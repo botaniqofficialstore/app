@@ -139,12 +139,16 @@ Widget profileView(BuildContext context) {
                           width: 18.dp,
                         ),
                         onPressed: () {
-                          LogoutPopup.showLogoutPopup(
-                            context: context,
-                            onConfirm: () {
-                              screenNotifier.callLogoutAPI(context);
-                            },
-                          );
+                          PreferencesManager.getInstance().then((pref) {
+                            pref.setBooleanValue(PreferenceKeys.isDialogOpened, true);
+                            LogoutPopup.showLogoutPopup(
+                              context: context,
+                              onConfirm: () {
+                                pref.setBooleanValue(PreferenceKeys.isDialogOpened, false);
+                                screenNotifier.callLogoutAPI(context);
+                              },
+                            );
+                          });
                         },
                       ),
 
@@ -183,7 +187,7 @@ Widget profileView(BuildContext context) {
                 width: double.infinity,
                 child: CupertinoButton(
                   padding: EdgeInsets.symmetric(vertical: 15.dp),
-                  color: Colors.black,
+                  color: objConstantColor.navyBlue,
                   borderRadius: BorderRadius.circular(12.dp),
                   onPressed: () {
                     ref.watch(MainScreenGlobalStateProvider.notifier)

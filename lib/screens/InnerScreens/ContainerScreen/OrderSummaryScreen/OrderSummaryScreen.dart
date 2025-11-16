@@ -206,10 +206,10 @@ class OrderSummaryScreenState extends ConsumerState<OrderSummaryScreen> {
                     SizedBox(height: 5.dp,),
 
                     ShippingAddressCard(
-                        name: '${userScreenState.userName}',
+                        name: userScreenState.userName,
                         phone: "+91 ${userScreenState.mobileNumber}",
-                        email: '${userScreenState.email}',
-                        address: '${userScreenState.address}',
+                        email: userScreenState.email,
+                        address: userScreenState.address,
                         onEdit: () {
                           userScreenNotifier.callNavigation(ScreenName.editProfile);
                         }

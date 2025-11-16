@@ -131,7 +131,7 @@ class EditProfileScreenGlobalStateNotifier
             prefs.setStringValue(PreferenceKeys.userLastName, state.lastNameController.text);
             prefs.setStringValue(PreferenceKeys.userEmailID, state.emailController.text);
             prefs.setStringValue(PreferenceKeys.userMobileNumber, state.mobileNumberController.text);
-            prefs.setStringValue(PreferenceKeys.userAddress, requestBody['address']);
+            prefs.setStringValue(PreferenceKeys.userAddress, '${requestBody['address']}');
 
             CommonWidgets().showLoadingBar(false, context); //  Loading bar is disabled Here
             callNavigation(context, notifier);
@@ -151,6 +151,7 @@ class EditProfileScreenGlobalStateNotifier
   }
 
   void callNavigation(BuildContext context, MainScreenGlobalStateNotifier notifier){
+    if (!context.mounted) return;
     notifier.callNavigation(ScreenName.profile);
     callOrderSuccessPopup(context);
   }

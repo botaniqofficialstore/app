@@ -13,22 +13,34 @@ class CartScreenGlobalState {
   final ScreenName currentModule;
   final List<CartItem> cartItems;
   final bool isLoading; // ✅ Added shimmer control flag
+  final bool isProfileCompleted;
+  final String profileIncompleteMessage;
+  final bool isDeliveryAddress;
 
   CartScreenGlobalState({
     this.currentModule = ScreenName.home,
     this.cartItems = const [],
     this.isLoading = true,
+    this.isProfileCompleted = true,
+    this.profileIncompleteMessage = '',
+    this.isDeliveryAddress = false,
   });
 
   CartScreenGlobalState copyWith({
     ScreenName? currentModule,
     List<CartItem>? cartItems,
     bool? isLoading,
+    bool? isProfileCompleted,
+    String? profileIncompleteMessage,
+    bool? isDeliveryAddress,
   }) {
     return CartScreenGlobalState(
       currentModule: currentModule ?? this.currentModule,
       cartItems: cartItems ?? this.cartItems,
       isLoading: isLoading ?? this.isLoading,
+      isProfileCompleted: isProfileCompleted ?? this.isProfileCompleted,
+      profileIncompleteMessage: profileIncompleteMessage ?? this.profileIncompleteMessage,
+      isDeliveryAddress: isDeliveryAddress ?? this.isDeliveryAddress,
     );
   }
 
@@ -65,6 +77,36 @@ class CartScreenGlobalStateNotifier extends StateNotifier<CartScreenGlobalState>
     notifier.callNavigation(ScreenName.orderSummary);
   }
 
+  void calNavigationToEditProfile(MainScreenGlobalStateNotifier notifier){
+    notifier.callNavigation(ScreenName.editProfile);
+  }
+
+  void updateCheckoutStatus(PreferencesManager prefs){
+    String mobile = prefs.getStringValue(PreferenceKeys.userMobileNumber) ?? '';
+    String address = prefs.getStringValue(PreferenceKeys.userAddress) ?? '';
+
+
+    String message = '';
+    bool deliveryAddress = true;
+    if (mobile.isEmpty && address.isEmpty){
+      message = 'Please update your mobile number and delivery location to continue shopping';
+      deliveryAddress = false;
+    } else if (mobile.isEmpty && address.isNotEmpty){
+      message = 'Please update your mobile number to continue shopping';
+    } else if (mobile.isNotEmpty && address.isEmpty){
+      message = 'Please update your delivery location to continue shopping';
+      deliveryAddress = false;
+    }
+
+    state = state.copyWith(
+        profileIncompleteMessage: message,
+        isProfileCompleted: message.isEmpty,
+      isDeliveryAddress: deliveryAddress
+    );
+  Logger().log('### message: $message, isProfileCompleted: ${state.isProfileCompleted}');
+
+  }
+
   /// 🧩 Get Cart List (with shimmer stop logic)
   Future<void> callCartListGepAPI(BuildContext context) async {
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
@@ -74,6 +116,7 @@ class CartScreenGlobalStateNotifier extends StateNotifier<CartScreenGlobalState>
 
         var prefs = await PreferencesManager.getInstance();
         String userID = prefs.getStringValue(PreferenceKeys.userID) ?? '';
+        updateCheckoutStatus(prefs);
 
         CartRepository().callCartListApi(
           '${ConstantURLs.cartListUrl}userId=$userID&page=1&limit=100',

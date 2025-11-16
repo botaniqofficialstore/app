@@ -15,4 +15,6 @@ class ConstantColors {
   Color liteGray2 = const Color.fromARGB(255, 255, 255, 255);
   Color liteGray3 = const Color.fromARGB(255, 202, 202, 202);
   Color liteGray4 = const Color.fromARGB(255, 241, 241, 241);
+  Color skinColor = const Color(0xFFfdffd0);
 }
+

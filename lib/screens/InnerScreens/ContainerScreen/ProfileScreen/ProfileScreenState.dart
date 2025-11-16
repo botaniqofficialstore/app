@@ -86,7 +86,6 @@ class ProfileScreenGlobalStateNotifier
 
         CommonWidgets().showLoadingBar(true, context);
         var prefs = await PreferencesManager.getInstance();
-        prefs.setBooleanValue(PreferenceKeys.isDialogOpened, true);
         String userID = prefs.getStringValue(PreferenceKeys.userID) ?? '';
         String loginID = prefs.getStringValue(PreferenceKeys.loginActivityId) ?? '';
         String fcmToken = prefs.getStringValue(PreferenceKeys.fcmToken) ?? '';
@@ -108,7 +107,6 @@ class ProfileScreenGlobalStateNotifier
             CodeReusability().clearLocalVariables();
 
             prefs.setBooleanValue(PreferenceKeys.isUserLogged, false);
-            prefs.setBooleanValue(PreferenceKeys.isDialogOpened, false);
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()),
             );
           }else{

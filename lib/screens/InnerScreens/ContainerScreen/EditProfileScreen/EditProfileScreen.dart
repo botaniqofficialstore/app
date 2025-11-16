@@ -263,7 +263,7 @@ class EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       width: double.infinity,
                       child: CupertinoButton(
                         padding: EdgeInsets.symmetric(vertical: 15.dp),
-                        color: Colors.black,
+                        color: objConstantColor.navyBlue,
                         borderRadius: BorderRadius.circular(12.dp),
                         onPressed: () {
                           screenNotifier.checkEmptyValidation(context, userScreenNotifier);
