@@ -85,7 +85,7 @@ class OrderSummaryScreenGlobalStateNotifier
     final userLastName = manager.getStringValue(PreferenceKeys.userLastName);
     final userEmailID = manager.getStringValue(PreferenceKeys.userEmailID);
     final userMobileNumber = manager.getStringValue(PreferenceKeys.userMobileNumber);
-    final userAddress = manager.getStringValue(PreferenceKeys.userAddress);
+    final userAddress = exactAddress;
 
     state = state.copyWith(
         cartItems: savedCartItems,

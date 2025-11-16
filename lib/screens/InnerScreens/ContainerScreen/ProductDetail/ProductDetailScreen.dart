@@ -6,9 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../../CodeReusable/CodeReusability.dart';
-import '../../../../constants/ConstantAssests.dart';
 import '../../../../constants/ConstantVariables.dart';
-import '../../../commonViews/CustomToast.dart';
 import '../../MainScreen/MainScreenState.dart';
 import 'ProductDetailScreenState.dart';
 
@@ -48,7 +46,6 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
     var detailsScreenState = ref.watch(productDetailScreenGlobalStateProvider);
     var detailsScreenNotifier =
     ref.watch(productDetailScreenGlobalStateProvider.notifier);
@@ -196,6 +193,8 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                             objConstantColor.navyBlue,
                             objConstantFonts.montserratSemiBold,
                           ),
+
+                          SizedBox(height: 10.dp),
 
                           /// Nutrient cards inside wrap
                           Wrap(

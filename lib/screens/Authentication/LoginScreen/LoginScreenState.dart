@@ -1,12 +1,11 @@
 import 'package:botaniqmicrogreens/screens/Authentication/OtpScreen/OtpScreen.dart';
-import 'package:botaniqmicrogreens/screens/InnerScreens/MainScreen/MainScreen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../API/CommonAPI.dart';
 import '../../../CodeReusable/CodeReusability.dart';
 import '../../../CodeReusable/CommonWidgets.dart';
 import '../../../Utility/PreferencesManager.dart';
+import '../../InnerScreens/MainScreen/MainScreen.dart';
 import 'LoginModel.dart';
 import 'LoginRepository.dart';
 
@@ -85,6 +84,60 @@ class LoginScreenGlobalStateNotifier
             context, 'Please Check Your Internet Connection');
       }
     });
+  }
+
+  ///This method used to call Login API for Social Platform users
+  void callSocialSignInAPI(BuildContext context, String mail, String platform, String firstName, String lastName) {
+    if (!context.mounted) return;
+    CodeReusability().isConnectedToNetwork().then((isConnected) async {
+      if (isConnected) {
+
+        Map<String, dynamic> requestBody = {
+          'email': mail,
+          "firstName": firstName,
+          "lastName": lastName,
+          "provider": platform
+        };
+
+        CommonWidgets().showLoadingBar(true, context);
+
+        LoginRepository().callSocialLoginApi(requestBody, (statusCode, responseBody) {
+          LoginResponse response = LoginResponse.fromJson(responseBody);
+
+          if (statusCode == 200) {
+            PreferencesManager.getInstance().then((prefs) {
+              prefs.setStringValue(PreferenceKeys.userID,
+                  response.userId ?? '');
+              prefs.setStringValue(PreferenceKeys.refreshToken,
+                  response.refreshToken ?? '');
+              prefs.setStringValue(PreferenceKeys.accessToken,
+                  response.accessToken ?? '');
+              prefs.setStringValue(PreferenceKeys.loginActivityId,
+                  response.loginActivityId ?? '');
+              prefs.setBooleanValue(PreferenceKeys.isUserLogged, true);
+
+              CommonWidgets().showLoadingBar(false, context); //  Loading bar is disabled Here
+              CommonAPI().callUserProfileAPI();
+              CommonAPI().callDeviceRegisterAPI();
+
+              //Call Navigation
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainScreen()),
+              );
+            });
+
+          } else {
+            CommonWidgets().showLoadingBar(false, context);
+            CodeReusability().showAlert(context, response.message ?? "something Went Wrong");
+          }
+        });
+
+
+
+      } else {
+        CodeReusability().showAlert(context, 'Please Check Your Internet Connection');
+      }
+    });
+
   }
 
 

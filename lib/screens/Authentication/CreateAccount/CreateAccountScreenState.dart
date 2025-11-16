@@ -1,5 +1,6 @@
 import 'package:botaniqmicrogreens/constants/ConstantVariables.dart';
 import 'package:botaniqmicrogreens/screens/Authentication/CreateAccount/CreateAccountRepository.dart';
+import 'package:botaniqmicrogreens/screens/Authentication/LoginScreen/LoginScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,14 +15,12 @@ class CreateAccountScreenGlobalState {
   final TextEditingController lastNameController;
   final TextEditingController emailController;
   final TextEditingController mobileNumberController;
-  final String userID;
 
   CreateAccountScreenGlobalState({
     required this.firstNameController,
     required this.lastNameController,
     required this.emailController,
     required this.mobileNumberController,
-    required this.userID
   });
 
   CreateAccountScreenGlobalState copyWith({
@@ -29,14 +28,12 @@ class CreateAccountScreenGlobalState {
     TextEditingController? lastNameController,
     TextEditingController? emailController,
     TextEditingController? mobileNumberController,
-    String? userID
   }) {
     return CreateAccountScreenGlobalState(
       firstNameController: firstNameController ?? this.firstNameController,
       lastNameController: firstNameController ?? this.lastNameController,
       emailController: firstNameController ?? this.lastNameController,
       mobileNumberController: firstNameController ?? this.lastNameController,
-        userID: userID ?? this.userID
     );
   }
 }
@@ -48,7 +45,6 @@ class CreateAccountScreenStateNotifier
     lastNameController: TextEditingController(),
     emailController: TextEditingController(),
     mobileNumberController: TextEditingController(),
-      userID: ''
   ));
 
   @override
@@ -98,7 +94,6 @@ class CreateAccountScreenStateNotifier
         CreateAccountRepository().callCreateAccountApi(requestBody, (statusCode, responseBody) {
           CreateAccountResponse response = CreateAccountResponse.fromJson(responseBody);
 
-          state = state.copyWith(userID: response.data?.userId);
 
           if (statusCode == 200 || statusCode == 201) {
               CommonWidgets().showLoadingBar(false, context); //  Loading bar is disabled Here
@@ -123,7 +118,7 @@ class CreateAccountScreenStateNotifier
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-          builder: (context) => CreatePassword(userID: state.userID,)),//const ForgotPasswordScreen()),
+          builder: (context) => const LoginScreen()),//const ForgotPasswordScreen()),
     );
   }
 

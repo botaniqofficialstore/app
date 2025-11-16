@@ -62,236 +62,230 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () {
-          CodeReusability.hideKeyboard(context);
-        },
-        child: Scaffold(
-          resizeToAvoidBottomInset: true,
-          key: _scaffoldKey,
-          backgroundColor: objConstantColor.navyBlue,
-          body: loginView(context),
-        )
+      onTap: () => CodeReusability.hideKeyboard(context),
+      child: Scaffold(
+        key: _scaffoldKey,
+        backgroundColor: objConstantColor.navyBlue,
+        body: SafeArea(
+          bottom: false,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight, // important
+                  ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      children: [
+                        const Spacer(),
+                        // LOGO
+                        Padding(
+                          padding: EdgeInsets.only(top: 35.dp),
+                          child: Center(
+                            child: Image.asset(
+                              objConstantAssest.loginLogo,
+                              width: 150.dp,
+                              height: 90.dp,
+                            ),
+                          ),
+                        ),
+
+                        const Spacer(),
+                        const Spacer(),
+                        const Spacer(),
+                        // White Bottom Section
+                        loginBottomContainer(context),
+
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
     );
   }
 
 
-  Widget loginView(BuildContext context) {
+  Widget loginBottomContainer(BuildContext context) {
     final loginState = ref.watch(loginScreenProvider);
     final loginNotifier = ref.read(loginScreenProvider.notifier);
 
-    return Column(
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(35.dp),
+          topRight: Radius.circular(35.dp),
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(25.dp, 20.dp, 25.dp, MediaQuery.of(context).viewInsets.bottom + 5.dp),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 40.dp),
-            child: SafeArea(
-              bottom: false,
-              child: Center(
-                child: Image.asset(
-                  objConstantAssest.loginLogo,
-                  width: 150.dp,
-                  height: 90.dp,
-                ),
+          // Title
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 20.dp),
+            child: Center(
+              child: objCommonWidgets.customText(
+                context,
+                'Login',
+                30,
+                objConstantColor.navyBlue,
+                objConstantFonts.montserratBold,
               ),
             ),
           ),
-          SizedBox(height: 10.dp,),
 
-          //Container View...
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(35.dp),
-                  topRight: Radius.circular(35.dp),
-                ),
-              ),
-              padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 25.dp),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+          SizedBox(height: 15.dp),
 
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 20.dp),
-                      child: Center(
-                        child: objCommonWidgets.customText(
-                            context, 'Login', 30,
-                            objConstantColor.navyBlue,
-                            objConstantFonts.montserratBold),
-                      ),
-                    ),
+          objCommonWidgets.customText(
+            context,
+            'Email/Mobile Number',
+            15,
+            objConstantColor.navyBlue,
+            objConstantFonts.montserratSemiBold,
+          ),
 
-                    SizedBox(height: 15.dp,),
+          SizedBox(height: 5.dp),
 
-                    objCommonWidgets.customText(
-                        context, 'Email/Mobile Number', 15,
-                        objConstantColor.navyBlue,
-                        objConstantFonts.montserratSemiBold),
-                    CommonTextField(
-                      controller: loginState.emailMobileController,
-                      placeholder: "Enter your email or mobile number",
-                      textSize: 15,
-                      fontFamily: objConstantFonts.montserratMedium,
-                      textColor: objConstantColor.navyBlue,
-                      isNumber: false,
-                      // alphabetic
-                      onChanged: (value) {},
-                    ),
+          CommonTextField(
+            controller: loginState.emailMobileController,
+            placeholder: "Enter your email or mobile number",
+            textSize: 15,
+            fontFamily: objConstantFonts.montserratMedium,
+            textColor: objConstantColor.navyBlue,
+            isNumber: false,
+            onChanged: (value) {},
+          ),
 
-                    SizedBox(height: 15.dp,),
+          SizedBox(height: 18.dp),
 
-                    SizedBox(
-                      width: double.infinity,
-                      child: CupertinoButton(
-                        padding: EdgeInsets.symmetric(vertical: 15.dp),
-                        color: objConstantColor.orange,
-                        borderRadius: BorderRadius.circular(12.dp),
-                        onPressed: () {
-                          setState(() {
-                            loginNotifier.checkLoginFieldValidation(context);
-                          });
-                        },
-                        child: objCommonWidgets.customText(
-                          context,
-                          'GET OTP',
-                          18,
-                          objConstantColor.white,
-                          objConstantFonts.montserratSemiBold,
-                        ),
-                      ),
-                    ),
-
-
-                    SizedBox(height: 20.dp,),
-
-                    objCommonWidgets.orWidget(context),
-
-                    SizedBox(height: 20.dp,),
-
-                    Row(
-                      children: [
-
-                        const Spacer(),
-
-                        CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(50.dp),
-                                border: Border.all(
-                                  color: Colors.grey.shade400,
-                                  width: 1,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    blurRadius: 1,
-                                    spreadRadius: 1,
-                                    offset: const Offset(0, 1),
-                                  ),
-                                ],
-                              ),
-                              child:
-                              Padding(
-                                padding: EdgeInsets.all(12.dp),
-                                child: Image.asset(
-                                  objConstantAssest.google, width: 16.dp,),
-                              ),
-                            ), onPressed: () async {
-                          final user = await GoogleSignInService.signInWithGoogle();
-
-                          if (user != null) {
-                            print("NAME: ${user.displayName}");
-                            print("EMAIL: ${user.email}");
-                            print("PHOTO: ${user.photoUrl}");
-                          } else {
-                            print("Google Sign-In cancelled or failed");
-                          }
-                        }),
-
-                        SizedBox(width: 50.dp,),
-
-                        CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(50.dp),
-                                border: Border.all(
-                                  color: Colors.grey.shade400,
-                                  width: 1,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    blurRadius: 1,
-                                    spreadRadius: 1,
-                                    offset: const Offset(0, 1),
-                                  ),
-                                ],
-                              ),
-                              child:
-                              Padding(
-                                padding: EdgeInsets.all(10.dp),
-                                child: Image.asset(
-                                  objConstantAssest.facebook, width: 18.dp,),
-                              ),
-                            ), onPressed: () async {
-
-                          final user = await FacebookSignInService.signInWithFacebook();
-                          if (user != null) {
-                            print("NAME: ${user.displayName}");
-                            print("EMAIL: ${user.email}");
-                            print("PHOTO: ${user.photoURL}");
-                          }
-
-                        }),
-                        const Spacer(),
-                      ],
-                    ),
-
-                    SizedBox(height: 15.dp,),
-
-                    Row(
-                      children: [
-                        const Spacer(),
-                        objCommonWidgets.customText(
-                            context, 'New User?', 12, Colors.grey.shade600,
-                            objConstantFonts.montserratMedium),
-                        SizedBox(width: 5.dp,),
-                        CupertinoButton(padding: EdgeInsets.zero,
-                            child: objCommonWidgets.customText(
-                                context, 'Create Account', 13,
-                                objConstantColor.orange,
-                                objConstantFonts.montserratSemiBold),
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (
-                                        context) => const CreateAccountScreen()),
-                              );
-                            }),
-                        const Spacer(),
-                      ],
-                    )
-
-
-                  ],
-                ),
+          // OTP Button
+          SizedBox(
+            width: double.infinity,
+            child: CupertinoButton(
+              padding: EdgeInsets.symmetric(vertical: 15.dp),
+              color: objConstantColor.orange,
+              borderRadius: BorderRadius.circular(12.dp),
+              onPressed: () {
+                loginNotifier.checkLoginFieldValidation(context);
+              },
+              child: objCommonWidgets.customText(
+                context,
+                'GET OTP',
+                18,
+                objConstantColor.white,
+                objConstantFonts.montserratSemiBold,
               ),
             ),
-          )
+          ),
+
+          SizedBox(height: 25.dp),
+
+          objCommonWidgets.orWidget(context),
+
+          SizedBox(height: 20.dp),
+
+          // Social buttons
+          Row(
+            children: [
+              const Spacer(),
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                child: socialIcon(objConstantAssest.google, 16.dp),
+                onPressed: () async {
+                  final user = await GoogleSignInService.signInWithGoogle();
+                  if (user != null){
+                    var result = CodeReusability().splitFullName('${user.displayName}');
+                    loginNotifier.callSocialSignInAPI(context, user.email, 'google', '${result["firstName"]}', '${result["lastName"]}');
+                  }
+                },
+              ),
+              SizedBox(width: 50.dp),
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                child: socialIcon(objConstantAssest.facebook, 18.dp),
+                onPressed: () async {
+                  final user = await FacebookSignInService.signInWithFacebook();
+                  var result = CodeReusability().splitFullName('${user?.displayName}');
+                  if (user != null){
+                    loginNotifier.callSocialSignInAPI(context, '${user.email}', 'facebook', '${result["firstName"]}', '${result["lastName"]}');
+                  }
+                },
+              ),
+              const Spacer(),
+            ],
+          ),
+
+          SizedBox(height: 25.dp),
+
+          // Create account
+          Row(
+            children: [
+              const Spacer(),
+              objCommonWidgets.customText(
+                  context,
+                  'New User?',
+                  12,
+                  Colors.grey.shade600,
+                  objConstantFonts.montserratMedium),
+              SizedBox(width: 5.dp),
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                child: objCommonWidgets.customText(
+                    context,
+                    'Create Account',
+                    13,
+                    objConstantColor.orange,
+                    objConstantFonts.montserratSemiBold),
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CreateAccountScreen(),
+                    ),
+                  );
+                },
+              ),
+              const Spacer(),
+            ],
+          ),
+          SizedBox(height: MediaQuery.of(context).padding.bottom)
 
 
-        ]
+        ],
+      ),
     );
   }
+
+  Widget socialIcon(String asset, double size) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(50.dp),
+        border: Border.all(color: Colors.grey.shade400, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            blurRadius: 1,
+            spreadRadius: 1,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(12.dp),
+        child: Image.asset(asset, width: size),
+      ),
+    );
+  }
+
 
 
 }

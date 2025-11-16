@@ -4,8 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
-import '../../../../CodeReusable/FacebookSignInService.dart';
-import '../../../../CodeReusable/GoogleSignInService.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../../CodeReusable/CodeReusability.dart';
 import '../../../Utility/PreferencesManager.dart';
@@ -89,7 +87,6 @@ class CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
 
-
           Stack(
             children: [
               Image.asset(
@@ -113,21 +110,29 @@ class CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                       );
                     },
                   )),
+
+              Positioned(left: 15.dp, bottom: 5.dp, child:
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  objCommonWidgets.customText(
+                    context,
+                    'Create',
+                    40,
+                    objConstantColor.white,
+                    objConstantFonts.montserratBold,
+                  ),
+                  objCommonWidgets.customText(
+                    context,
+                    'Account',
+                    40,
+                    objConstantColor.white,
+                    objConstantFonts.montserratBold,
+                  ),
+                ],
+              ))
             ],
           ),
-
-          Padding(
-            padding: EdgeInsets.only(top: 15.dp),
-            child: objCommonWidgets.customText(
-              context,
-              'Create Account',
-              30,
-              objConstantColor.navyBlue,
-              objConstantFonts.montserratBold,
-            ),
-          ),
-
-
 
 
           Padding(
@@ -233,7 +238,7 @@ class CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                   width: double.infinity,
                   child: CupertinoButton(
                     padding: EdgeInsets.symmetric(vertical: 15.dp),
-                    color: Colors.black,
+                    color: objConstantColor.navyBlue,
                     borderRadius: BorderRadius.circular(12.dp),
                     onPressed: () {
                       screenNotifier.checkTextFieldValidation(context);
@@ -248,7 +253,36 @@ class CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                     ),
                   ),
                 ),
-              )
+              ),
+
+
+
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 15.dp),
+                child: Row(
+                  children: [
+                    const Spacer(),
+                    objCommonWidgets.customText(
+                        context, 'Already have account?', 12, Colors.grey.shade600,
+                        objConstantFonts.montserratMedium),
+                    SizedBox(width: 2.dp,),
+                    CupertinoButton(padding: EdgeInsets.zero,
+                        child: objCommonWidgets.customText(
+                            context, 'Login', 13,
+                            objConstantColor.orange,
+                            objConstantFonts.montserratSemiBold),
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (
+                                    context) => const LoginScreen()),
+                          );
+                        }),
+                    const Spacer(),
+                  ],
+                ),
+              ),
 
             ],
           ),)

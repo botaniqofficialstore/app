@@ -145,38 +145,55 @@ router.post('/resend-otp', async (req, res) => {
 // NOTE: You usually verify token from Google/Facebook SDK and then create/find user
 router.post('/social-login', async (req, res) => {
   try {
-    const { email, firstName, lastName, provider } = req.body; // provider = google/facebook
+    const { email, firstName, lastName, provider, deviceId, appVersion } = req.body;
 
+    if (!email || !provider) {
+      return res.status(400).json({ message: 'Email and provider are required' });
+    }
+
+    // Find or create user
     let user = await UserProfile.findOne({ email });
+
     if (!user) {
-      user = new UserProfile({ userId: `user-${Date.now()}`, email, firstName, lastName });
+      user = new UserProfile({
+        userId: `user-${Date.now()}`,
+        email,
+        firstName,
+        lastName,
+        mobileNumber: undefined, // VERY IMPORTANT → avoid null duplicate issue
+      });
+
       await user.save();
     }
 
-    // Save login activity for social login
-  const loginActivity = new LoginActivity({
-    userId: user.userId,
-    loginType: provider, // 'google' or 'facebook'
-    deviceId: req.body.deviceId || 'unknown',
-    appVersion: req.body.appVersion || '1.0',
-    activeStatus: 0
-  });
-
-  await loginActivity.save();
-  const token = generateToken(user);
-
-   res.json({
-     message: 'Login successful',
-     userId: user.userId,
-     token,
-     loginActivityId: loginActivity._id
+    // Save login activity
+    const loginActivity = new LoginActivity({
+      userId: user.userId,
+      loginType: provider, 
+      deviceId: deviceId || 'unknown',
+      appVersion: appVersion || '1.0',
+      activeStatus: 0
     });
 
-    
+    await loginActivity.save();
+
+    // Generate tokens
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    res.json({
+      message: 'Login successful',
+      userId: user.userId,
+      accessToken,
+      refreshToken,
+      loginActivityId: loginActivity._id
+    });
+
   } catch (error) {
+    console.error("Social Login Error:", error);
     res.status(500).json({ message: error.message });
   }
-  });
+});
 
 
 

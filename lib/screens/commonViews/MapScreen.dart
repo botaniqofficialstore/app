@@ -18,6 +18,7 @@ import '../../constants/Constants.dart';
 import '../InnerScreens/ContainerScreen/EditProfileScreen/EditProfileModel.dart';
 import '../InnerScreens/ContainerScreen/EditProfileScreen/EditProfileRepository.dart';
 import '../InnerScreens/MainScreen/MainScreenState.dart';
+import 'DeliveryRestrictionPopup.dart';
 
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
@@ -113,19 +114,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, 2))],
+                      boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5.dp, offset: const Offset(0, 2))],
                     ),
                     child: GooglePlaceAutoCompleteTextField(
                       textEditingController: _searchController,
                       googleAPIKey: 'AIzaSyBj448jygDcUrpUtXtmynTluoxWFbKP6Gk',
                       inputDecoration: InputDecoration(
-                        hintText: "Search address",
+                        hintText: "Search here...",
                         border: InputBorder.none,
                         prefixIcon: Icon(Icons.search, color: objConstantColor.navyBlue),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12.dp, vertical: 14.dp),
                       ),
                       debounceTime: 800,
-                      countries: ["in"],
+                      countries: const ["in"],
                       isLatLngRequired: true,
                       getPlaceDetailWithLatLng: (Prediction prediction) async {
                         final lat = double.parse(prediction.lat!);
@@ -243,15 +244,20 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   double _toRadians(double deg) => deg * pi / 180;
 
   void _showOutOfRangeAlert() {
-    showDialog(
+    /*showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text("Out of Delivery Range"),
-        content: const Text("Sorry, we can't deliver to this address. We will come to you soon!"),
+        content: const Text("Sorry, we can't deliver to this address now. We will come to you soon!"),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK")),
         ],
       ),
+    );*/
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (_) => const DeliveryRestrictionPopup(),
     );
   }
 
@@ -286,16 +292,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     bool serviceEnabled;
     LocationPermission permission;
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      objCommonWidgets.showLocationSettingsAlert(context);
-      return;
-    }
-
     permission = await Geolocator.checkPermission();
+
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
     }
+
 
     if (permission == LocationPermission.deniedForever) {
       await CommonWidgets().showPermissionDialog(context);

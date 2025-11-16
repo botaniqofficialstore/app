@@ -234,6 +234,35 @@ class CodeReusability {
     print('✅ Local saved data cleared successfully.');
   }
 
+  ///This method is used to separate string
+  Map<String, String> splitFullName(String fullName) {
+    // Trim extra spaces
+    fullName = fullName.trim();
+
+    // Split by spaces
+    List<String> parts = fullName.split(" ");
+
+    if (parts.length == 1) {
+      // Only one name given
+      return {
+        "firstName": parts[0],
+        "lastName": "",
+      };
+    }
+
+    // First word = first name
+    String firstName = parts.first;
+
+    // Everything after first = last name
+    String lastName = parts.sublist(1).join(" ");
+
+    return {
+      "firstName": firstName,
+      "lastName": lastName,
+    };
+  }
+
+
 
   ///This method used to show alert dialog.
   ///

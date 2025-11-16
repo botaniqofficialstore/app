@@ -15,7 +15,7 @@ class LogoutPopup {
     showGeneralDialog(
       context: context,
       barrierLabel: "Logout",
-      barrierDismissible: true,
+      barrierDismissible: false,
       barrierColor: Colors.black38,
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, anim1, anim2) {

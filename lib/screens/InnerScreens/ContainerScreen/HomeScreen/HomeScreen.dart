@@ -79,14 +79,9 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
             child: Row(
               children: [
                 SizedBox(width: 5.dp,),
-                Text(
-                  "Microgreens",
-                  style: TextStyle(
-                    color: objConstantColor.navyBlue,
-                    fontSize: 28.dp,
-                    fontFamily: ConstantAssests.montserratBold,
-                  ),
-                ),
+
+                objCommonWidgets.customText(context, "Microgreens", 28, objConstantColor.navyBlue, ConstantAssests.montserratBold),
+
                 const Spacer(),
                 CupertinoButton(
                   key: wishButtonKey,

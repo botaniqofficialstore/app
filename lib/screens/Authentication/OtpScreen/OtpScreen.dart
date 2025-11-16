@@ -1,6 +1,7 @@
 import 'dart:async';
-
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_sizer/flutter_sizer.dart';
 import 'package:lottie/lottie.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../../CodeReusable/CodeReusability.dart';
+import '../../../Utility/PreferencesManager.dart';
 import '../LoginScreen/LoginScreen.dart';
 import 'OtpScreenState.dart';
 
@@ -34,6 +36,7 @@ class OtpScreenState extends ConsumerState<OtpScreen> {
   @override
   void initState() {
     super.initState();
+    BackButtonInterceptor.add(otpInterceptor);
     Future.microtask(() {
       final otpScreenNotifier = ref.read(otpScreenGlobalStateProvider.notifier);
       otpScreenNotifier.updateUserData(widget.loginWith);
@@ -50,26 +53,64 @@ class OtpScreenState extends ConsumerState<OtpScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    BackButtonInterceptor.remove(otpInterceptor);
+    super.dispose();
+  }
+
+  //MARK: - METHODS
+  /// Return true to prevent default behavior (app exit)
+  /// Return false to allow default behavior
+  bool otpInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
+    if (kDebugMode) {
+      print("Back button intercepted!");
+    }
+    PreferencesManager.getInstance().then((prefs) {
+      if (prefs.getBooleanValue(PreferenceKeys.isDialogOpened) == true) {
+        return false;
+      } else if ((prefs.getBooleanValue(PreferenceKeys.isLoadingBarStarted) ==
+          true)) {
+        return true;
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const LoginScreen()),
+        );
+      }
+    });
+    return true;
+  }
+
+
+
   //MARK: - Widget
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () {
-          CodeReusability.hideKeyboard(context);
-        },
-        child: Scaffold(
-          resizeToAvoidBottomInset: true,
-          key: _scaffoldKey,
-          backgroundColor: Colors.white,
-          body: SingleChildScrollView(
-            child: otpView(context),
-          ),
-        )
+      onTap: () => CodeReusability.hideKeyboard(context),
+      child: Scaffold(
+        key: _scaffoldKey,
+        backgroundColor: objConstantColor.navyBlue,
+        body: SafeArea(
+            bottom: false,
+            child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight, // important
+                        ),
+                        child: IntrinsicHeight(
+                            child: otpView(context))
+                    ),
+                  );
+                })),
+      ),
     );
   }
-
-
-  
 
 
   ///This method used to start OTP Timer
@@ -92,53 +133,53 @@ class OtpScreenState extends ConsumerState<OtpScreen> {
     final otpState = ref.watch(otpScreenGlobalStateProvider);
     final otpNotifier = ref.read(otpScreenGlobalStateProvider.notifier);
 
-    return SafeArea(
-      bottom: false,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 5.dp, vertical: 10.dp),
-        child: Column(
-          children: [
+    return Column(
+        children: [
 
-            Row(
-              children: [
-                CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  child: Image.asset(
-                    objConstantAssest.backIcon,
-                    color: objConstantColor.navyBlue,
-                    height: 30.dp,
+          const Spacer(),
+
+          Padding(
+            padding: EdgeInsets.only(top: 35.dp),
+            child: Center(
+              child: Image.asset(
+                objConstantAssest.loginLogo,
+                width: 150.dp,
+                height: 90.dp,
+              ),
+            ),
+          ),
+
+          const Spacer(),
+          const Spacer(),
+    
+    
+          /// Center Content
+          Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(35.dp),
+                    topRight: Radius.circular(35.dp),
                   ),
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginScreen()),
-                    );
-                  },
                 ),
-                const Spacer()
-              ],
-            ),
-
-            SizedBox(height: 15.dp,),
-
-
-            Lottie.asset(
-              objConstantAssest.otpAnimation,
-              height: 200.dp,
-              repeat: true,
-            ),
-
-
-            SizedBox(height: 50.dp,),
-
-
-            /// Center Content
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 25.dp),
+                padding: EdgeInsets.fromLTRB(25.dp, 20.dp, 25.dp, MediaQuery.of(context).viewInsets.bottom + 5.dp),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20.dp),
+                    child: Center(
+                      child: objCommonWidgets.customText(
+                          context, 'Verify OTP', 30,
+                          objConstantColor.navyBlue,
+                          objConstantFonts.montserratBold),
+                    ),
+                  ),
+
+                  SizedBox(height: 10.dp),
+
                   objCommonWidgets.customText(
                     context,
                     'Enter the OTP sended to the ${widget.isEmail ? 'Email' : 'Mobile Number'} ${CodeReusability().maskEmailOrMobile(widget.loginWith)}',
@@ -147,7 +188,7 @@ class OtpScreenState extends ConsumerState<OtpScreen> {
                     objConstantFonts.montserratSemiBold,
                     textAlign: TextAlign.center
                   ),
-                  SizedBox(height: 25.dp),
+                  SizedBox(height: 35.dp),
 
                   //OTP Field
                 Padding(
@@ -222,13 +263,41 @@ class OtpScreenState extends ConsumerState<OtpScreen> {
                       ),
                     ),
                   ),
+
+                  SizedBox(height: 60.dp,),
+
+                  Row(
+                    children: [
+                      const Spacer(),
+                      objCommonWidgets.customText(
+                          context, 'Back to', 12, Colors.grey.shade600,
+                          objConstantFonts.montserratMedium),
+                      SizedBox(width: 2.dp,),
+                      CupertinoButton(padding: EdgeInsets.zero,
+                          child: objCommonWidgets.customText(
+                              context, 'Login', 13,
+                              objConstantColor.orange,
+                              objConstantFonts.montserratSemiBold),
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (
+                                      context) => const LoginScreen()),
+                            );
+                          }),
+                      const Spacer(),
+                    ],
+                  ),
+
+                  SizedBox(height: MediaQuery.of(context).padding.bottom)
+
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
-    );
+
+          ),
+        ],
+      );
   }
 
 
@@ -288,7 +357,9 @@ class OtpScreenState extends ConsumerState<OtpScreen> {
         isDense: true,
         contentPadding: EdgeInsets.only(bottom: 8.dp),
         enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: objConstantColor.navyBlue, width: 1.5),
+          borderSide: BorderSide(color: otpStateWatch.otpValues[index].isNotEmpty
+              ? objConstantColor.orange
+              : objConstantColor.navyBlue, width: 1.5),
         ),
         focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: objConstantColor.orange, width: 2),

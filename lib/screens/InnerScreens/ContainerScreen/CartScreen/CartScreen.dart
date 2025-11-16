@@ -158,12 +158,9 @@ class CartScreenState extends ConsumerState<CartScreen> {
                             SizedBox(height: 10.dp),
                             amountText('Amount', '${userScreenState.totalAmount}', ConstantAssests.montserratMedium),
                             amountText('Discount', '${userScreenState.totalDiscount}', ConstantAssests.montserratMedium),
-                            amountText('Delivery Charge', '89', ConstantAssests.montserratMedium),
+                            amountText('Delivery Charge', (userScreenState.isDeliveryAddress) ? '89' : ' __', ConstantAssests.montserratMedium),
                             SizedBox(height: 5.dp),
-                            amountText(
-                              'Payable Amount',
-                              '${userScreenState.totalPayableAmount}',
-                              ConstantAssests.montserratSemiBold,
+                            amountText('Payable Amount', (userScreenState.isDeliveryAddress) ? '${userScreenState.totalPayableAmount}' : ' __', ConstantAssests.montserratSemiBold,
                             ),
                           ],
                         );
@@ -175,7 +172,9 @@ class CartScreenState extends ConsumerState<CartScreen> {
             ),
 
             /// Checkout (only when not loading and cart is not empty)
+
             if (!userScreenState.isLoading && cartItems.isNotEmpty)
+             if (userScreenState.isProfileCompleted) ...{
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -215,7 +214,8 @@ class CartScreenState extends ConsumerState<CartScreen> {
                             cartScreenNotifier.callNavigateToSummary(userScreenNotifier);
                           },
                           child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 8.dp, horizontal: 20.dp),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 8.dp, horizontal: 20.dp),
                             decoration: BoxDecoration(
                               color: objConstantColor.green,
                               borderRadius: BorderRadius.circular(4.dp),
@@ -224,7 +224,7 @@ class CartScreenState extends ConsumerState<CartScreen> {
                                 width: 1.5,
                               ),
                             ),
-                            child:  Shimmer.fromColors(
+                            child: Shimmer.fromColors(
                               baseColor: objConstantColor.white,
                               highlightColor: objConstantColor.black,
                               child: customeText(
@@ -242,6 +242,69 @@ class CartScreenState extends ConsumerState<CartScreen> {
                   ),
                 ),
               ),
+            }else...{
+               showUpdateProfileView(context)
+            }
+
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget showUpdateProfileView(BuildContext context){
+    var userScreenState = ref.watch(cartScreenGlobalStateProvider);
+    final cartScreenNotifier = ref.read(cartScreenGlobalStateProvider.notifier);
+    final userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: objConstantColor.white,
+        boxShadow: const [
+          BoxShadow(
+              color: Colors.black12, blurRadius: 8, spreadRadius: 1),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(20.dp, 10.dp, 20.dp, 10.dp),
+        child: Row(
+          children: [
+
+            Expanded(
+              child: customeText(
+                userScreenState.profileIncompleteMessage,
+                12,
+                objConstantColor.navyBlue,
+                ConstantAssests.montserratSemiBold,
+
+              ),
+            ),
+
+            SizedBox(width: 10.dp,),
+
+            CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  cartScreenNotifier.calNavigationToEditProfile(userScreenNotifier);
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                      vertical: 10.dp, horizontal: 22.dp),
+                  decoration: BoxDecoration(
+                    color: objConstantColor.orange,
+                    borderRadius: BorderRadius.circular(4.dp),
+
+                  ),
+                  child: customeText(
+                    'Update',
+                    18,
+                    objConstantColor.white,
+                    ConstantAssests.montserratBold,
+                  ),
+                )
+            ),
+
 
           ],
         ),
