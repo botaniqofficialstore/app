@@ -73,7 +73,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             },
             onTap: (latLng) {
               if (!_isWithinAllowed(latLng)) {
-                _showOutOfRangeAlert();
+                _showOutOfRangeAlert(context);
                 return;
               }
               _placeSelectedMarker(latLng, _selectedAddress);
@@ -134,7 +134,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         final selected = LatLng(lat, lng);
 
                         if (!_isWithinAllowed(selected)) {
-                          _showOutOfRangeAlert();
+                          _showOutOfRangeAlert(context);
                           return;
                         }
 
@@ -243,22 +243,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   double _toRadians(double deg) => deg * pi / 180;
 
-  void _showOutOfRangeAlert() {
-    /*showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Out of Delivery Range"),
-        content: const Text("Sorry, we can't deliver to this address now. We will come to you soon!"),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK")),
-        ],
-      ),
-    );*/
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (_) => const DeliveryRestrictionPopup(),
-    );
+  void _showOutOfRangeAlert(BuildContext context) {
+    PreferencesManager.getInstance().then((pref) {
+      pref.setBooleanValue(PreferenceKeys.isDialogOpened, true);
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (_) => const DeliveryRestrictionPopup(),
+      );
+    });
   }
 
   Future<void> _getAddressFromLatLng(LatLng position) async {
@@ -313,7 +306,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     LatLng current = LatLng(position.latitude, position.longitude);
 
     if (!_isWithinAllowed(current)) {
-      _showOutOfRangeAlert();
+      _showOutOfRangeAlert(context);
       return;
     }
 
