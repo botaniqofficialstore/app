@@ -114,4 +114,44 @@ router.post("/reels/list", async (req, res) => {
   }
 });
 
+// ✅ Get all Reels with pagination
+router.post("/admin/reels/list", async (req, res) => {
+  try {
+    const {page = 1, limit = 10 } = req.body;
+
+    const skip = (page - 1) * limit;
+
+    // Fetch reels
+    const reels = await Reel.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit));
+
+    const totalCount = await Reel.countDocuments();
+
+    // Attach like info
+    const formatted = await Promise.all(
+      reels.map(async (reel) => {
+        const totalLikes = await ReelLike.countDocuments({ reelId: reel.reelId });
+        return {
+          reelId: reel.reelId,
+          reelUrl: reel.reelUrl,
+          caption: reel.caption,
+          totalLikes,
+        };
+      })
+    );
+
+    res.json({
+      page: Number(page),
+      limit: Number(limit),
+      totalReels: totalCount,
+      reels: formatted,
+    });
+  } catch (err) {
+    console.error("Error fetching reels:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;
