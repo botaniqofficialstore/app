@@ -88,7 +88,7 @@ Watch now: ${reel.reelUrl}
       Map<String, dynamic> body = {
         "userId": userId,
         "page": nextPage,
-        "limit": 4,
+        "limit": 10,
       };
 
       // ✅ Keep loading true until callback completes

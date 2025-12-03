@@ -5,7 +5,7 @@ import '../screens/InnerScreens/ContainerScreen/OrderScreen/OrderModel.dart';
 
 //MARK: - Class Declarations
 class ConstantURLs {
-  static String baseUrl = 'http://192.168.43.216:5000'; //'https://app-1q5g.onrender.com'; //
+  static String baseUrl = 'https://app-1q5g.onrender.com'; //'http://192.168.43.216:5000';
 
   ///Authentication API URL's
   static String manualLoginUrl = "$baseUrl/api/login";

@@ -1,4 +1,5 @@
 // ProductDetailScreen.dart
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:botaniqmicrogreens/constants/Constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,16 @@ class ProductDetailScreen extends ConsumerStatefulWidget {
 class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final ScrollController _scrollController = ScrollController();
+  int currentIndex = 0;
+  late CarouselController innerCarouselController;
+
+  final List<String> sample = [
+  'https://app-1q5g.onrender.com/uploads/1761632706172.png',
+  'https://app-1q5g.onrender.com/uploads/1761994235917.png',
+  'https://app-1q5g.onrender.com/uploads/1761994615276.png',
+  'https://app-1q5g.onrender.com/uploads/1761994304973.png',
+  'https://app-1q5g.onrender.com/uploads/1761994675928.png'
+  ];
 
   @override
   void initState() {
@@ -47,21 +58,418 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     var detailsScreenState = ref.watch(productDetailScreenGlobalStateProvider);
-    var detailsScreenNotifier =
-    ref.watch(productDetailScreenGlobalStateProvider.notifier);
+    var detailsScreenNotifier = ref.watch(productDetailScreenGlobalStateProvider.notifier);
 
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: objConstantColor.white,
       body: detailsScreenState.isLoading
           ? _buildShimmerPlaceholder()
-          : Scrollbar(
-        controller: _scrollController,
-        thumbVisibility: true,
-        thickness: 5.dp,
-        child: Column(
-          children: [
-            Expanded(
+          : Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      carousalSlider(context),
+
+
+                      Positioned(
+                        bottom: -18.dp,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          height: 40.dp,
+                          decoration: BoxDecoration(
+                            color: objConstantColor.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(25.dp),
+                              topRight: Radius.circular(25.dp),
+                            ),
+                          ),
+                          child: Center(child:
+                          Container(width: 50.dp,
+                            height: 5.dp,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withAlpha(50),
+                              borderRadius: BorderRadius.circular(20.dp)
+                            )),),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Full page white content after overlap
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.only(left: 15.dp, right: 15.dp), // offset to smooth transition
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+
+
+                        SizedBox(height: 15.dp),
+
+                        objCommonWidgets.customText(
+                          context,
+                          CodeReusability().cleanProductName(
+                              detailsScreenState.productData?.productName),
+                          22,
+                          objConstantColor.navyBlue,
+                          objConstantFonts.montserratBold,
+                        ),
+
+
+                        SizedBox(height: 20.dp),
+
+
+                        objCommonWidgets.customText(
+                          context, 'About',
+                          16,
+                          objConstantColor.navyBlue,
+                          objConstantFonts.montserratSemiBold,
+                        ),
+
+                        objCommonWidgets.customText(
+                            context,
+                            '${detailsScreenState.productData?.description}',
+                            12,
+                            objConstantColor.navyBlue,
+                            objConstantFonts.montserratMedium,
+                            textAlign: TextAlign.justify),
+
+
+                        SizedBox(height: 20.dp),
+
+                        objCommonWidgets.customText(
+                          context, 'Delivery Details',
+                          16,
+                          objConstantColor.navyBlue,
+                          objConstantFonts.montserratSemiBold,
+                        ),
+                        SizedBox(height: 5.dp),
+                        expectedDelivery(context),
+                        SizedBox(height: 1.dp),
+                        homeAddress(context),
+
+
+                        SizedBox(height: 20.dp),
+
+                        objCommonWidgets.customText(
+                          context, 'Price Details',
+                          16,
+                          objConstantColor.navyBlue,
+                          objConstantFonts.montserratSemiBold,
+                        ),
+                        SizedBox(height: 5.dp),
+                        priceDetails(context),
+
+
+
+                        SizedBox(height: 20.dp),
+
+
+
+
+
+
+
+
+
+                        SizedBox(height: 15.dp),
+
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+    );
+  }
+
+  Widget priceDetails(BuildContext context){
+    var detailsScreenState = ref.watch(productDetailScreenGlobalStateProvider);
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.green,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(5.dp),
+                topLeft: Radius.circular(5.dp),
+              ),
+            ),
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: 10.dp),
+            child: Center(
+              child: objCommonWidgets.customText(
+                context, '₹${detailsScreenState.productData?.productSellingPrice}/_',
+                17,
+                Colors.white,
+                objConstantFonts.montserratSemiBold,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: 2.dp),
+        Expanded(
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.black.withAlpha(8),
+              borderRadius: BorderRadius.only(
+                bottomRight: Radius.circular(5.dp),
+                topRight: Radius.circular(5.dp),
+              ),
+            ),
+            padding: EdgeInsets.symmetric(vertical: 10.dp),
+            child: Center(
+              child: Text(
+                "₹${detailsScreenState.productData?.productPrice}/_",
+                style: TextStyle(
+                  color: objConstantColor.gray,
+                  fontSize: 17.dp,
+                  fontFamily: objConstantFonts.montserratSemiBold,
+                  decoration: TextDecoration.lineThrough,
+                  decorationColor: objConstantColor.gray,
+                  decorationThickness: 1,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget homeAddress(BuildContext context){
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.only(left: 15.dp, right: 15.dp, bottom: 10.dp, top: 5.dp),
+      decoration: BoxDecoration(
+          color: Colors.black.withAlpha(8),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(10.dp),
+          bottomRight: Radius.circular(10.dp),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(objConstantAssest.home, width: 20.dp,),
+              SizedBox(width: 10.dp),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    objCommonWidgets.customText(context, 'Delivery Address',
+                        12, objConstantColor.navyBlue,
+                        objConstantFonts.montserratSemiBold),
+                    objCommonWidgets.customText(context, exactAddress,
+                        11, objConstantColor.orange,
+                        objConstantFonts.montserratSemiBold),
+                  ],
+                ),
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget expectedDelivery(BuildContext context){
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.only(left: 15.dp, right: 15.dp, bottom: 5.dp, top: 10.dp),
+      decoration: BoxDecoration(
+        color: Colors.black.withAlpha(8),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10.dp),
+          topRight: Radius.circular(10.dp),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(objConstantAssest.deliveryVan, width: 20.dp,),
+              SizedBox(width: 10.dp),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    objCommonWidgets.customText(context, 'Delivery expected by 6 Dec, sat',
+                        12, objConstantColor.navyBlue,
+                        objConstantFonts.montserratSemiBold),
+                    objCommonWidgets.customText(context, 'Order in 04h 13m 22s',
+                        11, objConstantColor.orange,
+                        objConstantFonts.montserratSemiBold),
+                  ],
+                ),
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget carousalSlider(BuildContext context){
+    var detailsScreenState = ref.watch(productDetailScreenGlobalStateProvider);
+    var detailsScreenNotifier = ref.watch(productDetailScreenGlobalStateProvider.notifier);
+
+      return Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          CarouselSlider.builder(
+            itemCount: sample.length,
+            itemBuilder: (context, index, realIndex) {
+              String imagePath = sample[index];
+
+              return Image.network(
+                imagePath,
+                width: double.infinity,
+                height: 250.dp,
+                fit: BoxFit.fill,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    objConstantAssest.placeHolder,
+                    // fallback image from assets
+                    width: double.infinity,
+                    height: 180.dp,
+                    fit: BoxFit.cover,
+                  );
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CupertinoActivityIndicator(
+                      color: objConstantColor.gray,
+                    ),
+                  );
+                },
+              );
+            },
+            options: CarouselOptions(
+              height: 320.dp,
+              autoPlay: false,
+              enlargeCenterPage: true,
+              viewportFraction: 1,
+              onPageChanged: (index, reason) {
+                setState(() => currentIndex = index);
+              },
+            ),
+          ),
+
+          // 🔥 Indicator placed inside the image
+          Positioned(
+            bottom: 45.dp,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(sample.length, (index) {
+                bool isActive = currentIndex == index;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 350),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: isActive ? 45.dp : 8.dp,
+                  height: 8.dp,
+                  decoration: BoxDecoration(
+                    color: isActive
+                        ? objConstantColor.white
+                        : objConstantColor.gray.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(20.dp),
+                  ),
+                );
+              }),
+            ),
+          ),
+
+          Positioned(
+            top: 10.dp,
+            right: 15.dp,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: CupertinoButton(
+                padding: EdgeInsets.all(4.dp),
+                minSize: 35.dp,
+                borderRadius: BorderRadius.circular(30),
+                child: Image.asset(
+                  (detailsScreenState.wishList == 0)
+                      ? objConstantAssest.wishUnCheckWhite
+                      : objConstantAssest.wishRed,
+                  width: 20.dp,
+                ),
+                onPressed: () {
+                  if (detailsScreenState.wishList == 0) {
+                    detailsScreenNotifier.callAddToWishList(
+                        context,
+                        '${detailsScreenState.productData?.productId}');
+                  } else {
+                    detailsScreenNotifier.callRemoveFromWishList(
+                        context,
+                        '${detailsScreenState.productData?.productId}');
+                  }
+                },
+              ),
+            ),
+          ),
+
+          Positioned(
+            top: 10.dp,
+            left: 15.dp,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: CupertinoButton(
+                padding: EdgeInsets.all(4.dp),
+                minSize: 35.dp,
+                borderRadius: BorderRadius.circular(30),
+                child: Image.asset(
+                  objConstantAssest.backIcon,
+                  color: objConstantColor.white,
+                  width: 25.dp,
+                ),
+                onPressed: () {
+                  ref
+                      .watch(MainScreenGlobalStateProvider.notifier)
+                      .callNavigation(ScreenName.home);
+                },
+              ),
+            ),
+          )
+
+        ],
+      );
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /*Expanded(
               child: SingleChildScrollView(
                 controller: _scrollController,
                 child: Column(
@@ -427,12 +835,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     ],
                   ),
                 ),
-              )
-          ],
-        ),
-      ),
-    );
-  }
+              )*/
 
   /// Helper method for nutrient icons
   String _getVitaminIcon(String vitamin) {

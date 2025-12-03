@@ -40,10 +40,27 @@ class ConstantAssests{
    String wish1 = '${homeScreenAssets}wishlist (1).png';
    String wish2 = '${homeScreenAssets}wishlist (2).png';
 
+   //Modules
+   String allIcon = '${homeScreenAssets}all.png';
+   String freshIcon = '${homeScreenAssets}fresh.png';
+   String healthWellnessIcon = '${homeScreenAssets}Health_Wellness.png';
+   String oilsStaplesIcon = '${homeScreenAssets}Oils_Staples.png';
+   String personalCareIcon = '${homeScreenAssets}Personal_Care.png';
+   String snacksIcon = '${homeScreenAssets}snacks.png';
+   String spicesIcon = '${homeScreenAssets}spices.png';
+   String spicesHerbsIcon = '${homeScreenAssets}Spices_Herbs.png';
+
+   String add1 = '${homeScreenAssets}add1.png';
+   String add2 = '${homeScreenAssets}add2.png';
+   String add3 = '${homeScreenAssets}add3.png';
+   String add4 = '${homeScreenAssets}add4.png';
+   String add5 = '${homeScreenAssets}add5.png';
+
 
    ///Order Screen Icons
    String noOrder = '${orderScreenAssets}no-order.png';
    String noWish = '${orderScreenAssets}noWishList.png';
+   String route = '${orderScreenAssets}route.png';
 
    ///Cart Screen Icons
    String addIcon = '${cartScreenAssets}add.png';
@@ -71,54 +88,13 @@ class ConstantAssests{
    String facebook = '${commonIconsAssets}facebook.png';
    String placeHolder = '${commonIconsAssets}placeHolder.png';
    String logout = '${commonIconsAssets}logout.png';
-
-   ///Products
-   /*String beetroot = '${homeScreenAssets}beetroot.png';
-   String broccoli = '${homeScreenAssets}Broccoli.png';
-   String sunflower = '${homeScreenAssets}sunflower.png';
-   String radishPink = '${homeScreenAssets}RadishPink.png';
-   String pakchoi = '${homeScreenAssets}pakchoi.png';
-   String amaranthus = '${homeScreenAssets}amaranthus.png';
-   String mustard = '${homeScreenAssets}GreenMustard.png';*/
-
-
-   String beetroot = '${homeScreenAssets}betroot_Micro.png';
-   String broccoli = '${homeScreenAssets}broccoli_Micro.png';
-   String sunflower = '${homeScreenAssets}sunflower_Micro.png';
-   String radishPink = '${homeScreenAssets}radhishPink_Micro.png';
-   String pakchoi = '${homeScreenAssets}pakchoi_Micro.png';
-   String amaranthus = '${homeScreenAssets}amaranthuRed_Micro.png';
-   String mustard = '${homeScreenAssets}greenMustard_Micro.png';
-
-
-
-
-
-
-
-   ///Products Details
-   String amaranthasBackground = '${productDetailsAssets}amaranthas_background.JPG';
-   String beetrootBackground = '${productDetailsAssets}beetroot_background.JPG';
-   String broccoliBackground = '${productDetailsAssets}Broccoli_background.JPG';
-   String greenMustardBackground = '${productDetailsAssets}greenMustard_background.PNG';
-   String pakchoiBackground = '${productDetailsAssets}pakchoi_background.PNG';
-   String radishPinkBackground = '${productDetailsAssets}radishPink_background.JPG';
-   String radishWhiteBackground = '${productDetailsAssets}radishWhite_background.JPG';
-   String sunflowerBackground = '${productDetailsAssets}microgreens_sunflower.PNG';
+   String verify = '${commonIconsAssets}verify.png';
+   String deliveryVan = '${commonIconsAssets}delivery-van.png';
+   String home = '${commonIconsAssets}home-button.png';
 
    ///Adds Assets
-   String addImage1 = '${addsAssets}adds1.jpg';
-   String addImage2 = '${addsAssets}adds2.webp';
-   String addImage3 = '${addsAssets}adds3.webp';
-   String addImage4 = '${addsAssets}adds4.jpg';
-   String addImage5 = '${addsAssets}adds5.jpeg';
    String addImage6 = '${addsAssets}adds6.webp';
-   String addImage7 = '${addsAssets}adds7.jpg';
    String addImage8 = '${addsAssets}adds8.jpg';
-   String addImage9 = '${addsAssets}adds9.jpg';
-   String addImage10 = '${addsAssets}adds10.jpg';
-   String addImage11 = '${addsAssets}adds11.webp';
-   String addImage12 = '${addsAssets}adds12.webp';
    String forgotPassword = '${addsAssets}forgotPassword.png';
    String createPassword = '${addsAssets}createPassword.png';
 

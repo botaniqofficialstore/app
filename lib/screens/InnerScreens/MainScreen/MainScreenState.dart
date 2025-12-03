@@ -20,36 +20,34 @@ import '../../../API/APIService.dart';
 import '../../../API/CommonModel.dart';
 import '../../../Utility/Logger.dart';
 import '../../../Utility/PreferencesManager.dart';
-import '../../commonViews/LocationPickerScreen.dart';
 import '../ContainerScreen/OrderScreen/OrderScreen.dart';
 import '../ContainerScreen/ReelsScreen/ReelsScreen.dart';
 
 class MainScreenGlobalState {
   final ScreenName currentModule;
 
-  // ✅ NEW: Added count fields
   final int cartCount;
   final int wishlistCount;
   final int totalCount;
 
   MainScreenGlobalState({
     this.currentModule = ScreenName.home,
-    this.cartCount = 0, // ✅ NEW
-    this.wishlistCount = 0, // ✅ NEW
-    this.totalCount = 0, // ✅ NEW
+    this.cartCount = 0,
+    this.wishlistCount = 0,
+    this.totalCount = 0,
   });
 
   MainScreenGlobalState copyWith({
     ScreenName? currentModule,
-    int? cartCount, // ✅ NEW
-    int? wishlistCount, // ✅ NEW
-    int? totalCount, // ✅ NEW
+    int? cartCount,
+    int? wishlistCount,
+    int? totalCount,
   }) {
     return MainScreenGlobalState(
       currentModule: currentModule ?? this.currentModule,
-      cartCount: cartCount ?? this.cartCount, // ✅ NEW
-      wishlistCount: wishlistCount ?? this.wishlistCount, // ✅ NEW
-      totalCount: totalCount ?? this.totalCount, // ✅ NEW
+      cartCount: cartCount ?? this.cartCount,
+      wishlistCount: wishlistCount ?? this.wishlistCount,
+      totalCount: totalCount ?? this.totalCount,
     );
   }
 }

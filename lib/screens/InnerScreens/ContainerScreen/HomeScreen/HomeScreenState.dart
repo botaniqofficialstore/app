@@ -19,6 +19,7 @@ class HomeScreenGlobalState {
   final int currentPage;
   final bool isLoading;
   final bool hasMore;
+  final int selectedIndex;
 
   HomeScreenGlobalState({
     this.currentModule = ScreenName.home,
@@ -26,6 +27,7 @@ class HomeScreenGlobalState {
     this.currentPage = 0,
     this.isLoading = false,
     this.hasMore = true,
+    required this.selectedIndex,
   });
 
   HomeScreenGlobalState copyWith({
@@ -34,6 +36,7 @@ class HomeScreenGlobalState {
     int? currentPage,
     bool? isLoading,
     bool? hasMore,
+    int? selectedIndex,
   }) {
     return HomeScreenGlobalState(
       currentModule: currentModule ?? this.currentModule,
@@ -41,12 +44,19 @@ class HomeScreenGlobalState {
       currentPage: currentPage ?? this.currentPage,
       isLoading: isLoading ?? this.isLoading,
       hasMore: hasMore ?? this.hasMore,
+      selectedIndex: selectedIndex ?? this.selectedIndex,
     );
   }
 }
 
 class HomeScreenGlobalStateNotifier extends StateNotifier<HomeScreenGlobalState> {
-  HomeScreenGlobalStateNotifier() : super(HomeScreenGlobalState());
+  HomeScreenGlobalStateNotifier() : super(HomeScreenGlobalState(selectedIndex: 0));
+
+
+
+  void updateSelectedIndex(int newIndex) {
+    state = state.copyWith(selectedIndex: newIndex);
+  }
 
   /// This method is used to get Product List from GET API
   Future<void> callProductListGepAPI(BuildContext context, {bool loadMore = false}) async {
