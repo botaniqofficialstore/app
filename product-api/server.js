@@ -17,6 +17,7 @@ const orderRoutes = require('./models/API/Orders/Orders');
 const notificationRoutes = require('./models/API/Notification/Notification');
 const countRoutes = require('./models/API/Count/Count');
 const reelsRoutes = require('./models/API/Reels/Reels');
+const AdminAuthRoutes = require('./models/API/Admin/AdminAuth');
 
 // Load the Service Account key
 const serviceAccount = JSON.parse(fs.readFileSync('./serviceAccountKey.json', 'utf-8'));
@@ -59,6 +60,7 @@ app.use('/api', orderRoutes);
 app.use('/api', notificationRoutes);
 app.use('/api', countRoutes);
 app.use('/api', reelsRoutes);
+app.use('/api/admin', AdminAuthRoutes);
 
 /* ---------------------------------------- MongoDB Connection ----------------------------------------------------------- */
 mongoose.connect(process.env.MONGO_URI)

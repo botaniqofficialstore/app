@@ -5,6 +5,7 @@ import 'package:botaniqmicrogreens/screens/Authentication/OtpScreen/OtpScreen.da
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/CartScreen/CartScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/EditProfileScreen/EditProfileScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/HomeScreen/HomeScreen.dart';
+import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/InformationScreen/InformationScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/OrderDetailsScreen/OrderDetailsScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/OrderSummaryScreen/OrderSummaryScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/ProductDetail/ProductDetailScreen.dart';
@@ -25,16 +26,18 @@ import '../ContainerScreen/ReelsScreen/ReelsScreen.dart';
 
 class MainScreenGlobalState {
   final ScreenName currentModule;
-
   final int cartCount;
   final int wishlistCount;
   final int totalCount;
+
+  final ProductDetailStatus? selectedProduct; // 👈 ADD THIS
 
   MainScreenGlobalState({
     this.currentModule = ScreenName.home,
     this.cartCount = 0,
     this.wishlistCount = 0,
     this.totalCount = 0,
+    this.selectedProduct, // 👈 ADD THIS
   });
 
   MainScreenGlobalState copyWith({
@@ -42,15 +45,18 @@ class MainScreenGlobalState {
     int? cartCount,
     int? wishlistCount,
     int? totalCount,
+    ProductDetailStatus? selectedProduct, // 👈 ADD THIS
   }) {
     return MainScreenGlobalState(
       currentModule: currentModule ?? this.currentModule,
       cartCount: cartCount ?? this.cartCount,
       wishlistCount: wishlistCount ?? this.wishlistCount,
       totalCount: totalCount ?? this.totalCount,
+      selectedProduct: selectedProduct ?? this.selectedProduct, // 👈 ADD THIS
     );
   }
 }
+
 
 class MainScreenGlobalStateNotifier
     extends StateNotifier<MainScreenGlobalState> {
@@ -115,6 +121,8 @@ class MainScreenGlobalStateNotifier
       return const OrderDetailsScreen();
     } else if (state.currentModule == ScreenName.map) {
       return const MapScreen();
+    } else if (state.currentModule == ScreenName.information){
+      return const InformationScreen();
     } else {
       return const HomeScreen();
     }
@@ -133,15 +141,30 @@ class MainScreenGlobalStateNotifier
         module == ScreenName.productDetail ||
         module == ScreenName.wishList ) {
       onScreen = ScreenName.home;
-    } else if (module == ScreenName.editProfile) {
+    } else if (module == ScreenName.editProfile || module == ScreenName.information) {
       onScreen = ScreenName.profile;
     } else if (module == ScreenName.orderSummary) {
       onScreen = ScreenName.cart;
     } else if (module == ScreenName.orderDetails) {
       onScreen = ScreenName.orders;
+    } else if (module == ScreenName.map){
+      if (userFrom == ScreenName.editProfile){
+        onScreen = ScreenName.editProfile;
+      } else if (userFrom == ScreenName.orderSummary){
+        onScreen = ScreenName.orderSummary;
+      } else if (userFrom == ScreenName.profile){
+        onScreen = ScreenName.profile;
+      } else {
+        onScreen = ScreenName.home;
+      }
     }
 
     state = state.copyWith(currentModule: onScreen);
+  }
+
+  ///This method is used to update product details screen UI
+  void updateSelectedProduct(ProductDetailStatus product) {
+    state = state.copyWith(selectedProduct: product);
   }
 
   ///This method is used to GET Api for refresh token api response as success

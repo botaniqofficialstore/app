@@ -50,9 +50,9 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
         Future.microtask(() {
           CommonAPI().callUserProfileAPI();
           ref.watch(MainScreenGlobalStateProvider.notifier).callFooterCountGETAPI();
-          final cartScreenNotifier = ref.read(
+          final homeScreenNotifier = ref.read(
               HomeScreenGlobalStateProvider.notifier);
-          cartScreenNotifier.callProductListGepAPI(context);
+          homeScreenNotifier.callProductListGepAPI(context);
         });
       }
     });
@@ -63,8 +63,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     var homeScreenState = ref.watch(HomeScreenGlobalStateProvider);
     var homeScreenNotifier = ref.watch(HomeScreenGlobalStateProvider.notifier);
-    final userScreenNotifier = ref.watch(
-        MainScreenGlobalStateProvider.notifier);
+    final userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
 
     return Scaffold(
         key: _scaffoldKey,
@@ -76,102 +75,150 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
           color: objConstantColor.navyBlue,
           backgroundColor: objConstantColor.white,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 15.dp),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
 
-              // ✅ Header Row (fixed at top)
-              Padding(
-                padding: EdgeInsets.symmetric(
-                    vertical: 10.dp, horizontal: 15.dp),
-                child: Row(
+                      Color(0xFFFFA600),
+                      Color(0xFFFF6A00),
+                      Color(0xFFFF3D00),
+                      Color(0xFFFF3D00),
+
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30.dp),
+                    bottomRight: Radius.circular(30.dp),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: CommonSearchField(
-                        controller: TextEditingController(),
-                        hintText: 'Search',
-                        onChanged: (value) {
-                          debugPrint("Searching: $value");
-                        },
-                      ),
+
+                    SizedBox(height: 20.dp,),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            objCommonWidgets.customText(context, 'Good to see you again',
+                                18, objConstantColor.white, objConstantFonts.montserratBold),
+
+                            objCommonWidgets.customText(context, 'Let’s find something natural today.',
+                                10, objConstantColor.white, objConstantFonts.montserratSemiBold),
+                          ],
+                        ),
+
+                        CupertinoButton(
+                          key: wishButtonKey,
+                          padding: EdgeInsets.zero,
+                          child: Image.asset(
+                            objConstantAssest.wishlist,
+                            width: 28.dp,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            userScreenNotifier.callNavigation(ScreenName.wishList);
+                          },
+                        ),
+                      ],
                     ),
 
-                    SizedBox(width: 5.dp),
-                    CupertinoButton(
-                      key: wishButtonKey,
-                      padding: EdgeInsets.zero,
-                      child: Image.asset(
-                        objConstantAssest.wish2,
-                        width: 30.dp,
-                      ),
-                      onPressed: () {
-                        userScreenNotifier.callNavigation(ScreenName.wishList);
+                    SizedBox(height: 15.dp),
+
+                    Row(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            objCommonWidgets.customText(context,
+                                'Delivery Location', 13, Colors.white,
+                                objConstantFonts.montserratBold),
+                            GestureDetector(
+                              onTap: (){
+                                userFrom = ScreenName.home;
+                                userScreenNotifier.callNavigation(ScreenName.map);
+                              },
+                              child: (exactAddress.isNotEmpty) ? Row(
+                                children: [
+                                  Icon(Icons.location_on,color: Colors.white, size: 18.dp,),
+                                  SizedBox(
+                                    width: 120.dp,
+                                    child: Text(exactAddress, style: TextStyle(color: Colors.white,
+                                    fontFamily: objConstantFonts.montserratSemiBold,
+                                    fontSize: 10.5.dp,
+                                    ),maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,),
+                                  ),
+                                  Icon(Icons.keyboard_arrow_down_rounded,color: Colors.white, size: 20.dp,),
+                                ],
+                              ) :
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10.dp)
+                                ),
+                                padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 7.dp),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.my_location_outlined,color: objConstantColor.orange, size: 15.dp,),
+                                    SizedBox(width: 2.dp,),
+                                    objCommonWidgets.customText(context,
+                                        'Update Location', 10, objConstantColor.orange,
+                                        objConstantFonts.montserratBold),
+
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+
+
+                      ],
+                    ),
+
+                    SizedBox(height: 15.dp),
+
+                    // ✅ Header Row (fixed at top)
+                    CommonSearchField(
+                      controller: TextEditingController(),
+                      hintText: 'Search',
+                      onChanged: (value) {
+                        debugPrint("Searching: $value");
                       },
                     ),
+
+                    SizedBox(height: 15.dp,),
+
+
+
                   ],
                 ),
               ),
 
-              SizedBox(height: 5.dp,),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15.dp),
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 5.dp,),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12.dp),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black54,
-                        blurRadius: 2.5,
-                        offset: Offset(1, 1),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-
-                      /// Animated Location Icon
-                      Lottie.asset(
-                        objConstantAssest.locationIcon,
-                        width: 35.dp,
-                        repeat: true,
-                      ),
-
-                      /// Address Text
-                      Expanded(
-                        child: objCommonWidgets.customText(context,
-                            (exactAddress.isEmpty
-                                ? 'Select delivery address'
-                                : exactAddress), 13, (exactAddress.isEmpty
-                                ? objConstantColor.navyBlue
-                                : objConstantColor.orange),
-                            objConstantFonts.montserratMedium),
-                      ),
-                      CupertinoButton(
-                        borderRadius: BorderRadius.circular(8.dp),
-                        onPressed: () {
-                          userFrom = ScreenName.home;
-                          userScreenNotifier.callNavigation(ScreenName.map);
-                        }, padding: EdgeInsets.zero,
-
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 8.dp, vertical: 6.dp),
-                          child: Image.asset(
-                            objConstantAssest.editImage, width: 20.dp,),
-                        ),
-                      ),
-
-                      SizedBox(width: 5.dp,)
-                    ],
-                  ),
-                ),
-              ),
 
               SizedBox(height: 15.dp,),
 
               Padding(
-                padding: EdgeInsets.only(left: 15.dp, right: 5.dp),
+                padding: EdgeInsets.only(left: 15.dp),
+                child: objCommonWidgets.customText(context,
+                    'Categories', 15, objConstantColor.navyBlue,
+                    objConstantFonts.montserratSemiBold),
+              ),
+
+              Padding(
+                padding: EdgeInsets.only(left: 15.dp, right: 5.dp, top: 5.dp),
                 child: SizedBox(
                   height: 50.dp,
                   child: ListView.separated(
@@ -327,10 +374,17 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                         );
                       }),
+
+
+
                     ],
                   ),
                 ),
-              )
+              ),
+
+
+
+
 
 
 
@@ -353,6 +407,10 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
             coverImage: product.coverImage,
             inCart: product.inCart,
             isWishlisted: product.isWishlisted);
+
+        ref.read(MainScreenGlobalStateProvider.notifier)
+            .updateSelectedProduct(savedProductDetails!);
+
         ref.watch(MainScreenGlobalStateProvider.notifier).callNavigation(
             ScreenName.productDetail);
       },
@@ -413,8 +471,8 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
 
                         // ✅ Top-right heart button
                         Positioned(
-                          top: 6.dp,
                           right: 6.dp,
+                          top: 6.dp,
                           child: Container(
                             decoration: BoxDecoration(
                               color: Colors.black.withOpacity(0.6),
@@ -572,7 +630,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
 
         // ✅ Offer label
         Positioned(
-            top: 9.dp,
+            top: 8.dp,
             left: 1.dp,
             child: Container(
               color: objConstantColor.yellow,
@@ -762,7 +820,7 @@ class CommonSearchField extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 5.dp, vertical: 3.dp),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10.dp), // rounded corners
+        borderRadius: BorderRadius.circular(30.dp), // rounded corners
         border: Border.all(
           color: objConstantColor.navyBlue, // ✅ border color
           width: 0.8,

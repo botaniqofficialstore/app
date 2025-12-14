@@ -83,7 +83,13 @@ enum ScreenName {
   createAccount,
   forgotPassword,
   orderDetails,
-  map
+  map,
+  information,
+  privacyPolicy,
+  termsAndCondition,
+  refundPolicy,
+  shippingPolicy,
+  aboutUS
 }
 
 
@@ -107,6 +113,7 @@ ProductDetailStatus? savedProductDetails;
 FooterCount ? savedFooterCount;
 ScreenName? userFrom;
 String exactAddress = '';
+ScreenName? selectedLegalInformation;
 
 
 //This Class is used to save Footer Count

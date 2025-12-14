@@ -1,14 +1,12 @@
-import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import '../../../../Utility/PreferencesManager.dart';
-import '../../../../constants/ConstantVariables.dart';
-import '../../../../constants/Constants.dart';
 import '../../../Authentication/LoginScreen/LoginScreen.dart';
 import '../../../commonViews/LogoutPopup.dart';
+import '../../../../constants/ConstantVariables.dart';
+import '../../../../constants/Constants.dart';
 import '../../MainScreen/MainScreenState.dart';
 import 'ProfileScreenState.dart';
 
@@ -38,11 +36,9 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey.withAlpha(30),
 
-      body: SingleChildScrollView(
-        child: profileView(context),
-      ),
+      body: profileView(context),
     );
   }
 
@@ -51,192 +47,280 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
 Widget profileView(BuildContext context) {
   final screenState = ref.watch(ProfileScreenGlobalStateProvider);
   final screenNotifier = ref.read(ProfileScreenGlobalStateProvider.notifier);
+  final mainScreenNotifier = ref.read(MainScreenGlobalStateProvider.notifier);
 
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
 
-      /// Header
-      Stack(
-        children: [
-          Image.asset(
-            objConstantAssest.addImage6,
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: 180.dp,
-          ),
-
-          Positioned(
-            left: 15.dp,
-            bottom: 10.dp,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                objCommonWidgets.customText(
-                  context,
-                  'Welcome',
-                  40,
-                  objConstantColor.white,
-                  objConstantFonts.montserratBold,
-                ),
-                objCommonWidgets.customText(
-                  context,
-                  '${screenState.firstName} ${screenState.lastName}',
-                  30,
-                  objConstantColor.white,
-                  objConstantFonts.montserratSemiBold,
-                ),
-              ],
-            ),
-          ),
-
-          /// Back Button
-          Positioned(
-            top: 10.dp,
-            left: 15.dp,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: CupertinoButton(
-                padding: EdgeInsets.all(4.dp),
-                minSize: 35.dp,
-                borderRadius: BorderRadius.circular(30),
-                child: Image.asset(
-                  objConstantAssest.backIcon,
-                  color: objConstantColor.white,
-                  width: 25.dp,
+      Container(
+        padding: EdgeInsets.symmetric(vertical: 8.dp, horizontal: 5.dp),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2.dp, offset: const Offset(0, 1))],
+        ),
+        child: Stack(
+          children: [
+            CupertinoButton(
+                padding: EdgeInsets.zero,
+                minimumSize: const Size(0, 0),
+                child: Padding(
+                  padding: EdgeInsets.only(top: 5.dp),
+                  child: Image.asset(
+                    objConstantAssest.backIcon,
+                    height: 20.dp,
+                    color: objConstantColor.navyBlue,
+                  ),
                 ),
                 onPressed: () {
-                  ref.watch(MainScreenGlobalStateProvider.notifier)
-                      .callNavigation(ScreenName.home);
-                },
+                  mainScreenNotifier.callNavigation(ScreenName.home);
+                }),
+
+
+            Align(
+              alignment: Alignment.center,
+              child: objCommonWidgets.customText(
+                context,
+                'Account',
+                18,
+                objConstantColor.navyBlue,
+                objConstantFonts.montserratSemiBold,
               ),
             ),
-          ),
 
-          /// Logout Button
-          Positioned(
-            top: 10.dp,
-            right: 15.dp,
-            child: Stack(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Stack(
+
+          ],
+        )
+      ),
+
+      Expanded(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            children: [
+
+              SizedBox(height: 10.dp),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2.dp, offset: const Offset(0, 1))],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10.dp, vertical: 5.dp),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CupertinoButton(
-                        padding: EdgeInsets.all(4.dp),
-                        minSize: 35.dp,
-                        borderRadius: BorderRadius.circular(30),
-                        child: Image.asset(
-                          objConstantAssest.logout,
-                          color: objConstantColor.white,
-                          width: 18.dp,
-                        ),
-                        onPressed: () {
-                          PreferencesManager.getInstance().then((pref) {
-                            pref.setBooleanValue(PreferenceKeys.isDialogOpened, true);
-                            LogoutPopup.showLogoutPopup(
-                              context: context,
-                              onConfirm: () {
-                                pref.setBooleanValue(PreferenceKeys.isDialogOpened, false);
-                                screenNotifier.callLogoutAPI(context);
-                              },
-                            );
-                          });
-                        },
-                      ),
+                      SizedBox(height: 3.dp),
+                      objCommonWidgets.customText(context, 'Personal Details', 15, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+                      SizedBox(height: 7.dp),
+
+                      optionCard(context, 'My Profile', Icons.person_3_outlined, Colors.blueAccent,(){
+                        mainScreenNotifier.callNavigation(ScreenName.editProfile);
+                      }),
+                      optionCard(context, 'Delivery Location', Icons.location_on_outlined, Colors.blueAccent,(){
+                        userFrom = ScreenName.profile;
+                        mainScreenNotifier.callNavigation(ScreenName.map);
+                      }),
 
                     ],
                   ),
                 ),
+              ),
 
-              ],
-            ),
-          )
-        ],
-      ),
-
-      SizedBox(height: 20.dp),
-
-      /// Info Section
-      Padding(
-        padding: EdgeInsets.symmetric(horizontal: 15.dp),
-        child: Column(
-          children: [
-            buildInfoTile(context, "First Name", screenState.firstName,
-                screenState.firstName.isEmpty, '--'),
-            buildInfoTile(context, "Last Name", screenState.lastName,
-                screenState.lastName.isEmpty, '--'),
-            buildInfoTile(
-                context, "Email", screenState.email, screenState.email.isEmpty,
-                '--'),
-            buildInfoTile(context, "Mobile", "+91 ${screenState.mobileNumber}",
-                screenState.mobileNumber.isEmpty, '--'),
-            buildInfoTile(context, "Address", screenState.address,
-                screenState.address.isEmpty, '--'),
-
-            Padding(
-              padding: EdgeInsets.only(top: 10.dp, bottom: 20.dp),
-              child: SizedBox(
+              SizedBox(height: 10.dp),
+              Container(
                 width: double.infinity,
-                child: CupertinoButton(
-                  padding: EdgeInsets.symmetric(vertical: 15.dp),
-                  color: objConstantColor.navyBlue,
-                  borderRadius: BorderRadius.circular(12.dp),
-                  onPressed: () {
-                    ref.watch(MainScreenGlobalStateProvider.notifier)
-                        .callNavigation(ScreenName.editProfile);
-                  },
-                  child: objCommonWidgets.customText(
-                    context,
-                    'Edit Profile',
-                    18,
-                    objConstantColor.white,
-                    objConstantFonts.montserratSemiBold,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2.dp, offset: const Offset(0, 1))],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10.dp, vertical: 5.dp),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 3.dp),
+                      objCommonWidgets.customText(context, 'Shopping Details', 15, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+                      SizedBox(height: 7.dp),
+
+                      optionCard(context, 'My Orders', Icons.shopping_bag_outlined, Colors.blueAccent,(){
+                        mainScreenNotifier.callNavigation(ScreenName.orders);
+                      }),
+                      optionCard(context, 'Wish List', Icons.favorite_border_outlined, Colors.blueAccent,(){
+                        mainScreenNotifier.callNavigation(ScreenName.wishList);
+                      }),
+                      optionCard(context, 'Cart List', Icons.shopping_cart_outlined, Colors.blueAccent,(){
+                        mainScreenNotifier.callNavigation(ScreenName.cart);
+                      }),
+
+                    ],
                   ),
                 ),
               ),
-            ),
-          ],
+
+
+              SizedBox(height: 10.dp),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2.dp, offset: const Offset(0, 1))],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10.dp, vertical: 5.dp),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 3.dp),
+                      objCommonWidgets.customText(context, 'Legal & Information', 15, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+                      SizedBox(height: 7.dp),
+
+
+                      optionCard(context, 'Privacy Policy', Icons.privacy_tip_outlined, Colors.blueAccent,(){
+                        selectedLegalInformation = ScreenName.privacyPolicy;
+                        mainScreenNotifier.callNavigation(ScreenName.information);
+                      }),
+                      optionCard(context, 'Terms & Conditions', Icons.description_outlined, Colors.blueAccent,(){
+                        selectedLegalInformation = ScreenName.termsAndCondition;
+                        mainScreenNotifier.callNavigation(ScreenName.information);
+                      }),
+                      optionCard(context, 'Refund Policy', Icons.currency_rupee, Colors.blueAccent,(){
+                        selectedLegalInformation = ScreenName.refundPolicy;
+                        mainScreenNotifier.callNavigation(ScreenName.information);
+                      }),
+                      optionCard(context, 'Shipping Policy', Icons.local_shipping_outlined, Colors.blueAccent,(){
+                        selectedLegalInformation = ScreenName.shippingPolicy;
+                        mainScreenNotifier.callNavigation(ScreenName.information);
+                      }),
+                      optionCard(context, 'About Us', Icons.info_outline_rounded, Colors.blueAccent,(){
+                        selectedLegalInformation = ScreenName.aboutUS;
+                        mainScreenNotifier.callNavigation(ScreenName.information);
+                      }),
+
+                    ],
+                  ),
+                ),
+              ),
+
+
+              SizedBox(height: 10.dp),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2.dp, offset: const Offset(0, 1))],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10.dp, vertical: 5.dp),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 3.dp),
+                      objCommonWidgets.customText(context, 'Support', 15, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+                      SizedBox(height: 7.dp),
+
+                      optionCard(context, 'Customer Care', Icons.headset_mic, Colors.blueAccent,(){
+                        screenNotifier.openCustomerSupportEmail();
+                      }),
+
+
+                    ],
+                  ),
+                ),
+              ),
+
+
+              SizedBox(height: 10.dp),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2.dp, offset: const Offset(0, 1))],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10.dp, vertical: 5.dp),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      optionCard(context, 'Log Out', Icons.power_settings_new_outlined, Colors.red,(){
+                        PreferencesManager.getInstance().then((pref) {
+                          pref.setBooleanValue(PreferenceKeys.isDialogOpened, true);
+                          LogoutPopup.showLogoutPopup(
+                            context: context,
+                            onConfirm: () {
+                              pref.setBooleanValue(PreferenceKeys.isDialogOpened, false);
+                              screenNotifier.callLogoutAPI(context);
+                            },
+                          );
+                        });
+                      }, isLogout: true),
+                    ],
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 20.dp),
+
+            ],
+          ),
         ),
-      ),
+      )
+
+
+
+
+
+
+
+
+
     ],
   );
 }
 
 
-  /// Custom Info Tile
-  Widget buildInfoTile(BuildContext context,String label, String value, bool isEmpty, String placeholder) {
-    return Container(
-      width: double.infinity,
-      margin: EdgeInsets.only(bottom: 12.dp),
-      padding: EdgeInsets.symmetric(horizontal: 10.dp, vertical: 10.dp),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 5,
-            offset: const Offset(0, 1),
-          ),
-        ],
-        border: Border.all(color: Colors.grey, width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          objCommonWidgets.customText(context, label, 12.5, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
-          SizedBox(height: 2.dp),
-          objCommonWidgets.customText(context, isEmpty ? placeholder : value, 15, isEmpty ? objConstantColor.gray : objConstantColor.navyBlue, objConstantFonts.montserratSemiBold)
-        ],
+  Widget optionCard(
+      BuildContext context,
+      String title,
+      IconData image,
+      Color colour,
+      VoidCallback onClick, {
+        bool isLogout = false,
+      }) {
+    return CupertinoButton(
+      padding: EdgeInsets.zero,
+      minimumSize: const Size(0, 0),
+      onPressed: onClick,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 5.dp),
+        child: Row(
+          mainAxisAlignment:
+          isLogout ? MainAxisAlignment.center : MainAxisAlignment.start,
+          children: [
+            Icon(image, color: colour, size: 17.9.dp),
+            SizedBox(width: 5.dp),
+            objCommonWidgets.customText(
+              context,
+              title,
+              14.50,
+              colour,
+              objConstantFonts.montserratMedium,
+            ),
+
+            if (!isLogout) ...[
+              const Spacer(),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: colour,
+                size: 17.9.dp,
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
+
+
 }

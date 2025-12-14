@@ -62,17 +62,10 @@ class EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     children: [
                       objCommonWidgets.customText(
                         context,
-                        'Edit',
+                        'Edit Profile',
                         35,
                         objConstantColor.white,
-                        objConstantFonts.montserratBold,
-                      ),
-                      objCommonWidgets.customText(
-                        context,
-                        'Profile',
-                        35,
-                        objConstantColor.white,
-                        objConstantFonts.montserratBold,
+                        objConstantFonts.montserratSemiBold,
                       ),
                     ],
                   ),
@@ -262,9 +255,9 @@ class EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     child: SizedBox(
                       width: double.infinity,
                       child: CupertinoButton(
-                        padding: EdgeInsets.symmetric(vertical: 15.dp),
-                        color: objConstantColor.navyBlue,
-                        borderRadius: BorderRadius.circular(12.dp),
+                        padding: EdgeInsets.symmetric(vertical: 13.dp),
+                        color: objConstantColor.orange,
+                        borderRadius: BorderRadius.circular(25.dp),
                         onPressed: () {
                           screenNotifier.checkEmptyValidation(context, userScreenNotifier);
                         },

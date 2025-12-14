@@ -1,4 +1,5 @@
 // CartScreen.dart
+import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,32 +52,22 @@ class CartScreenState extends ConsumerState<CartScreen> {
           children: [
 
             /// Header
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: objConstantColor.white,
-                boxShadow: const [
-                  BoxShadow(
-                      color: Colors.black12, blurRadius: 8, spreadRadius: 1),
+            Padding(
+              padding: EdgeInsets.only(top: 5.dp, bottom: 5.dp),
+              child: Row(
+                children: [
+                  CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      child: Image.asset(objConstantAssest.backIcon, width: 20.dp,), onPressed: (){
+                    userScreenNotifier.callNavigation(ScreenName.home);
+                  }),
+                  customeText(
+                    'My Cart',
+                    18,
+                    objConstantColor.navyBlue,
+                    ConstantAssests.montserratSemiBold,
+                  ),
                 ],
-              ),
-              child: Padding(
-                padding: EdgeInsets.only(left: 2.dp, top: 5.dp, bottom: 5.dp),
-                child: Row(
-                  children: [
-                    CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        child: Image.asset(objConstantAssest.backIcon, width: 25.dp,), onPressed: (){
-                      userScreenNotifier.callNavigation(ScreenName.home);
-                    }),
-                    customeText(
-                      'My Cart',
-                      23,
-                      objConstantColor.navyBlue,
-                      ConstantAssests.montserratBold,
-                    ),
-                  ],
-                ),
               ),
             ),
 
@@ -87,15 +78,14 @@ class CartScreenState extends ConsumerState<CartScreen> {
                   : Scrollbar(
                 thumbVisibility: true,
                 thickness: 6,
-                radius: Radius.circular(10.dp),
                 child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(), // ✅ Important line
+                  physics: const AlwaysScrollableScrollPhysics(),
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 18.dp),
                     child: Builder(
                       builder: (context) {
                         if (cartItems.isEmpty) {
-                          // ✅ Still allow pull to refresh even when empty
+
                           return SizedBox(
                             height: MediaQuery.of(context).size.height * 0.7, // fill height
                             child: Center(
@@ -103,16 +93,34 @@ class CartScreenState extends ConsumerState<CartScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Image.asset(objConstantAssest.emptyCartIcon, width: 70.dp),
-                                  SizedBox(height: 10.dp),
+                                  Image.asset(objConstantAssest.emptyCartIcon, width: 65.dp),
+                                  SizedBox(height: 1.dp),
                                   Text(
                                     "Your cart is empty.",
                                     style: TextStyle(
                                       color: objConstantColor.gray,
-                                      fontSize: 17.dp,
-                                      fontFamily: ConstantAssests.montserratMedium,
+                                      fontSize: 13.dp,
+                                      fontFamily: ConstantAssests.montserratSemiBold,
                                     ),
                                   ),
+
+                                  SizedBox(height: 20.dp),
+
+                                  CupertinoButton(padding: EdgeInsets.zero,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: objConstantColor.orange,
+                                            borderRadius: BorderRadius.circular(5.dp)
+                                        ),
+                                        padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                                        child: objCommonWidgets.customText(context,
+                                            'Shop Now',
+                                            14, objConstantColor.white,
+                                            objConstantFonts.montserratBold),
+                                      ),
+                                      onPressed: (){
+                                        userScreenNotifier.callNavigation(ScreenName.home);
+                                      })
                                 ],
                               ),
                             ),
@@ -123,14 +131,14 @@ class CartScreenState extends ConsumerState<CartScreen> {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(height: 10.dp),
+
                             customeText(
                               'Order Summary',
-                              20,
+                              18,
                               objConstantColor.navyBlue,
                               ConstantAssests.montserratSemiBold,
                             ),
-                            SizedBox(height: 5.dp),
+                            SizedBox(height: 15.dp),
 
                             /// Cart List
                             ListView.builder(
@@ -156,11 +164,24 @@ class CartScreenState extends ConsumerState<CartScreen> {
                             ),
 
                             SizedBox(height: 10.dp),
-                            amountText('Amount', '${userScreenState.totalAmount}', ConstantAssests.montserratMedium),
-                            amountText('Discount', '${userScreenState.totalDiscount}', ConstantAssests.montserratMedium),
-                            amountText('Delivery Charge', (userScreenState.isDeliveryAddress) ? '89' : ' __', ConstantAssests.montserratMedium),
-                            SizedBox(height: 5.dp),
-                            amountText('Payable Amount', (userScreenState.isDeliveryAddress) ? '${userScreenState.totalPayableAmount}' : ' __', ConstantAssests.montserratSemiBold,
+                            amountText(context, 'Amount', '${userScreenState.totalAmount}', ConstantAssests.montserratMedium, 12, 12),
+                            amountText(context, 'Discount', '${userScreenState.totalDiscount}', ConstantAssests.montserratMedium, 12, 12),
+                            amountText(context, 'Delivery Charge', (userScreenState.isDeliveryAddress) ? '89' : ' __', ConstantAssests.montserratMedium, 12 , 12),
+                            SizedBox(height: 10.dp),
+                            DottedLine(
+                              direction: Axis.horizontal,
+                              alignment: WrapAlignment.center,
+                              lineLength: double.infinity,
+                              lineThickness: 1.5,
+                              dashLength: 8.0,
+                              dashColor: objConstantColor.black.withAlpha(50),
+                              dashRadius: 0.0,
+                              dashGapLength: 4.0,
+                              dashGapColor: Colors.transparent,
+                              dashGapRadius: 0.0,
+                            ),
+                            SizedBox(height: 10.dp),
+                            amountText(context, 'Payable Amount', (userScreenState.isDeliveryAddress) ? '${userScreenState.totalPayableAmount}' : ' __', ConstantAssests.montserratSemiBold, 15, 15,
                             ),
                           ],
                         );
@@ -185,7 +206,7 @@ class CartScreenState extends ConsumerState<CartScreen> {
                   ],
                 ),
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(20.dp, 20.dp, 20.dp, 20.dp),
+                  padding: EdgeInsets.fromLTRB(20.dp, 10.dp, 20.dp, 10.dp),
                   child: Row(
                     children: [
 
@@ -215,24 +236,16 @@ class CartScreenState extends ConsumerState<CartScreen> {
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(
-                                vertical: 8.dp, horizontal: 20.dp),
+                                vertical: 10.dp, horizontal: 20.dp),
                             decoration: BoxDecoration(
-                              color: objConstantColor.green,
-                              borderRadius: BorderRadius.circular(4.dp),
-                              border: Border.all(
-                                color: objConstantColor.navyBlue,
-                                width: 1.5,
-                              ),
+                              color: objConstantColor.orange,
+                              borderRadius: BorderRadius.circular(5.dp),
                             ),
-                            child: Shimmer.fromColors(
-                              baseColor: objConstantColor.white,
-                              highlightColor: objConstantColor.black,
-                              child: customeText(
-                                'Checkout',
-                                20,
-                                objConstantColor.white,
-                                ConstantAssests.montserratBold,
-                              ),
+                            child: customeText(
+                              'Checkout',
+                              18,
+                              objConstantColor.white,
+                              ConstantAssests.montserratSemiBold,
                             ),
                           )
                       ),
@@ -366,7 +379,7 @@ class CartScreenState extends ConsumerState<CartScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   customeText(CodeReusability().cleanProductName(productName),
-                    17,
+                    15,
                     objConstantColor.navyBlue,
                     objConstantFonts.montserratSemiBold,
                   ),
@@ -419,7 +432,7 @@ class CartScreenState extends ConsumerState<CartScreen> {
                     child: Image.asset(
                       objConstantAssest.deleteIcon,
                       width: 18.dp,
-                      height: 18.dp,
+                      height: 18.dp,color: Colors.red,
                     ),
                   ),
 
@@ -454,21 +467,21 @@ class CartScreenState extends ConsumerState<CartScreen> {
   }
 
 
-  Widget amountText(String name, String value, String font){
+  Widget amountText(BuildContext context,String name, String value, String font, double size,  double textSize){
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 2.dp),
       child: Row(
         children: [
-          customeText(
+          objCommonWidgets.customText(context,
             name,
-            15,
+            textSize,
             objConstantColor.navyBlue,
             font,
           ),
           const Spacer(),
-          customeText(
-            '₹${value}/_',
-            15,
+          objCommonWidgets.customText(context,
+            '₹$value/_',
+            size,
             objConstantColor.navyBlue,
             font,
           )

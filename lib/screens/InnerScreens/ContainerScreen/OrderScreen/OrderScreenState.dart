@@ -132,6 +132,40 @@ class OrderScreenGlobalStateNotifier
       fallbackTimer?.cancel();
     }
   }
+
+  ///This method is used to cancel the order
+  void callCancelOrderAPi(BuildContext context, String orderID, int index){
+    if (!context.mounted) return;
+    CodeReusability().isConnectedToNetwork().then((isConnected) async {
+      if (isConnected) {
+
+        CommonWidgets().showLoadingBar(true, context);
+        var prefs = await PreferencesManager.getInstance();
+        String userID = prefs.getStringValue(PreferenceKeys.userID) ?? '';
+
+        Map<String, dynamic> requestBody = {
+          'userId': userID,
+          'orderId': orderID,
+        };
+
+        OrderListRepository().callCancelOrderDELETEApi(ConstantURLs.placeOrderUrl, requestBody, (statusCode, responseBody) async {
+          final cancelResponse = CancelOrderResponseModel.fromJson(responseBody);
+          CodeReusability().showAlert(context, cancelResponse.message ?? "something Went Wrong");
+          CommonWidgets().showLoadingBar(false, context);
+          if (statusCode == 200 || statusCode == 201){
+            if (index < 0 || index >= state.orderList.length) return;
+
+            final updatedList = List<OrderDataList>.from(state.orderList)
+              ..removeAt(index);
+
+            state = state.copyWith(orderList: updatedList);
+          }
+        });
+      } else {
+        CodeReusability().showAlert(context, 'Please Check Your Internet Connection');
+      }
+    });
+  }
 }
 
 final OrderScreenGlobalStateProvider =

@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:botaniqmicrogreens/screens/Authentication/OtpScreen/OtpRepository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -89,6 +88,17 @@ class OtpScreenGlobalStateNotifier
   void updateUserData(String user){
     state = state.copyWith(user: user);
   }
+
+  void listenOtpAutoFill(BuildContext context,String otp) {
+    clearOtpFields();
+    updateFieldsWithAutoFill(otp);
+
+    // Automatically verify when full OTP is received
+    if (otp.length == 6) {
+      callOTPVerifyAPI(context, otp); // store globalContext from init
+    }
+  }
+
 
   ///This method is used to for empty validation
     void checkEmptyValidation(BuildContext context) {

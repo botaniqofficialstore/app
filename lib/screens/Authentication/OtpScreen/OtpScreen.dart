@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
+import 'package:sms_autofill/sms_autofill.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../../CodeReusable/CodeReusability.dart';
 import '../../../Utility/PreferencesManager.dart';
@@ -35,6 +36,10 @@ class OtpScreenState extends ConsumerState<OtpScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Start SMS Listener
+    SmsAutoFill().listenForCode();
+
     BackButtonInterceptor.add(otpInterceptor);
     Future.microtask(() {
       final otpScreenNotifier = ref.read(otpScreenGlobalStateProvider.notifier);
@@ -54,9 +59,20 @@ class OtpScreenState extends ConsumerState<OtpScreen> {
 
   @override
   void dispose() {
+    SmsAutoFill().unregisterListener();
     BackButtonInterceptor.remove(otpInterceptor);
     super.dispose();
   }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    SmsAutoFill().code.listen((code) {
+      final otpNotifier = ref.read(otpScreenGlobalStateProvider.notifier);
+      otpNotifier.listenOtpAutoFill(context, code);
+    });
+  }
+
 
   //MARK: - METHODS
   /// Return true to prevent default behavior (app exit)

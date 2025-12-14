@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../CodeReusable/CodeReusability.dart';
 import '../../../../CodeReusable/CommonWidgets.dart';
 import '../../../../Utility/PreferencesManager.dart';
@@ -118,6 +119,25 @@ class ProfileScreenGlobalStateNotifier
         CodeReusability().showAlert(context, 'Please Check Your Internet Connection');
       }
     });
+  }
+
+
+
+  //This method is used to connect gmail
+  Future<void> openCustomerSupportEmail() async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: 'botaniqofficialstore@gmail.com',
+      query: Uri.encodeFull(
+          'subject=BotaniQ Customer Support&body=Hello BotaniQ Team, Please describe your issue here. Order ID (if any):'
+      ),
+    );
+
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    } else {
+      debugPrint('Could not open email app');
+    }
   }
 
 }

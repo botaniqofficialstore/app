@@ -14,7 +14,7 @@ import '../LoginScreen/LoginScreen.dart';
 import 'CreatePasswordState.dart';
 
 class CreatePassword extends ConsumerStatefulWidget {
-  final String userID; // 👈 received string
+  final String userID;
 
   const CreatePassword({
     super.key,
@@ -258,8 +258,6 @@ class CreatePasswordState extends ConsumerState<CreatePassword> {
               ],
             ),
           ),
-
-
         ]
     );
   }
@@ -330,7 +328,7 @@ class PasswordHintBubble extends StatelessWidget {
             size: Size(arrowWidth, arrowHeight),
             painter: _UpTrianglePainter(
               color: objConstantColor.navyBlue,
-              borderColor: borderColor, // ✅ same border color
+              borderColor: borderColor,
             ),
           ),
         ),

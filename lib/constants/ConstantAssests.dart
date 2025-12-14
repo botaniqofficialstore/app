@@ -39,6 +39,7 @@ class ConstantAssests{
    String wishUnCheckWhite = '${homeScreenAssets}wishUncheckWhite.png';
    String wish1 = '${homeScreenAssets}wishlist (1).png';
    String wish2 = '${homeScreenAssets}wishlist (2).png';
+   String wish3 = '${homeScreenAssets}wishCart.png';
 
    //Modules
    String allIcon = '${homeScreenAssets}all.png';
@@ -91,6 +92,8 @@ class ConstantAssests{
    String verify = '${commonIconsAssets}verify.png';
    String deliveryVan = '${commonIconsAssets}delivery-van.png';
    String home = '${commonIconsAssets}home-button.png';
+   String wishlist = '${commonIconsAssets}wishlist.png';
+   String quote = '${commonIconsAssets}quote.png';
 
    ///Adds Assets
    String addImage6 = '${addsAssets}adds6.webp';

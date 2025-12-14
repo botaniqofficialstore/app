@@ -59,35 +59,25 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
         children: [
 
           /// Header
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: objConstantColor.white,
-              boxShadow: const [
-                BoxShadow(
-                    color: Colors.black12, blurRadius: 8, spreadRadius: 1),
+          Padding(
+            padding: EdgeInsets.only(top: 5.dp,),
+            child: Row(
+              children: [
+                CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    child: Image.asset(
+                        objConstantAssest.backIcon, width: 25.dp),
+                    onPressed: () {
+                      userScreenNotifier.callNavigation(ScreenName.orders);
+                    }),
+                objCommonWidgets.customText(
+                  context,
+                  'Track Order',
+                  18,
+                  objConstantColor.navyBlue,
+                  ConstantAssests.montserratBold,
+                ),
               ],
-            ),
-            child: Padding(
-              padding: EdgeInsets.only(left: 2.dp, top: 5.dp, bottom: 5.dp),
-              child: Row(
-                children: [
-                  CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      child: Image.asset(
-                          objConstantAssest.backIcon, width: 25.dp),
-                      onPressed: () {
-                        userScreenNotifier.callNavigation(ScreenName.orders);
-                      }),
-                  objCommonWidgets.customText(
-                    context,
-                    'Track Order',
-                    23,
-                    objConstantColor.navyBlue,
-                    ConstantAssests.montserratBold,
-                  ),
-                ],
-              ),
             ),
           ),
 
@@ -100,19 +90,22 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
               child: SingleChildScrollView(
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                      vertical: 10.dp, horizontal: 15.dp),
+                      vertical: 5.dp, horizontal: 15.dp),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+
 
                       /// Order Details Section
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           objCommonWidgets.customText(
-                              context, 'Order Details', 18,
+                              context, 'Order Details', 16,
                               objConstantColor.navyBlue,
-                              objConstantFonts.montserratBold),
+                              objConstantFonts.montserratSemiBold),
+
+                          SizedBox(height: 5.dp),
 
                           titleAndValueRow(
                               context,
@@ -120,7 +113,7 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                               orderDetails?.orderId ?? '',
                               objConstantColor.navyBlue,
                               objConstantColor.navyBlue,
-                              12.5,
+                              11.5,
                               12.5,
                               ConstantAssests.montserratSemiBold,
                               ConstantAssests.montserratBold),
@@ -132,7 +125,7 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                                   orderDetails?.orderDate ?? ''),
                               objConstantColor.navyBlue,
                               objConstantColor.navyBlue,
-                              12.5,
+                              11.5,
                               12.5,
                               ConstantAssests.montserratSemiBold,
                               ConstantAssests.montserratBold),
@@ -143,7 +136,7 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                               steps[orderDetails?.currentOrderStatus ?? 0],
                               objConstantColor.navyBlue,
                               objConstantColor.green,
-                              12.5,
+                              11.5,
                               12.5,
                               ConstantAssests.montserratSemiBold,
                               ConstantAssests.montserratBold),
@@ -154,7 +147,7 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                               'Not Confirmed',
                               objConstantColor.navyBlue,
                               objConstantColor.navyBlue,
-                              12.5,
+                              11.5,
                               12.5,
                               ConstantAssests.montserratSemiBold,
                               ConstantAssests.montserratBold),
@@ -166,8 +159,8 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                       SizedBox(height: 10.dp),
 
                       objCommonWidgets.customText(
-                          context, 'Track Order', 18, objConstantColor.navyBlue,
-                          objConstantFonts.montserratBold),
+                          context, 'Track Order', 15, objConstantColor.navyBlue,
+                          objConstantFonts.montserratSemiBold),
 
                       SizedBox(height: 10.dp),
 
@@ -202,9 +195,11 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                       SizedBox(height: 10.dp),
 
                       objCommonWidgets.customText(
-                          context, 'Purchase List', 18,
+                          context, 'Purchase List', 16,
                           objConstantColor.navyBlue,
-                          objConstantFonts.montserratBold),
+                          objConstantFonts.montserratSemiBold),
+
+                      SizedBox(height: 2.dp),
 
                       ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),

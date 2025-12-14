@@ -73,14 +73,14 @@ class _LogoutPopupContent extends StatelessWidget {
                     color: objConstantColor.redd.withOpacity(0.15),
                     shape: BoxShape.circle,
                   ),
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16.dp),
                   child: Icon(
                     CupertinoIcons.power,
                     size: 35.dp,
                     color: Colors.redAccent,
                   ),
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height: 15.dp),
 
                 // 🔹 Title
                 objCommonWidgets.customText(
@@ -88,21 +88,21 @@ class _LogoutPopupContent extends StatelessWidget {
                   'Logout',
                   20,
                   objConstantColor.navyBlue,
-                  objConstantFonts.montserratBold,
+                  objConstantFonts.montserratSemiBold,
                 ),
 
-                const SizedBox(height: 8),
+                SizedBox(height: 8.dp),
 
                 objCommonWidgets.customText(
                   context,
                   'Are you sure you want to logout?',
-                  14,
+                  12,
                   objConstantColor.black,
                   objConstantFonts.montserratRegular,
                   textAlign: TextAlign.center
                 ),
 
-                const SizedBox(height: 25),
+                SizedBox(height: 40.dp),
 
                 // 🔹 Buttons
                 Row(
@@ -116,20 +116,20 @@ class _LogoutPopupContent extends StatelessWidget {
                           Navigator.of(context).pop();
                         },
                         child: Container(
-                          height: 45,
                           decoration: BoxDecoration(
                             border: Border.all(
                                 color: objConstantColor.navyBlue, width: 1.5),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           alignment: Alignment.center,
+                          padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
                           child: objCommonWidgets.customText(
                             context,
                             'Cancel',
                             14,
                             objConstantColor.black,
-                            objConstantFonts.montserratBold,
-                        ),
+                            objConstantFonts.montserratSemiBold,
+                                                  ),
                       ),
                     ),
                     ),
@@ -142,18 +142,18 @@ class _LogoutPopupContent extends StatelessWidget {
                           onConfirm();
                         },
                         child: Container(
-                          height: 45,
                           decoration: BoxDecoration(
                             color: Colors.redAccent,
                             borderRadius: BorderRadius.circular(10),
                           ),
+                          padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
                           alignment: Alignment.center,
                           child: objCommonWidgets.customText(
                               context,
                               'Logout',
                               14,
                               objConstantColor.white,
-                              objConstantFonts.montserratBold,
+                              objConstantFonts.montserratSemiBold,
                           )
                         ),
                       ),

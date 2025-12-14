@@ -132,13 +132,23 @@ class UserFooterViewState extends ConsumerState<UserFooterView> {
     objConstantAssest.profileSelectedIcon,
   ];
 
+  final List<String> modules = [
+    'Home',
+    'Orders',
+    'Reels',
+    'Cart',
+    'Account',
+  ];
+
   int get currentIndex {
     if (widget.currentModule == ScreenName.home) return 0;
     if (widget.currentModule == ScreenName.orders) return 1;
     if (widget.currentModule == ScreenName.reels) return 2;
     if (widget.currentModule == ScreenName.cart) return 3;
     if (widget.currentModule == ScreenName.profile ||
-        widget.currentModule == ScreenName.editProfile) return 4;
+        widget.currentModule == ScreenName.editProfile) {
+      return 4;
+    }
     return 5;
   }
 
@@ -146,10 +156,9 @@ class UserFooterViewState extends ConsumerState<UserFooterView> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double tabWidth = screenWidth / inactiveIcons.length;
-    double indicatorWidth = 20.dp;
+    double indicatorWidth = 22.5.dp;
 
     return Container(
-      height: 65.dp,
       decoration: BoxDecoration(
         color: objConstantColor.white,
         boxShadow: const [
@@ -167,60 +176,81 @@ class UserFooterViewState extends ConsumerState<UserFooterView> {
             AnimatedPositioned(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
-              top: 10.dp,
+              top: 6.dp,
               left: currentIndex * tabWidth + (tabWidth - indicatorWidth) / 2,
               child: Container(
                 height: 4.dp,
                 width: indicatorWidth,
                 decoration: BoxDecoration(
                   color: objConstantColor.navyBlue,
-                  borderRadius: BorderRadius.circular(8.dp),
+                  borderRadius: BorderRadius.circular(20.dp),
                 ),
               ),
             ),
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(inactiveIcons.length, (index) {
-              final isSelected = currentIndex == index;
-              return Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  CupertinoButton(
-                    onPressed: () => widget.selectedFooterIndex(index),
-                    padding: EdgeInsets.zero,
-                    child: Image.asset(
-                      isSelected ? activeIcons[index] : inactiveIcons[index],
-                      height: 24.dp,
-                      width: 24.dp,
-                    ),
-                  ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(height: 10.dp),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: List.generate(inactiveIcons.length, (index) {
+                  final isSelected = currentIndex == index;
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
 
-                  //Badge for Cart
-                  if (index == 3 && widget.cartCount > 0)
-                    Positioned(
-                      right: 1.dp,
-                      top: 2.dp,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 0.8.dp, horizontal: 5.dp),
-                        decoration: BoxDecoration(
-                          color: objConstantColor.redd,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          '${widget.cartCount}',
-                          style: TextStyle(
-                            fontSize: 10.dp,
-                            color: Colors.white,
-                            fontFamily: objConstantFonts.montserratBold,
-                          ),
+                      CupertinoButton(
+                        onPressed: () => widget.selectedFooterIndex(index),
+                        padding: EdgeInsets.zero,
+                        child: Column(
+                          children: [
+                            SizedBox(height: 5.dp),
+                            Image.asset(
+                              isSelected ? activeIcons[index] : inactiveIcons[index],
+                              height: 24.dp,
+                              width: 24.dp,
+                            ),
+                            SizedBox(height: 5.dp),
+                            objCommonWidgets.customText(
+                                context,
+                                modules[index],
+                                10,
+                                objConstantColor.navyBlue,
+                                objConstantFonts.montserratSemiBold
+                            ),
+                            SizedBox(height: 2.dp),
+                          ],
                         ),
                       ),
-                    ),
-                ],
-              );
-            }),
+
+                      //Badge for Cart
+                      if (index == 3 && widget.cartCount > 0)
+                        Positioned(
+                          right: 1.dp,
+                          top: 2.dp,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 0.8.dp, horizontal: 5.dp),
+                            decoration: BoxDecoration(
+                              color: objConstantColor.redd,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              '${widget.cartCount}',
+                              style: TextStyle(
+                                fontSize: 10.dp,
+                                color: Colors.white,
+                                fontFamily: objConstantFonts.montserratBold,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                }),
+              ),
+            ],
           ),
         ],
       ),

@@ -48,7 +48,7 @@ class LoadingBarOverlay {
                   children: [
                     // 🌈 Beautiful Animated Loader
                     LoadingAnimationWidget.fourRotatingDots(
-                      color: objConstantColor.navyBlue,
+                      color: objConstantColor.orange,
                       size: 35.dp,
                     ),
 

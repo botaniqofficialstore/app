@@ -6,6 +6,7 @@ import 'package:flutter_sizer/flutter_sizer.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
+import 'package:google_places_flutter/model/place_type.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,6 +43,38 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   void initState() {
     super.initState();
+    getSavedLocation();
+  }
+
+  Future<void> getSavedLocation() async {
+    var prefs = await PreferencesManager.getInstance();
+    String position = prefs.getStringValue(PreferenceKeys.userAddress) ?? '';
+    if (position.isNotEmpty){
+      try {
+        // Split the string and extract latitude & longitude
+        final parts = position.split(',');
+        if (parts.length != 2) {
+          throw const FormatException("Invalid position format. Expected 'lat, lng'");
+        }
+
+        final latitude = double.parse(parts[0].trim());
+        final longitude = double.parse(parts[1].trim());
+        final location = LatLng(latitude, longitude);
+
+
+
+        setState(() async {
+          _selectedLocation = location;
+          _markers = {Marker(markerId: const MarkerId("current"), position: location)};
+          _getAddressFromLatLng(location);
+          final controller = await _controller.future;
+          controller.animateCamera(CameraUpdate.newLatLngZoom(location, 19));
+        });
+
+      } catch (e) {
+        print("Reverse geocoding error: $e");
+      }
+    }
   }
 
 
@@ -81,72 +114,172 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
 
           Positioned(
-            top: 20,
-            left: 15,
-            right: 15,
-            child: Row(
-              children: [
-                Container(
-                  height: 50.dp,
-                  width: 40.dp,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, 2))],
-                  ),
-                  child: CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () {
-                      if (userFrom == ScreenName.home){
-                        userScreenNotifier.callNavigation(ScreenName.home);
-                      }else{
-                        userScreenNotifier.callNavigation(ScreenName.editProfile);
-                      }
-                    },
-                    child: Icon(Icons.arrow_back, color: objConstantColor.navyBlue, size: 24),
-                  ),
-                ),
-                SizedBox(width: 10.dp),
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 5.dp, vertical: 15.dp),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
 
-                Expanded(
-                  child: Container(
-                    height: 50.dp,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5.dp, offset: const Offset(0, 2))],
+                    Color(0xFFFF8000),
+                    Color(0xFFFF4D00),
+                    Color(0xFFFF3D00),
+
+
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20.dp),
+                  bottomRight: Radius.circular(20.dp),
+                ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 5,
+                      offset: const Offset(0, 1),
                     ),
-                    child: GooglePlaceAutoCompleteTextField(
-                      textEditingController: _searchController,
-                      googleAPIKey: 'AIzaSyBj448jygDcUrpUtXtmynTluoxWFbKP6Gk',
-                      inputDecoration: InputDecoration(
-                        hintText: "Search here...",
-                        border: InputBorder.none,
-                        prefixIcon: Icon(Icons.search, color: objConstantColor.navyBlue),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12.dp, vertical: 14.dp),
+                  ]
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                  Row(
+                    children: [
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          if (userFrom == ScreenName.home){
+                            userScreenNotifier.callNavigation(ScreenName.home);
+                          } else if (userFrom == ScreenName.productDetail) {
+                            userScreenNotifier.callNavigation(ScreenName.productDetail);
+                          } else if (userFrom == ScreenName.profile) {
+                            userScreenNotifier.callNavigation(ScreenName.profile);
+                          } else{
+                            userScreenNotifier.callNavigation(ScreenName.editProfile);
+                          }
+                        },
+                        child: Icon(Icons.arrow_back, color: objConstantColor.white, size: 25.dp),
                       ),
-                      debounceTime: 800,
-                      countries: const ["in"],
-                      isLatLngRequired: true,
-                      getPlaceDetailWithLatLng: (Prediction prediction) async {
-                        final lat = double.parse(prediction.lat!);
-                        final lng = double.parse(prediction.lng!);
-                        final selected = LatLng(lat, lng);
 
-                        if (!_isWithinAllowed(selected)) {
-                          _showOutOfRangeAlert(context);
-                          return;
-                        }
 
-                        _placeSelectedMarker(selected, prediction.description);
-
-                        final controller = await _controller.future;
-                        controller.animateCamera(CameraUpdate.newLatLngZoom(selected, 19));
-                      },
-                    ),
+                      objCommonWidgets.customText(
+                        context,
+                        'Update Delivery Address',
+                        15,
+                        objConstantColor.white,
+                        objConstantFonts.montserratSemiBold,
+                      )
+                    ],
                   ),
-                ),
-              ],
+
+                  SizedBox(height: 10.dp),
+
+
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15.dp),
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          // Opening quote
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.top,
+                            child: Transform.translate(
+                                offset: const Offset(0, -2),
+                                child: Transform.rotate(
+                                  angle: 3.14,
+                                  child: Image.asset(
+                                    objConstantAssest.quote,
+                                    width: 15,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                          ),
+                          ),
+                          
+                          // Main text
+                          TextSpan(
+                            text: " Choose where you want us to deliver and confirm your exact location. ",
+                            style: TextStyle(
+                              fontFamily: objConstantFonts.montserratSemiBold,
+                              fontSize: 15,
+                              color: objConstantColor.white,
+                            ),
+                          ),
+
+                          // Ending quote (flipped)
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.bottom,
+                            child: Transform.translate(
+                              offset: const Offset(0, -2),
+                              child: Image.asset(
+                                objConstantAssest.quote,
+                                width: 15,
+                                color: Colors.white,
+                              ),
+                            )
+                          ),
+                        ],
+                      ),
+                    )
+
+
+                  ),
+
+                  SizedBox(height: 15.dp),
+
+                  Row(
+                    children: [
+
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.dp),
+                          child: GooglePlaceAutoCompleteTextField(
+                            boxDecoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(50.dp),
+                              boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5.dp, offset: const Offset(0, 2))],
+                            ),
+                            textEditingController: _searchController,
+                            googleAPIKey: 'AIzaSyBj448jygDcUrpUtXtmynTluoxWFbKP6Gk',
+                            inputDecoration: InputDecoration(
+                              hintText: "Search your location here...",
+                              border: InputBorder.none,
+                              prefixIcon: Icon(Icons.search, color: objConstantColor.navyBlue),
+                              contentPadding: EdgeInsets.symmetric(vertical: 10.dp),
+                            ),
+                            debounceTime: 800,
+                            countries: const ["in"],
+                            isLatLngRequired: true,
+                            getPlaceDetailWithLatLng: (Prediction prediction) async {
+                              final lat = double.parse(prediction.lat!);
+                              final lng = double.parse(prediction.lng!);
+                              final selected = LatLng(lat, lng);
+
+                              if (!_isWithinAllowed(selected)) {
+                                _showOutOfRangeAlert(context);
+                                return;
+                              }
+
+                              _placeSelectedMarker(selected, prediction.description);
+
+                              final controller = await _controller.future;
+                              controller.animateCamera(CameraUpdate.newLatLngZoom(selected, 19));
+                            },
+                          ),
+                        ),
+                      ),
+
+
+                    ],
+                  ),
+                  SizedBox(height: 2.dp)
+                ],
+              ),
             ),
           ),
 
@@ -161,9 +294,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     const Spacer(),
                     FloatingActionButton(
                       onPressed: () => _goToCurrentLocation(context),
-                      backgroundColor: objConstantColor.navyBlue,
+                      backgroundColor: objConstantColor.orange,
                       shape: const CircleBorder(),
-                      child: Icon(Icons.my_location, color: Colors.white, size: 25.dp),
+                      child: Icon(Icons.my_location, color: Colors.white, size: 28.dp),
                     ),
                   ],
                 ),
@@ -175,16 +308,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            color: objConstantColor.white,
+                            color: objConstantColor.navyBlue,
                             borderRadius: BorderRadius.circular(5.dp),
                           ),
                           child: Padding(
-                            padding: EdgeInsets.all(7.5.dp),
+                            padding: EdgeInsets.symmetric(vertical: 8.dp, horizontal: 10.dp),
                             child: objCommonWidgets.customText(
                               context,
                               _selectedAddress.isNotEmpty ? _selectedAddress : "Fetching address...",
                               12,
-                              objConstantColor.navyBlue,
+                              objConstantColor.white,
                               objConstantFonts.montserratMedium,
                               textAlign: TextAlign.start,
                             ),
@@ -200,16 +333,23 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: objConstantColor.orange,
+                            color: objConstantColor.white,
                             borderRadius: BorderRadius.circular(5.dp),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withAlpha(150),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ]
                           ),
                           child: Padding(
-                            padding: EdgeInsets.all(10.dp),
+                            padding: EdgeInsets.symmetric(vertical: 8.dp, horizontal: 10.dp),
                             child: objCommonWidgets.customText(
                               context,
                               'Confirm',
                               15,
-                              objConstantColor.white,
+                              objConstantColor.orange,
                               objConstantFonts.montserratSemiBold,
                               textAlign: TextAlign.start,
                             ),
@@ -408,7 +548,11 @@ class MapScreenGlobalStateNotifier extends StateNotifier<MapScreenGlobalState> {
     CodeReusability().showAlert(context, 'Delivery location updated successfully');
     if (userFrom == ScreenName.home){
       notifier.callNavigation(ScreenName.home);
-    }else{
+    } else if (userFrom == ScreenName.productDetail){
+    notifier.callNavigation(ScreenName.productDetail);
+    } else if (userFrom == ScreenName.profile){
+      notifier.callNavigation(ScreenName.profile);
+    } else {
       notifier.callNavigation(ScreenName.editProfile);
     }
   }
