@@ -98,112 +98,113 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                     bottomRight: Radius.circular(30.dp),
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                child: SafeArea(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                  
 
-                    SizedBox(height: 20.dp,),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            objCommonWidgets.customText(context, 'Good to see you again',
-                                18, objConstantColor.white, objConstantFonts.montserratBold),
-
-                            objCommonWidgets.customText(context, 'Let’s find something natural today.',
-                                10, objConstantColor.white, objConstantFonts.montserratSemiBold),
-                          ],
-                        ),
-
-                        CupertinoButton(
-                          key: wishButtonKey,
-                          padding: EdgeInsets.zero,
-                          child: Image.asset(
-                            objConstantAssest.wishlist,
-                            width: 28.dp,
-                            color: Colors.white,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              objCommonWidgets.customText(context, 'Good to see you again',
+                                  18, objConstantColor.white, objConstantFonts.montserratBold),
+                  
+                              objCommonWidgets.customText(context, 'Let’s find something natural today.',
+                                  10, objConstantColor.white, objConstantFonts.montserratSemiBold),
+                            ],
                           ),
-                          onPressed: () {
-                            userScreenNotifier.callNavigation(ScreenName.wishList);
-                          },
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: 15.dp),
-
-                    Row(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            objCommonWidgets.customText(context,
-                                'Delivery Location', 13, Colors.white,
-                                objConstantFonts.montserratBold),
-                            GestureDetector(
-                              onTap: (){
-                                userFrom = ScreenName.home;
-                                userScreenNotifier.callNavigation(ScreenName.map);
-                              },
-                              child: (exactAddress.isNotEmpty) ? Row(
-                                children: [
-                                  Icon(Icons.location_on,color: Colors.white, size: 18.dp,),
-                                  SizedBox(
-                                    width: 120.dp,
-                                    child: Text(exactAddress, style: TextStyle(color: Colors.white,
-                                    fontFamily: objConstantFonts.montserratSemiBold,
-                                    fontSize: 10.5.dp,
-                                    ),maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,),
-                                  ),
-                                  Icon(Icons.keyboard_arrow_down_rounded,color: Colors.white, size: 20.dp,),
-                                ],
-                              ) :
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10.dp)
-                                ),
-                                padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 7.dp),
-                                child: Row(
+                  
+                          CupertinoButton(
+                            key: wishButtonKey,
+                            padding: EdgeInsets.zero,
+                            child: Image.asset(
+                              objConstantAssest.wishlist,
+                              width: 28.dp,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              userScreenNotifier.callNavigation(ScreenName.wishList);
+                            },
+                          ),
+                        ],
+                      ),
+                  
+                      SizedBox(height: 15.dp),
+                  
+                      Row(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              objCommonWidgets.customText(context,
+                                  'Delivery Location', 13, Colors.white,
+                                  objConstantFonts.montserratBold),
+                              GestureDetector(
+                                onTap: (){
+                                  userFrom = ScreenName.home;
+                                  userScreenNotifier.callNavigation(ScreenName.map);
+                                },
+                                child: (exactAddress.isNotEmpty) ? Row(
                                   children: [
-                                    Icon(Icons.my_location_outlined,color: objConstantColor.orange, size: 15.dp,),
-                                    SizedBox(width: 2.dp,),
-                                    objCommonWidgets.customText(context,
-                                        'Update Location', 10, objConstantColor.orange,
-                                        objConstantFonts.montserratBold),
-
+                                    Icon(Icons.location_on,color: Colors.white, size: 18.dp,),
+                                    SizedBox(
+                                      width: 120.dp,
+                                      child: Text(exactAddress, style: TextStyle(color: Colors.white,
+                                      fontFamily: objConstantFonts.montserratSemiBold,
+                                      fontSize: 10.5.dp,
+                                      ),maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,),
+                                    ),
+                                    Icon(Icons.keyboard_arrow_down_rounded,color: Colors.white, size: 20.dp,),
                                   ],
+                                ) :
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10.dp)
+                                  ),
+                                  padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 7.dp),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.my_location_outlined,color: objConstantColor.orange, size: 15.dp,),
+                                      SizedBox(width: 2.dp,),
+                                      objCommonWidgets.customText(context,
+                                          'Update Location', 10, objConstantColor.orange,
+                                          objConstantFonts.montserratBold),
+                  
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-
-
-
-                      ],
-                    ),
-
-                    SizedBox(height: 15.dp),
-
-                    // ✅ Header Row (fixed at top)
-                    CommonSearchField(
-                      controller: TextEditingController(),
-                      hintText: 'Search',
-                      onChanged: (value) {
-                        debugPrint("Searching: $value");
-                      },
-                    ),
-
-                    SizedBox(height: 15.dp,),
-
-
-
-                  ],
+                            ],
+                          ),
+                  
+                  
+                  
+                        ],
+                      ),
+                  
+                      SizedBox(height: 15.dp),
+                  
+                      // ✅ Header Row (fixed at top)
+                      CommonSearchField(
+                        controller: TextEditingController(),
+                        hintText: 'Search',
+                        onChanged: (value) {
+                          debugPrint("Searching: $value");
+                        },
+                      ),
+                  
+                      SizedBox(height: 15.dp,),
+                  
+                  
+                  
+                    ],
+                  ),
                 ),
               ),
 
@@ -347,7 +348,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                         }
 
                         return SliverPadding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                          padding: EdgeInsets.symmetric(horizontal: 14.dp, vertical: 10.dp),
                           sliver: SliverGrid(
                             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,

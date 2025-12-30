@@ -42,121 +42,125 @@ class WishListScreenState extends ConsumerState<WishListScreen> {
     final wishListState = ref.watch(WishListScreenGlobalStateProvider);
     final wishListData = wishListState.wishListItems;
 
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: objConstantColor.white,
-      body: Column(
-        children: [
-          /// Header
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: objConstantColor.white,
-            ),
-            child: Padding(
-              padding: EdgeInsets.only(left: 2.dp, top: 5.dp),
-              child: Row(
-                children: [
-                  CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    child: Image.asset(
-                      objConstantAssest.backIcon,
-                      width: 20.dp,
+    return SafeArea(
+      child: Scaffold(
+        key: _scaffoldKey,
+        backgroundColor: objConstantColor.white,
+        body: Column(
+          children: [
+            /// Header
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: objConstantColor.white,
+              ),
+              child: Padding(
+                padding: EdgeInsets.only(left: 15.dp, top: 5.dp),
+                child: Row(
+                  children: [
+                    CupertinoButton(
+                      minimumSize: const Size(0, 0),
+                      padding: EdgeInsets.zero,
+                      child: Image.asset(
+                        objConstantAssest.backIcon,
+                        width: 20.dp,
+                      ),
+                      onPressed: () {
+                        userScreenNotifier.callNavigation(ScreenName.home);
+                      },
                     ),
-                    onPressed: () {
-                      userScreenNotifier.callNavigation(ScreenName.home);
-                    },
-                  ),
-                  CommonWidget().customeText(
-                    'My WishList',
-                    18,
-                    objConstantColor.navyBlue,
-                    ConstantAssests.montserratSemiBold,
-                  ),
-                ],
+                    SizedBox(width: 5.dp),
+                    CommonWidget().customeText(
+                      'My WishList',
+                      15,
+                      objConstantColor.navyBlue,
+                      ConstantAssests.montserratSemiBold,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-
-          SizedBox(height: 5.dp),
-
-          /// Body (with pull to refresh)
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () async {
-                await wishListScreenNotifier.callWishListGepAPI(context);
-              },
-              color: objConstantColor.navyBlue,
-              backgroundColor: objConstantColor.white,
-              child: wishListData.isNotEmpty
-                  ? GridView.builder(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 0),
-                gridDelegate:
-                const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 0.60,
-                ),
-                itemCount: wishListData.length,
-                itemBuilder: (context, index) {
-                  final item = wishListData[index];
-                  final product = item.productDetails!;
-                  return _buildProductCard(
-                      item, product, index, wishListScreenNotifier);
+      
+            SizedBox(height: 20.dp),
+      
+            /// Body (with pull to refresh)
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await wishListScreenNotifier.callWishListGepAPI(context);
                 },
-              )
-                  : SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.7,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          objConstantAssest.noWish,
-                          width: 65.dp,
-                        ),
-                        Text(
-                          "Your wishlist is empty.",
-                          style: TextStyle(
-                            color: objConstantColor.gray,
-                            fontSize: 13.dp,
-                            fontFamily:
-                            ConstantAssests.montserratMedium,
+                color: objConstantColor.navyBlue,
+                backgroundColor: objConstantColor.white,
+                child: wishListData.isNotEmpty
+                    ? GridView.builder(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 0),
+                  gridDelegate:
+                  const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 0.60,
+                  ),
+                  itemCount: wishListData.length,
+                  itemBuilder: (context, index) {
+                    final item = wishListData[index];
+                    final product = item.productDetails!;
+                    return _buildProductCard(
+                        item, product, index, wishListScreenNotifier);
+                  },
+                )
+                    : SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            objConstantAssest.noWish,
+                            width: 65.dp,
                           ),
-                        ),
-
-                        SizedBox(height: 20.dp),
-
-                        CupertinoButton(padding: EdgeInsets.zero,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: objConstantColor.orange,
-                                  borderRadius: BorderRadius.circular(5.dp)
-                              ),
-                              padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
-                              child: objCommonWidgets.customText(context,
-                                  'Add New Products',
-                                  14, objConstantColor.white,
-                                  objConstantFonts.montserratBold),
+                          Text(
+                            "Your wishlist is empty.",
+                            style: TextStyle(
+                              color: objConstantColor.gray,
+                              fontSize: 13.dp,
+                              fontFamily:
+                              ConstantAssests.montserratMedium,
                             ),
-                            onPressed: (){
-                              userScreenNotifier.callNavigation(ScreenName.home);
-                            })
-                      ],
+                          ),
+      
+                          SizedBox(height: 20.dp),
+      
+                          CupertinoButton(padding: EdgeInsets.zero,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: objConstantColor.orange,
+                                    borderRadius: BorderRadius.circular(5.dp)
+                                ),
+                                padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                                child: objCommonWidgets.customText(context,
+                                    'Add New Products',
+                                    14, objConstantColor.white,
+                                    objConstantFonts.montserratBold),
+                              ),
+                              onPressed: (){
+                                userScreenNotifier.callNavigation(ScreenName.home);
+                              })
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-
-          SizedBox(height: 10.dp),
-        ],
+      
+            SizedBox(height: 10.dp),
+          ],
+        ),
       ),
     );
   }

@@ -51,255 +51,261 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
     var orderDetails = savedOrderData;
     var orderTracking = orderDetails?.orderTracking;
 
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: objConstantColor.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return SafeArea(
+      child: Scaffold(
+        key: _scaffoldKey,
+        backgroundColor: objConstantColor.white,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
 
-          /// Header
-          Padding(
-            padding: EdgeInsets.only(top: 5.dp,),
-            child: Row(
-              children: [
-                CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    child: Image.asset(
-                        objConstantAssest.backIcon, width: 25.dp),
-                    onPressed: () {
-                      userScreenNotifier.callNavigation(ScreenName.orders);
-                    }),
-                objCommonWidgets.customText(
-                  context,
-                  'Track Order',
-                  18,
-                  objConstantColor.navyBlue,
-                  ConstantAssests.montserratBold,
-                ),
-              ],
-            ),
-          ),
-
-          /// Scroll content
-          Expanded(
-            child: Scrollbar(
-              thumbVisibility: true,
-              thickness: 6,
-              radius: Radius.circular(10.dp),
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: 5.dp, horizontal: 15.dp),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-
-                      /// Order Details Section
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          objCommonWidgets.customText(
-                              context, 'Order Details', 16,
-                              objConstantColor.navyBlue,
-                              objConstantFonts.montserratSemiBold),
-
-                          SizedBox(height: 5.dp),
-
-                          titleAndValueRow(
-                              context,
-                              'Order ID :',
-                              orderDetails?.orderId ?? '',
-                              objConstantColor.navyBlue,
-                              objConstantColor.navyBlue,
-                              11.5,
-                              12.5,
-                              ConstantAssests.montserratSemiBold,
-                              ConstantAssests.montserratBold),
-
-                          titleAndValueRow(
-                              context,
-                              'Ordered Date :',
-                              CodeReusability().convertUTCToIST(
-                                  orderDetails?.orderDate ?? ''),
-                              objConstantColor.navyBlue,
-                              objConstantColor.navyBlue,
-                              11.5,
-                              12.5,
-                              ConstantAssests.montserratSemiBold,
-                              ConstantAssests.montserratBold),
-
-                          titleAndValueRow(
-                              context,
-                              'Order Status :',
-                              steps[orderDetails?.currentOrderStatus ?? 0],
-                              objConstantColor.navyBlue,
-                              objConstantColor.green,
-                              11.5,
-                              12.5,
-                              ConstantAssests.montserratSemiBold,
-                              ConstantAssests.montserratBold),
-
-                          titleAndValueRow(
-                              context,
-                              'Delivery Date :',
-                              'Not Confirmed',
-                              objConstantColor.navyBlue,
-                              objConstantColor.navyBlue,
-                              11.5,
-                              12.5,
-                              ConstantAssests.montserratSemiBold,
-                              ConstantAssests.montserratBold),
-                        ],
-                      ),
-
-                      Divider(
-                          color: objConstantColor.navyBlue, thickness: 0.5.dp),
-                      SizedBox(height: 10.dp),
-
-                      objCommonWidgets.customText(
-                          context, 'Track Order', 15, objConstantColor.navyBlue,
-                          objConstantFonts.montserratSemiBold),
-
-                      SizedBox(height: 10.dp),
-
-                      /// Track Order List
-                      ListView.builder(
-                        shrinkWrap: true,
-                        primary: false,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: steps.length,
-                        itemBuilder: (context, index) {
-                          var date = '';
-                          if (orderTracking != null && index <
-                              orderTracking.length) {
-                            date = CodeReusability()
-                                .convertUTCToIST(
-                                orderTracking[index].orderStatusDate ?? '');
-                          }
-
-                          return AnimatedOrderTrackStep(
-                            text: steps[index],
-                            date: date,
-                            isCompleted: index <= animatedStep,
-                            // 👈 Animated state
-                            isLast: index == steps.length - 1,
-                          );
-                        },
-                      ),
-
-                      SizedBox(height: 10.dp),
-                      Divider(
-                          color: objConstantColor.navyBlue, thickness: 0.5.dp),
-                      SizedBox(height: 10.dp),
-
-                      objCommonWidgets.customText(
-                          context, 'Purchase List', 16,
-                          objConstantColor.navyBlue,
-                          objConstantFonts.montserratSemiBold),
-
-                      SizedBox(height: 2.dp),
-
-                      ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: orderDetails?.orderDetails.length,
-                        itemBuilder: (context, index) {
-                          var productDetails = orderDetails
-                              ?.orderDetails[index];
-                          return cell(
-                            context,
-                            index,
-                            '${productDetails?.productDetails.productName}',
-                            '${productDetails?.productDetails
-                                .productSellingPrice}',
-                            '${productDetails?.productDetails.gram}',
-                            productDetails?.productCount ?? 0,
-                            '${productDetails?.productDetails.image}',
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          /// Bottom total bar
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: objConstantColor.white,
-              boxShadow: const [
-                BoxShadow(
-                    color: Colors.black12, blurRadius: 8, spreadRadius: 1),
-              ],
-            ),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(15.dp, 10.dp, 20.dp, 10.dp),
+            /// Header
+            Padding(
+              padding: EdgeInsets.only(left: 10.dp, top: 5.dp,),
               child: Row(
                 children: [
-
-                  if (orderDetails?.currentOrderStatus == 0)...{
-                    CupertinoButton(padding: EdgeInsets.zero,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: objConstantColor.orange,
-                            borderRadius: BorderRadius.circular(5.dp),
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 12.dp, horizontal: 13.dp),
-                            child: objCommonWidgets.customText(
-                                context, 'Cancel Order', 15,
-                                objConstantColor.white,
-                                objConstantFonts.montserratSemiBold),
-                          ),
-                        ), onPressed: () {
-
-                      setState(() {
-                        final orderDetailScreenNotifier = ref.read(OrderDetailsScreenGlobalStateProvider.notifier);
-                        orderDetailScreenNotifier.callCancelOrderAPi(context, orderDetails?.orderId ?? '', userScreenNotifier);
-                      });
-                        }),
-
-                    const Spacer(),
-                  }else...{
-                    objCommonWidgets.customText(
-                      context,
-                      'Total Amount',
-                      17,
-                      objConstantColor.navyBlue,
-                      objConstantFonts.montserratBold,
-                    ),
-                  const Spacer(),
-                  },
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      objCommonWidgets.customText(
-                        context,
-                        '₹${orderDetails?.orderTotalAmount}/_',
-                        18,
-                        objConstantColor.green,
-                        objConstantFonts.montserratBold,
-                      ),
-                      objCommonWidgets.customText(
-                        context,
-                        'Inc. of all taxes',
-                        10,
-                        objConstantColor.navyBlue,
-                        objConstantFonts.montserratMedium,
-                      ),
-                    ],
+                  CupertinoButton(
+                      minimumSize: const Size(0, 0),
+                      padding: EdgeInsets.zero,
+                      child: Image.asset(
+                          objConstantAssest.backIcon, width: 20.dp),
+                      onPressed: () {
+                        userScreenNotifier.callNavigation(ScreenName.orders);
+                      }),
+                  SizedBox(width: 5.dp),
+                  objCommonWidgets.customText(
+                    context,
+                    'Track Order',
+                    15,
+                    objConstantColor.navyBlue,
+                    ConstantAssests.montserratSemiBold,
                   ),
                 ],
               ),
             ),
-          )
-        ],
+
+            SizedBox(height: 5.dp),
+
+            /// Scroll content
+            Expanded(
+              child: Scrollbar(
+                thumbVisibility: true,
+                thickness: 6,
+                radius: Radius.circular(10.dp),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                        vertical: 5.dp, horizontal: 15.dp),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+
+
+                        /// Order Details Section
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            objCommonWidgets.customText(
+                                context, 'Order Details', 16,
+                                objConstantColor.navyBlue,
+                                objConstantFonts.montserratSemiBold),
+
+                            SizedBox(height: 5.dp),
+
+                            titleAndValueRow(
+                                context,
+                                'Order ID :',
+                                orderDetails?.orderId ?? '',
+                                objConstantColor.navyBlue,
+                                objConstantColor.navyBlue,
+                                11.5,
+                                12.5,
+                                ConstantAssests.montserratSemiBold,
+                                ConstantAssests.montserratBold),
+
+                            titleAndValueRow(
+                                context,
+                                'Ordered Date :',
+                                CodeReusability().convertUTCToIST(
+                                    orderDetails?.orderDate ?? ''),
+                                objConstantColor.navyBlue,
+                                objConstantColor.navyBlue,
+                                11.5,
+                                12.5,
+                                ConstantAssests.montserratSemiBold,
+                                ConstantAssests.montserratBold),
+
+                            titleAndValueRow(
+                                context,
+                                'Order Status :',
+                                steps[orderDetails?.currentOrderStatus ?? 0],
+                                objConstantColor.navyBlue,
+                                objConstantColor.green,
+                                11.5,
+                                12.5,
+                                ConstantAssests.montserratSemiBold,
+                                ConstantAssests.montserratBold),
+
+                            titleAndValueRow(
+                                context,
+                                'Delivery Date :',
+                                'Not Confirmed',
+                                objConstantColor.navyBlue,
+                                objConstantColor.navyBlue,
+                                11.5,
+                                12.5,
+                                ConstantAssests.montserratSemiBold,
+                                ConstantAssests.montserratBold),
+                          ],
+                        ),
+
+                        Divider(
+                            color: objConstantColor.navyBlue, thickness: 0.5.dp),
+                        SizedBox(height: 10.dp),
+
+                        objCommonWidgets.customText(
+                            context, 'Track Order', 15, objConstantColor.navyBlue,
+                            objConstantFonts.montserratSemiBold),
+
+                        SizedBox(height: 10.dp),
+
+                        /// Track Order List
+                        ListView.builder(
+                          shrinkWrap: true,
+                          primary: false,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: steps.length,
+                          itemBuilder: (context, index) {
+                            var date = '';
+                            if (orderTracking != null && index <
+                                orderTracking.length) {
+                              date = CodeReusability()
+                                  .convertUTCToIST(
+                                  orderTracking[index].orderStatusDate ?? '');
+                            }
+
+                            return AnimatedOrderTrackStep(
+                              text: steps[index],
+                              date: date,
+                              isCompleted: index <= animatedStep,
+                              // 👈 Animated state
+                              isLast: index == steps.length - 1,
+                            );
+                          },
+                        ),
+
+                        SizedBox(height: 10.dp),
+                        Divider(
+                            color: objConstantColor.navyBlue, thickness: 0.5.dp),
+                        SizedBox(height: 10.dp),
+
+                        objCommonWidgets.customText(
+                            context, 'Purchase List', 16,
+                            objConstantColor.navyBlue,
+                            objConstantFonts.montserratSemiBold),
+
+                        SizedBox(height: 2.dp),
+
+                        ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: orderDetails?.orderDetails.length,
+                          itemBuilder: (context, index) {
+                            var productDetails = orderDetails
+                                ?.orderDetails[index];
+                            return cell(
+                              context,
+                              index,
+                              '${productDetails?.productDetails.productName}',
+                              '${productDetails?.productDetails
+                                  .productSellingPrice}',
+                              '${productDetails?.productDetails.gram}',
+                              productDetails?.productCount ?? 0,
+                              '${productDetails?.productDetails.image}',
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            /// Bottom total bar
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: objConstantColor.white,
+                boxShadow: const [
+                  BoxShadow(
+                      color: Colors.black12, blurRadius: 8, spreadRadius: 1),
+                ],
+              ),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(15.dp, 10.dp, 20.dp, 10.dp),
+                child: Row(
+                  children: [
+
+                    if (orderDetails?.currentOrderStatus == 0)...{
+                      CupertinoButton(padding: EdgeInsets.zero,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: objConstantColor.orange,
+                              borderRadius: BorderRadius.circular(5.dp),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 12.dp, horizontal: 13.dp),
+                              child: objCommonWidgets.customText(
+                                  context, 'Cancel Order', 15,
+                                  objConstantColor.white,
+                                  objConstantFonts.montserratSemiBold),
+                            ),
+                          ), onPressed: () {
+
+                        setState(() {
+                          final orderDetailScreenNotifier = ref.read(OrderDetailsScreenGlobalStateProvider.notifier);
+                          orderDetailScreenNotifier.callCancelOrderAPi(context, orderDetails?.orderId ?? '', userScreenNotifier);
+                        });
+                          }),
+
+                      const Spacer(),
+                    }else...{
+                      objCommonWidgets.customText(
+                        context,
+                        'Total Amount',
+                        17,
+                        objConstantColor.navyBlue,
+                        objConstantFonts.montserratBold,
+                      ),
+                    const Spacer(),
+                    },
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        objCommonWidgets.customText(
+                          context,
+                          '₹${orderDetails?.orderTotalAmount}/_',
+                          18,
+                          objConstantColor.green,
+                          objConstantFonts.montserratBold,
+                        ),
+                        objCommonWidgets.customText(
+                          context,
+                          'Inc. of all taxes',
+                          10,
+                          objConstantColor.navyBlue,
+                          objConstantFonts.montserratMedium,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

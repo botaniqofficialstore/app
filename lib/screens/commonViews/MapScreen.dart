@@ -144,141 +144,145 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     ),
                   ]
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+              child: SafeArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                
+                    Row(
+                      children: [
+                        SizedBox(width: 10.dp),
+                        CupertinoButton(
+                          minimumSize: const Size(0, 0),
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            if (userFrom == ScreenName.home){
+                              userScreenNotifier.callNavigation(ScreenName.home);
+                            } else if (userFrom == ScreenName.productDetail) {
+                              userScreenNotifier.callNavigation(ScreenName.productDetail);
+                            } else if (userFrom == ScreenName.profile) {
+                              userScreenNotifier.callNavigation(ScreenName.profile);
+                            } else{
+                              userScreenNotifier.callNavigation(ScreenName.editProfile);
+                            }
+                          },
+                          child: Icon(Icons.arrow_back, color: objConstantColor.white, size: 25.dp),
+                        ),
 
-                  Row(
-                    children: [
-                      CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          if (userFrom == ScreenName.home){
-                            userScreenNotifier.callNavigation(ScreenName.home);
-                          } else if (userFrom == ScreenName.productDetail) {
-                            userScreenNotifier.callNavigation(ScreenName.productDetail);
-                          } else if (userFrom == ScreenName.profile) {
-                            userScreenNotifier.callNavigation(ScreenName.profile);
-                          } else{
-                            userScreenNotifier.callNavigation(ScreenName.editProfile);
-                          }
-                        },
-                        child: Icon(Icons.arrow_back, color: objConstantColor.white, size: 25.dp),
-                      ),
-
-
-                      objCommonWidgets.customText(
-                        context,
-                        'Update Delivery Address',
-                        15,
-                        objConstantColor.white,
-                        objConstantFonts.montserratSemiBold,
-                      )
-                    ],
-                  ),
-
-                  SizedBox(height: 10.dp),
-
-
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 15.dp),
-                    child: RichText(
-                      text: TextSpan(
-                        children: [
-                          // Opening quote
-                          WidgetSpan(
-                            alignment: PlaceholderAlignment.top,
-                            child: Transform.translate(
-                                offset: const Offset(0, -2),
-                                child: Transform.rotate(
-                                  angle: 3.14,
-                                  child: Image.asset(
-                                    objConstantAssest.quote,
-                                    width: 15,
-                                    color: Colors.white,
+                        SizedBox(width: 10.dp),
+                        objCommonWidgets.customText(
+                          context,
+                          'Update Delivery Address',
+                          15,
+                          objConstantColor.white,
+                          objConstantFonts.montserratSemiBold,
+                        )
+                      ],
+                    ),
+                
+                    SizedBox(height: 10.dp),
+                
+                
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 15.dp),
+                      child: RichText(
+                        text: TextSpan(
+                          children: [
+                            // Opening quote
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.top,
+                              child: Transform.translate(
+                                  offset: const Offset(0, -2),
+                                  child: Transform.rotate(
+                                    angle: 3.14,
+                                    child: Image.asset(
+                                      objConstantAssest.quote,
+                                      width: 15,
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                ),
-                          ),
-                          ),
-                          
-                          // Main text
-                          TextSpan(
-                            text: " Choose where you want us to deliver and confirm your exact location. ",
-                            style: TextStyle(
-                              fontFamily: objConstantFonts.montserratSemiBold,
-                              fontSize: 15,
-                              color: objConstantColor.white,
                             ),
-                          ),
-
-                          // Ending quote (flipped)
-                          WidgetSpan(
-                            alignment: PlaceholderAlignment.bottom,
-                            child: Transform.translate(
-                              offset: const Offset(0, -2),
-                              child: Image.asset(
-                                objConstantAssest.quote,
-                                width: 15,
-                                color: Colors.white,
+                            ),
+                            
+                            // Main text
+                            TextSpan(
+                              text: " Choose where you want us to deliver and confirm your exact location. ",
+                              style: TextStyle(
+                                fontFamily: objConstantFonts.montserratSemiBold,
+                                fontSize: 15,
+                                color: objConstantColor.white,
                               ),
-                            )
-                          ),
-                        ],
-                      ),
-                    )
-
-
-                  ),
-
-                  SizedBox(height: 15.dp),
-
-                  Row(
-                    children: [
-
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10.dp),
-                          child: GooglePlaceAutoCompleteTextField(
-                            boxDecoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(50.dp),
-                              boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5.dp, offset: const Offset(0, 2))],
                             ),
-                            textEditingController: _searchController,
-                            googleAPIKey: 'AIzaSyBj448jygDcUrpUtXtmynTluoxWFbKP6Gk',
-                            inputDecoration: InputDecoration(
-                              hintText: "Search your location here...",
-                              border: InputBorder.none,
-                              prefixIcon: Icon(Icons.search, color: objConstantColor.navyBlue),
-                              contentPadding: EdgeInsets.symmetric(vertical: 10.dp),
+                
+                            // Ending quote (flipped)
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.bottom,
+                              child: Transform.translate(
+                                offset: const Offset(0, -2),
+                                child: Image.asset(
+                                  objConstantAssest.quote,
+                                  width: 15,
+                                  color: Colors.white,
+                                ),
+                              )
                             ),
-                            debounceTime: 800,
-                            countries: const ["in"],
-                            isLatLngRequired: true,
-                            getPlaceDetailWithLatLng: (Prediction prediction) async {
-                              final lat = double.parse(prediction.lat!);
-                              final lng = double.parse(prediction.lng!);
-                              final selected = LatLng(lat, lng);
-
-                              if (!_isWithinAllowed(selected)) {
-                                _showOutOfRangeAlert(context);
-                                return;
-                              }
-
-                              _placeSelectedMarker(selected, prediction.description);
-
-                              final controller = await _controller.future;
-                              controller.animateCamera(CameraUpdate.newLatLngZoom(selected, 19));
-                            },
+                          ],
+                        ),
+                      )
+                
+                
+                    ),
+                
+                    SizedBox(height: 15.dp),
+                
+                    Row(
+                      children: [
+                
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10.dp),
+                            child: GooglePlaceAutoCompleteTextField(
+                              boxDecoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(50.dp),
+                                boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5.dp, offset: const Offset(0, 2))],
+                              ),
+                              textEditingController: _searchController,
+                              googleAPIKey: 'AIzaSyBj448jygDcUrpUtXtmynTluoxWFbKP6Gk',
+                              inputDecoration: InputDecoration(
+                                hintText: "Search your location here...",
+                                border: InputBorder.none,
+                                prefixIcon: Icon(Icons.search, color: objConstantColor.navyBlue),
+                                contentPadding: EdgeInsets.symmetric(vertical: 10.dp),
+                              ),
+                              debounceTime: 800,
+                              countries: const ["in"],
+                              isLatLngRequired: true,
+                              getPlaceDetailWithLatLng: (Prediction prediction) async {
+                                final lat = double.parse(prediction.lat!);
+                                final lng = double.parse(prediction.lng!);
+                                final selected = LatLng(lat, lng);
+                
+                                if (!_isWithinAllowed(selected)) {
+                                  _showOutOfRangeAlert(context);
+                                  return;
+                                }
+                
+                                _placeSelectedMarker(selected, prediction.description);
+                
+                                final controller = await _controller.future;
+                                controller.animateCamera(CameraUpdate.newLatLngZoom(selected, 19));
+                              },
+                            ),
                           ),
                         ),
-                      ),
-
-
-                    ],
-                  ),
-                  SizedBox(height: 2.dp)
-                ],
+                
+                
+                      ],
+                    ),
+                    SizedBox(height: 2.dp)
+                  ],
+                ),
               ),
             ),
           ),

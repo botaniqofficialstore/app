@@ -47,6 +47,8 @@ class MainScreenState extends ConsumerState<MainScreen> {
         FocusScope.of(context).unfocus();
       },
       child: SafeArea(
+        bottom: false,
+        top: false,
         child: Scaffold(
           key: _scaffoldKey,
           backgroundColor: objConstantColor.white,

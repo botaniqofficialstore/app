@@ -328,85 +328,89 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         ),
 
         Positioned(
-          top: 10.dp,
+          top: 0.dp,
           right: 15.dp,
-          child: Row(
-            children: [
-
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: CupertinoButton(
-                  padding: EdgeInsets.all(4.dp),
-                  minSize: 35.dp,
-                  borderRadius: BorderRadius.circular(30),
-                  child: Image.asset(
-                    (detailsScreenState.wishList == 0)
-                        ? objConstantAssest.wishUnCheckWhite
-                        : objConstantAssest.wishRed,
-                    width: 20.dp,
+          child: SafeArea(
+            child: Row(
+              children: [
+            
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  onPressed: () {
-                    if (detailsScreenState.wishList == 0) {
-                      detailsScreenNotifier.callAddToWishList(
-                          context,
-                          '${detailsScreenState.productData?.productId}');
-                    } else {
-                      detailsScreenNotifier.callRemoveFromWishList(
-                          context,
-                          '${detailsScreenState.productData?.productId}');
-                    }
-                  },
+                  child: CupertinoButton(
+                    padding: EdgeInsets.all(4.dp),
+                    minSize: 35.dp,
+                    borderRadius: BorderRadius.circular(30),
+                    child: Image.asset(
+                      (detailsScreenState.wishList == 0)
+                          ? objConstantAssest.wishUnCheckWhite
+                          : objConstantAssest.wishRed,
+                      width: 20.dp,
+                    ),
+                    onPressed: () {
+                      if (detailsScreenState.wishList == 0) {
+                        detailsScreenNotifier.callAddToWishList(
+                            context,
+                            '${detailsScreenState.productData?.productId}');
+                      } else {
+                        detailsScreenNotifier.callRemoveFromWishList(
+                            context,
+                            '${detailsScreenState.productData?.productId}');
+                      }
+                    },
+                  ),
                 ),
-              ),
-
-              SizedBox(width: 5.dp),
-
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(30),
+            
+                SizedBox(width: 10.dp),
+            
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: CupertinoButton(
+                    padding: EdgeInsets.all(4.dp),
+                    minSize: 35.dp,
+                    borderRadius: BorderRadius.circular(30),
+                    child: const Icon(Icons.share, color: Colors.white),
+                    onPressed: () {
+            
+                    },
+                  ),
                 ),
-                child: CupertinoButton(
-                  padding: EdgeInsets.all(4.dp),
-                  minSize: 35.dp,
-                  borderRadius: BorderRadius.circular(30),
-                  child: const Icon(Icons.share, color: Colors.white),
-                  onPressed: () {
-
-                  },
-                ),
-              ),
-
-
-            ],
+            
+            
+              ],
+            ),
           ),
         ),
 
         Positioned(
-          top: 10.dp,
+          top: 0.dp,
           left: 15.dp,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.4),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: CupertinoButton(
-              padding: EdgeInsets.all(4.dp),
-              minSize: 35.dp,
-              borderRadius: BorderRadius.circular(30),
-              child: Image.asset(
-                objConstantAssest.backIcon,
-                color: Colors.white,
-                width: 25.dp,
+          child: SafeArea(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(30),
               ),
-              onPressed: () {
-                ref
-                    .watch(MainScreenGlobalStateProvider.notifier)
-                    .callNavigation(ScreenName.home);
-              },
+              child: CupertinoButton(
+                padding: EdgeInsets.all(4.dp),
+                minSize: 35.dp,
+                borderRadius: BorderRadius.circular(30),
+                child: Image.asset(
+                  objConstantAssest.backIcon,
+                  color: Colors.white,
+                  width: 25.dp,
+                ),
+                onPressed: () {
+                  ref
+                      .watch(MainScreenGlobalStateProvider.notifier)
+                      .callNavigation(ScreenName.home);
+                },
+              ),
             ),
           ),
         )

@@ -35,8 +35,8 @@ class InformationScreenState extends ConsumerState<InformationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.grey.withAlpha(30),
-      body: profileView(context),
+      backgroundColor: Colors.white,
+      body: SafeArea(child: profileView(context)),
     );
   }
 
@@ -90,16 +90,19 @@ class InformationScreenState extends ConsumerState<InformationScreen> {
             )
         ),
 
-        SizedBox(height: 10.dp),
 
         Expanded(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: _policyContentView(context),
+          child: Container(
+            color: Colors.black.withAlpha(10),
+            padding: EdgeInsets.only(top: 10.dp),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: _policyContentView(context),
+            ),
           ),
-        )
+        ),
 
-
+        SizedBox(height: 10.dp),
 
 
 
@@ -110,33 +113,70 @@ class InformationScreenState extends ConsumerState<InformationScreen> {
 
 
   Widget _policyContentView(BuildContext context) {
-    final screenState = ref.watch(InformationScreenGlobalStateProvider);
-
     final content = LegalContentHelper.getContent(selectedLegalInformation!);
+    final lines = content.split('\n');
 
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 15.dp),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4.dp,
-            offset: const Offset(0, 2),
-          )
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 10.dp),
+        children: lines.map((line) {
+          final text = line.trim();
 
-          objCommonWidgets.customText(context, content, 12, objConstantColor.navyBlue, objConstantFonts.montserratMedium)
-        ],
+          // Empty line
+          if (text.isEmpty) {
+            return SizedBox(height: 8.dp);
+          }
+
+          // Headings (end with :)
+          if (text.endsWith(':')) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 15.dp),
+              child: objCommonWidgets.customText(
+                context,
+                text.toUpperCase(),
+                10,
+                objConstantColor.navyBlue,
+                objConstantFonts.montserratSemiBold,
+              ),
+            );
+          }
+
+          // Bullet points
+          if (text.startsWith('•')) {
+            return Container(
+              color: Colors.white,
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: 15.dp, vertical: 0.8.dp),
+              child: objCommonWidgets.customText(
+                context,
+                text,
+                10,
+                objConstantColor.navyBlue,
+                objConstantFonts.montserratMedium,
+              ),
+            );
+          }
+
+          // Normal paragraph
+          return Container(
+            color: Colors.white,
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+            child: objCommonWidgets.customText(
+              context,
+              text,
+              10,
+              objConstantColor.navyBlue,
+              objConstantFonts.montserratMedium,
+            ),
+          );
+        }).toList(),
       ),
     );
   }
+
+
 
 
 

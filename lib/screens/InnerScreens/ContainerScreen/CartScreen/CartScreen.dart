@@ -38,228 +38,232 @@ class CartScreenState extends ConsumerState<CartScreen> {
     final cartScreenNotifier = ref.read(cartScreenGlobalStateProvider.notifier);
     final cartItems = userScreenState.cartItems;
 
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: objConstantColor.white,
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await cartScreenNotifier.callCartListGepAPI(context);
-        },
-        color: objConstantColor.navyBlue,
+    return SafeArea(
+      child: Scaffold(
+        key: _scaffoldKey,
         backgroundColor: objConstantColor.white,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            /// Header
-            Padding(
-              padding: EdgeInsets.only(top: 5.dp, bottom: 5.dp),
-              child: Row(
-                children: [
-                  CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      child: Image.asset(objConstantAssest.backIcon, width: 20.dp,), onPressed: (){
-                    userScreenNotifier.callNavigation(ScreenName.home);
-                  }),
-                  customeText(
-                    'My Cart',
-                    18,
-                    objConstantColor.navyBlue,
-                    ConstantAssests.montserratSemiBold,
-                  ),
-                ],
+        body: RefreshIndicator(
+          onRefresh: () async {
+            await cartScreenNotifier.callCartListGepAPI(context);
+          },
+          color: objConstantColor.navyBlue,
+          backgroundColor: objConstantColor.white,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+      
+              /// Header
+              Padding(
+                padding: EdgeInsets.only(left: 10.dp, top: 5.dp, bottom: 5.dp),
+                child: Row(
+                  children: [
+                    CupertinoButton(
+                        minimumSize: const Size(0, 0),
+                        padding: EdgeInsets.zero,
+                        child: Image.asset(objConstantAssest.backIcon, width: 20.dp,), onPressed: (){
+                      userScreenNotifier.callNavigation(ScreenName.home);
+                    }),
+                    SizedBox(width: 5.dp),
+                    customeText(
+                      'My Cart',
+                      15,
+                      objConstantColor.navyBlue,
+                      ConstantAssests.montserratSemiBold,
+                    ),
+                  ],
+                ),
               ),
-            ),
-
-            /// Scroll content (shimmer while loading, else real content)
-            Expanded(
-              child: userScreenState.isLoading
-                  ? _buildShimmerPlaceholder() // show shimmer while loading
-                  : Scrollbar(
-                thumbVisibility: true,
-                thickness: 6,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 18.dp),
-                    child: Builder(
-                      builder: (context) {
-                        if (cartItems.isEmpty) {
-
-                          return SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.7, // fill height
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Image.asset(objConstantAssest.emptyCartIcon, width: 65.dp),
-                                  SizedBox(height: 1.dp),
-                                  Text(
-                                    "Your cart is empty.",
-                                    style: TextStyle(
-                                      color: objConstantColor.gray,
-                                      fontSize: 13.dp,
-                                      fontFamily: ConstantAssests.montserratSemiBold,
-                                    ),
-                                  ),
-
-                                  SizedBox(height: 20.dp),
-
-                                  CupertinoButton(padding: EdgeInsets.zero,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            color: objConstantColor.orange,
-                                            borderRadius: BorderRadius.circular(5.dp)
-                                        ),
-                                        padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
-                                        child: objCommonWidgets.customText(context,
-                                            'Shop Now',
-                                            14, objConstantColor.white,
-                                            objConstantFonts.montserratBold),
+      
+              /// Scroll content (shimmer while loading, else real content)
+              Expanded(
+                child: userScreenState.isLoading
+                    ? _buildShimmerPlaceholder() // show shimmer while loading
+                    : Scrollbar(
+                  thumbVisibility: true,
+                  thickness: 6,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 18.dp),
+                      child: Builder(
+                        builder: (context) {
+                          if (cartItems.isEmpty) {
+      
+                            return SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.7, // fill height
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Image.asset(objConstantAssest.emptyCartIcon, width: 65.dp),
+                                    SizedBox(height: 1.dp),
+                                    Text(
+                                      "Your cart is empty.",
+                                      style: TextStyle(
+                                        color: objConstantColor.gray,
+                                        fontSize: 13.dp,
+                                        fontFamily: ConstantAssests.montserratSemiBold,
                                       ),
-                                      onPressed: (){
-                                        userScreenNotifier.callNavigation(ScreenName.home);
-                                      })
-                                ],
+                                    ),
+      
+                                    SizedBox(height: 20.dp),
+      
+                                    CupertinoButton(padding: EdgeInsets.zero,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color: objConstantColor.orange,
+                                              borderRadius: BorderRadius.circular(5.dp)
+                                          ),
+                                          padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                                          child: objCommonWidgets.customText(context,
+                                              'Shop Now',
+                                              14, objConstantColor.white,
+                                              objConstantFonts.montserratBold),
+                                        ),
+                                        onPressed: (){
+                                          userScreenNotifier.callNavigation(ScreenName.home);
+                                        })
+                                  ],
+                                ),
                               ),
-                            ),
+                            );
+                          }
+      
+                          // ✅ Normal cart content
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+      
+                              customeText(
+                                'Order Summary',
+                                15,
+                                objConstantColor.navyBlue,
+                                ConstantAssests.montserratSemiBold,
+                              ),
+                              SizedBox(height: 15.dp),
+      
+                              /// Cart List
+                              ListView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: cartItems.length,
+                                itemBuilder: (context, index) {
+                                  final item = cartItems[index];
+                                  final details = item.productDetails!;
+      
+                                  return cell(
+                                      index,
+                                      details.productName,
+                                      details.productSellingPrice.toString(),
+                                      details.productPrice.toString(),
+                                      '${details.gram} gm',
+                                      item.productCount,
+                                      details.image,
+                                      cartScreenNotifier,
+                                      details.productId
+                                  );
+                                },
+                              ),
+      
+                              SizedBox(height: 10.dp),
+                              amountText(context, 'Amount', '${userScreenState.totalAmount}', ConstantAssests.montserratMedium, 12, 12),
+                              amountText(context, 'Discount', '${userScreenState.totalDiscount}', ConstantAssests.montserratMedium, 12, 12),
+                              amountText(context, 'Delivery Charge', (userScreenState.isDeliveryAddress) ? '89' : ' __', ConstantAssests.montserratMedium, 12 , 12),
+                              SizedBox(height: 10.dp),
+                              DottedLine(
+                                direction: Axis.horizontal,
+                                alignment: WrapAlignment.center,
+                                lineLength: double.infinity,
+                                lineThickness: 1.5,
+                                dashLength: 8.0,
+                                dashColor: objConstantColor.black.withAlpha(50),
+                                dashRadius: 0.0,
+                                dashGapLength: 4.0,
+                                dashGapColor: Colors.transparent,
+                                dashGapRadius: 0.0,
+                              ),
+                              SizedBox(height: 10.dp),
+                              amountText(context, 'Payable Amount', (userScreenState.isDeliveryAddress) ? '${userScreenState.totalPayableAmount}' : ' __', ConstantAssests.montserratSemiBold, 15, 15,
+                              ),
+                            ],
                           );
-                        }
-
-                        // ✅ Normal cart content
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-
-                            customeText(
-                              'Order Summary',
-                              18,
-                              objConstantColor.navyBlue,
-                              ConstantAssests.montserratSemiBold,
-                            ),
-                            SizedBox(height: 15.dp),
-
-                            /// Cart List
-                            ListView.builder(
-                              physics: const NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: cartItems.length,
-                              itemBuilder: (context, index) {
-                                final item = cartItems[index];
-                                final details = item.productDetails!;
-
-                                return cell(
-                                    index,
-                                    details.productName,
-                                    details.productSellingPrice.toString(),
-                                    details.productPrice.toString(),
-                                    '${details.gram} gm',
-                                    item.productCount,
-                                    details.image,
-                                    cartScreenNotifier,
-                                    details.productId
-                                );
-                              },
-                            ),
-
-                            SizedBox(height: 10.dp),
-                            amountText(context, 'Amount', '${userScreenState.totalAmount}', ConstantAssests.montserratMedium, 12, 12),
-                            amountText(context, 'Discount', '${userScreenState.totalDiscount}', ConstantAssests.montserratMedium, 12, 12),
-                            amountText(context, 'Delivery Charge', (userScreenState.isDeliveryAddress) ? '89' : ' __', ConstantAssests.montserratMedium, 12 , 12),
-                            SizedBox(height: 10.dp),
-                            DottedLine(
-                              direction: Axis.horizontal,
-                              alignment: WrapAlignment.center,
-                              lineLength: double.infinity,
-                              lineThickness: 1.5,
-                              dashLength: 8.0,
-                              dashColor: objConstantColor.black.withAlpha(50),
-                              dashRadius: 0.0,
-                              dashGapLength: 4.0,
-                              dashGapColor: Colors.transparent,
-                              dashGapRadius: 0.0,
-                            ),
-                            SizedBox(height: 10.dp),
-                            amountText(context, 'Payable Amount', (userScreenState.isDeliveryAddress) ? '${userScreenState.totalPayableAmount}' : ' __', ConstantAssests.montserratSemiBold, 15, 15,
-                            ),
-                          ],
-                        );
-                      },
+                        },
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-
-            /// Checkout (only when not loading and cart is not empty)
-
-            if (!userScreenState.isLoading && cartItems.isNotEmpty)
-             if (userScreenState.isProfileCompleted) ...{
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: objConstantColor.white,
-                  boxShadow: const [
-                    BoxShadow(
-                        color: Colors.black12, blurRadius: 8, spreadRadius: 1),
-                  ],
-                ),
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(20.dp, 10.dp, 20.dp, 10.dp),
-                  child: Row(
-                    children: [
-
-                      Column(
-                        children: [
-                          customeText(
-                            '₹${userScreenState.totalPayableAmount}/_',
-                            20,
-                            objConstantColor.navyBlue,
-                            ConstantAssests.montserratBold,
-                          ),
-                          customeText(
-                            'Inc. of all taxes',
-                            10,
-                            objConstantColor.navyBlue,
-                            ConstantAssests.montserratMedium,
-                          )
-                        ],
-                      ),
-
-                      const Spacer(),
-
-                      CupertinoButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            cartScreenNotifier.callNavigateToSummary(userScreenNotifier);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 10.dp, horizontal: 20.dp),
-                            decoration: BoxDecoration(
-                              color: objConstantColor.orange,
-                              borderRadius: BorderRadius.circular(5.dp),
-                            ),
-                            child: customeText(
-                              'Checkout',
-                              18,
-                              objConstantColor.white,
-                              ConstantAssests.montserratSemiBold,
-                            ),
-                          )
-                      ),
-
-
+      
+              /// Checkout (only when not loading and cart is not empty)
+      
+              if (!userScreenState.isLoading && cartItems.isNotEmpty)
+               if (userScreenState.isProfileCompleted) ...{
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: objConstantColor.white,
+                    boxShadow: const [
+                      BoxShadow(
+                          color: Colors.black12, blurRadius: 8, spreadRadius: 1),
                     ],
                   ),
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(20.dp, 10.dp, 20.dp, 10.dp),
+                    child: Row(
+                      children: [
+      
+                        Column(
+                          children: [
+                            customeText(
+                              '₹${userScreenState.totalPayableAmount}/_',
+                              20,
+                              objConstantColor.navyBlue,
+                              ConstantAssests.montserratBold,
+                            ),
+                            customeText(
+                              'Inc. of all taxes',
+                              10,
+                              objConstantColor.navyBlue,
+                              ConstantAssests.montserratMedium,
+                            )
+                          ],
+                        ),
+      
+                        const Spacer(),
+      
+                        CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              cartScreenNotifier.callNavigateToSummary(userScreenNotifier);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 10.dp, horizontal: 20.dp),
+                              decoration: BoxDecoration(
+                                color: objConstantColor.orange,
+                                borderRadius: BorderRadius.circular(5.dp),
+                              ),
+                              child: customeText(
+                                'Checkout',
+                                18,
+                                objConstantColor.white,
+                                ConstantAssests.montserratSemiBold,
+                              ),
+                            )
+                        ),
+      
+      
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            }else...{
-               showUpdateProfileView(context)
-            }
-
-          ],
+              }else...{
+                 showUpdateProfileView(context)
+              }
+      
+            ],
+          ),
         ),
       ),
     );

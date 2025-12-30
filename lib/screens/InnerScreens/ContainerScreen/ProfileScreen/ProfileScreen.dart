@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import '../../../../Utility/PreferencesManager.dart';
-import '../../../Authentication/LoginScreen/LoginScreen.dart';
 import '../../../commonViews/LogoutPopup.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../../../constants/Constants.dart';
@@ -25,8 +24,8 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      final profilrScreenNotifier = ref.read(ProfileScreenGlobalStateProvider.notifier);
-      profilrScreenNotifier.updateUserDetails();
+      final profileScreenNotifier = ref.read(ProfileScreenGlobalStateProvider.notifier);
+      profileScreenNotifier.updateUserDetails();
     });
   }
 
@@ -36,291 +35,512 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.grey.withAlpha(30),
-
       body: profileView(context),
     );
   }
 
 
   ///Profile Screen
-Widget profileView(BuildContext context) {
-  final screenState = ref.watch(ProfileScreenGlobalStateProvider);
-  final screenNotifier = ref.read(ProfileScreenGlobalStateProvider.notifier);
-  final mainScreenNotifier = ref.read(MainScreenGlobalStateProvider.notifier);
+  Widget profileView(BuildContext context) {
+    final screenNotifier =
+    ref.read(ProfileScreenGlobalStateProvider.notifier);
+    final mainScreenNotifier =
+    ref.read(MainScreenGlobalStateProvider.notifier);
+    var userScreenState = ref.watch(ProfileScreenGlobalStateProvider);
 
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-
-      Container(
-        padding: EdgeInsets.symmetric(vertical: 8.dp, horizontal: 5.dp),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2.dp, offset: const Offset(0, 1))],
-        ),
-        child: Stack(
+    return Scaffold(
+      backgroundColor: Colors.black.withAlpha(10),
+      body: SafeArea(
+        child: Column(
           children: [
-            CupertinoButton(
-                padding: EdgeInsets.zero,
-                minimumSize: const Size(0, 0),
-                child: Padding(
-                  padding: EdgeInsets.only(top: 5.dp),
-                  child: Image.asset(
-                    objConstantAssest.backIcon,
-                    height: 20.dp,
-                    color: objConstantColor.navyBlue,
+            Container(
+              padding: EdgeInsets.only(top: 5.dp, right: 10.dp, left: 10.dp, bottom: 8.dp),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+
+
+                  CupertinoButton(
+                    minimumSize: const Size(0, 0),
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      mainScreenNotifier.callNavigation(ScreenName.home);
+                    },
+                    child: Icon(
+                      Icons.arrow_back_sharp,
+                      size: 20.9.dp,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                onPressed: () {
-                  mainScreenNotifier.callNavigation(ScreenName.home);
-                }),
 
+                  SizedBox(width: 5.dp),
 
-            Align(
-              alignment: Alignment.center,
-              child: objCommonWidgets.customText(
-                context,
-                'Account',
-                18,
-                objConstantColor.navyBlue,
-                objConstantFonts.montserratSemiBold,
-              ),
-            ),
-
-
-          ],
-        )
-      ),
-
-      Expanded(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            children: [
-
-              SizedBox(height: 10.dp),
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2.dp, offset: const Offset(0, 1))],
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10.dp, vertical: 5.dp),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 3.dp),
-                      objCommonWidgets.customText(context, 'Personal Details', 15, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
-                      SizedBox(height: 7.dp),
-
-                      optionCard(context, 'My Profile', Icons.person_3_outlined, Colors.blueAccent,(){
-                        mainScreenNotifier.callNavigation(ScreenName.editProfile);
-                      }),
-                      optionCard(context, 'Delivery Location', Icons.location_on_outlined, Colors.blueAccent,(){
-                        userFrom = ScreenName.profile;
-                        mainScreenNotifier.callNavigation(ScreenName.map);
-                      }),
-
-                    ],
+                  objCommonWidgets.customText(
+                    context,
+                    'Account',
+                    18,
+                    objConstantColor.navyBlue,
+                    objConstantFonts.montserratSemiBold,
                   ),
-                ),
-              ),
 
-              SizedBox(height: 10.dp),
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2.dp, offset: const Offset(0, 1))],
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10.dp, vertical: 5.dp),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 3.dp),
-                      objCommonWidgets.customText(context, 'Shopping Details', 15, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
-                      SizedBox(height: 7.dp),
+                  const Spacer(),
 
-                      optionCard(context, 'My Orders', Icons.shopping_bag_outlined, Colors.blueAccent,(){
-                        mainScreenNotifier.callNavigation(ScreenName.orders);
-                      }),
-                      optionCard(context, 'Wish List', Icons.favorite_border_outlined, Colors.blueAccent,(){
-                        mainScreenNotifier.callNavigation(ScreenName.wishList);
-                      }),
-                      optionCard(context, 'Cart List', Icons.shopping_cart_outlined, Colors.blueAccent,(){
-                        mainScreenNotifier.callNavigation(ScreenName.cart);
-                      }),
-
-                    ],
-                  ),
-                ),
-              ),
-
-
-              SizedBox(height: 10.dp),
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2.dp, offset: const Offset(0, 1))],
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10.dp, vertical: 5.dp),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 3.dp),
-                      objCommonWidgets.customText(context, 'Legal & Information', 15, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
-                      SizedBox(height: 7.dp),
-
-
-                      optionCard(context, 'Privacy Policy', Icons.privacy_tip_outlined, Colors.blueAccent,(){
-                        selectedLegalInformation = ScreenName.privacyPolicy;
-                        mainScreenNotifier.callNavigation(ScreenName.information);
-                      }),
-                      optionCard(context, 'Terms & Conditions', Icons.description_outlined, Colors.blueAccent,(){
-                        selectedLegalInformation = ScreenName.termsAndCondition;
-                        mainScreenNotifier.callNavigation(ScreenName.information);
-                      }),
-                      optionCard(context, 'Refund Policy', Icons.currency_rupee, Colors.blueAccent,(){
-                        selectedLegalInformation = ScreenName.refundPolicy;
-                        mainScreenNotifier.callNavigation(ScreenName.information);
-                      }),
-                      optionCard(context, 'Shipping Policy', Icons.local_shipping_outlined, Colors.blueAccent,(){
-                        selectedLegalInformation = ScreenName.shippingPolicy;
-                        mainScreenNotifier.callNavigation(ScreenName.information);
-                      }),
-                      optionCard(context, 'About Us', Icons.info_outline_rounded, Colors.blueAccent,(){
-                        selectedLegalInformation = ScreenName.aboutUS;
-                        mainScreenNotifier.callNavigation(ScreenName.information);
-                      }),
-
-                    ],
-                  ),
-                ),
-              ),
-
-
-              SizedBox(height: 10.dp),
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2.dp, offset: const Offset(0, 1))],
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10.dp, vertical: 5.dp),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 3.dp),
-                      objCommonWidgets.customText(context, 'Support', 15, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
-                      SizedBox(height: 7.dp),
-
-                      optionCard(context, 'Customer Care', Icons.headset_mic, Colors.blueAccent,(){
-                        screenNotifier.openCustomerSupportEmail();
-                      }),
-
-
-                    ],
-                  ),
-                ),
-              ),
-
-
-              SizedBox(height: 10.dp),
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2.dp, offset: const Offset(0, 1))],
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10.dp, vertical: 5.dp),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      optionCard(context, 'Log Out', Icons.power_settings_new_outlined, Colors.red,(){
+                  CupertinoButton(
+                      minimumSize: const Size(0, 0),
+                      padding: EdgeInsets.zero,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 8.dp),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10.dp),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withAlpha(20),
+                              blurRadius: 10,
+                              offset: const Offset(2, 3),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            objCommonWidgets.customText(
+                              context,
+                              'Logout',
+                              12.5,
+                              Colors.red,
+                              objConstantFonts.montserratSemiBold,
+                            ),
+                            SizedBox(width: 2.5.dp),
+                            Icon(Icons.power_settings_new_outlined, color: Colors.red, size: 19.9.dp),
+                          ],
+                        ),
+                      ),
+                      onPressed: (){
                         PreferencesManager.getInstance().then((pref) {
-                          pref.setBooleanValue(PreferenceKeys.isDialogOpened, true);
+                          pref.setBooleanValue(
+                              PreferenceKeys.isDialogOpened, true);
                           LogoutPopup.showLogoutPopup(
                             context: context,
                             onConfirm: () {
-                              pref.setBooleanValue(PreferenceKeys.isDialogOpened, false);
+                              pref.setBooleanValue(
+                                  PreferenceKeys.isDialogOpened, false);
                               screenNotifier.callLogoutAPI(context);
                             },
                           );
                         });
-                      }, isLogout: true),
-                    ],
-                  ),
+                      }),
+
+                ],
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+
+                    SizedBox(height: 15.dp),
+
+                    /// PROFILE + LOCATION
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.dp),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 15.dp, horizontal: 10.dp),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20.dp),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _bigCard(
+                                    icon: Icons.person,
+                                    title: 'Profile',
+                                    subtitle: 'View & edit details',
+                                    onTap: () {
+                                      mainScreenNotifier
+                                          .callNavigation(ScreenName.editProfile);
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: 12.dp),
+                                Expanded(
+                                  child: _bigCard(
+                                    icon: Icons.location_on,
+                                    title: 'Location',
+                                    subtitle: 'Delivery address',
+                                    onTap: () {
+                                      userFrom = ScreenName.profile;
+                                      mainScreenNotifier.callNavigation(ScreenName.map);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            SizedBox(height: 12.dp),
+
+                            /// SUPPORT
+                            _supportCard(
+                              context,
+                              onTap: () {
+                                screenNotifier.openCustomerSupportEmail();
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 30.dp),
+
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.dp),
+                      child: objCommonWidgets.customText(
+                        context,
+                        'RECOMMENDATION & REMINDERS',
+                        10,
+                        objConstantColor.navyBlue,
+                        objConstantFonts.montserratMedium,
+                      ),
+                    ),
+                    SizedBox(height: 5.dp),
+
+                    Container(
+                      color: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                      child: objCommonWidgets.customText(
+                          context,
+                          'Keep this on to receive offer recommendations & timely reminders based on your interests',
+                          10,
+                          objConstantColor.navyBlue,
+                          objConstantFonts.montserratMedium
+                      ),
+                    ),
+
+                    SizedBox(height: 10.dp),
+
+                    switchButton(context, 'SMS', userScreenState.isSms, (newValue) {
+                      screenNotifier.updateSms(newValue);
+                    },),
+
+                    SizedBox(height: 2.dp),
+
+                    switchButton(context, 'WhatsApp', userScreenState.isWhatsAPP, (newValue) {
+                      screenNotifier.updateWhatsApp(newValue);
+                    },),
+
+                    SizedBox(height: 2.dp),
+
+                    switchButton(context, 'Push Notification', userScreenState.isPushNotification, (newValue) {
+                      screenNotifier.updatePushNotification(newValue);
+                    },),
+
+
+                    SizedBox(height: 30.dp),
+
+                    /// LEGAL
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.dp),
+                      child: objCommonWidgets.customText(
+                        context,
+                        'Legal & Information',
+                        10,
+                        objConstantColor.navyBlue,
+                        objConstantFonts.montserratMedium,
+                      ),
+                    ),
+
+                    SizedBox(height: 5.dp),
+
+                    Container(
+                      color: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                      child: objCommonWidgets.customText(
+                          context,
+                          'Find detailed information about our service standards and your consumer protections. We’ve made our terms easy to read so you can shop with complete peace of mind.',
+                          10,
+                          objConstantColor.navyBlue,
+                          objConstantFonts.montserratMedium
+                      ),
+                    ),
+
+                    SizedBox(height: 10.dp),
+
+                    Column(
+                      children: [
+                        _chipCard(context, 'Privacy Policy',
+                            ScreenName.privacyPolicy, Icons.privacy_tip_sharp),
+                        _chipCard(context, 'Terms & Conditions',
+                            ScreenName.termsAndCondition, Icons.description_sharp),
+                        _chipCard(context, 'Refund Policy',
+                            ScreenName.refundPolicy, Icons.currency_rupee),
+                        _chipCard(context, 'Shipping Policy',
+                            ScreenName.shippingPolicy, Icons.local_shipping),
+                        _chipCard(context, 'About Us',
+                            ScreenName.aboutUS, Icons.info),
+                      ],
+                    ),
+
+
+                    SizedBox(height: 30.dp),
+
+                    /// LEGAL
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.dp),
+                      child: objCommonWidgets.customText(
+                        context,
+                        'DELETE ACCOUNT',
+                        10,
+                        objConstantColor.navyBlue,
+                        objConstantFonts.montserratMedium,
+                      ),
+                    ),
+
+                    SizedBox(height: 5.dp),
+
+                    Container(
+                      color: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                      child: objCommonWidgets.customText(
+                          context,
+                          'Closing your account will delete your profile and personal data permanently. You will no longer be able to access your purchase history or loyalty points.',
+                          10,
+                          objConstantColor.navyBlue,
+                          objConstantFonts.montserratMedium
+                      ),
+                    ),
+
+                    SizedBox(height: 20.dp),
+
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 15.dp),
+                      child: CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: (){},
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(vertical: 14.dp),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(20.dp),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withAlpha(45),
+                                blurRadius: 10,
+                                offset: const Offset(2, 5),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: objCommonWidgets.customText(
+                                context,
+                                'DELETE ACCOUNT',
+                                15,
+                                Colors.white,
+                                objConstantFonts.montserratSemiBold),
+                          ),
+                        ), ),
+                    ),
+
+                    SizedBox(height: 20.dp),
+
+
+                  ],
                 ),
               ),
-
-              SizedBox(height: 20.dp),
-
-            ],
-          ),
-        ),
-      )
-
-
-
-
-
-
-
-
-
-    ],
-  );
-}
-
-
-  Widget optionCard(
-      BuildContext context,
-      String title,
-      IconData image,
-      Color colour,
-      VoidCallback onClick, {
-        bool isLogout = false,
-      }) {
-    return CupertinoButton(
-      padding: EdgeInsets.zero,
-      minimumSize: const Size(0, 0),
-      onPressed: onClick,
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 5.dp),
-        child: Row(
-          mainAxisAlignment:
-          isLogout ? MainAxisAlignment.center : MainAxisAlignment.start,
-          children: [
-            Icon(image, color: colour, size: 17.9.dp),
-            SizedBox(width: 5.dp),
-            objCommonWidgets.customText(
-              context,
-              title,
-              14.50,
-              colour,
-              objConstantFonts.montserratMedium,
             ),
-
-            if (!isLogout) ...[
-              const Spacer(),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: colour,
-                size: 17.9.dp,
-              ),
-            ],
           ],
         ),
       ),
     );
   }
+
+  Widget switchButton(BuildContext context, String title, bool status, ValueChanged<bool> action) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 15.dp),
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Using Expanded ensures the text doesn't push the switch off-screen
+          Expanded(
+            child: objCommonWidgets.customText(
+              context,
+              title,
+              12.5,
+              objConstantColor.navyBlue,
+              objConstantFonts.montserratSemiBold,
+            ),
+          ),
+          // Shrink the switch here
+          Transform.scale(
+            scale: 0.75, // Scaled down to 75% of original size
+            alignment: Alignment.centerRight,
+            child: CupertinoSwitch(
+              value: status,
+              activeColor: CupertinoColors.activeGreen,
+              trackColor: CupertinoColors.systemGrey5,
+              onChanged: action,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+
+
+  Widget _bigCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return CupertinoButton(
+      padding: EdgeInsets.zero,
+      onPressed: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(18.dp),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20.dp),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(45),
+              blurRadius: 10,
+              offset: const Offset(2, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 40.dp,
+              width: 40.dp,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF2F3F6),
+                borderRadius: BorderRadius.circular(10.5.dp),
+              ),
+              child: Icon(icon, size: 20.dp, color: objConstantColor.orange),
+            ),
+            SizedBox(height: 14.dp),
+            objCommonWidgets.customText(context, title, 15, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+            SizedBox(height: 2.dp),
+            objCommonWidgets.customText(context, subtitle, 10.5, Colors.grey.shade600, objConstantFonts.montserratMedium),
+
+          ],
+        ),
+      ),
+    );
+  }
+
+
+
+  Widget _chipCard(
+      BuildContext context,
+      String title,
+      ScreenName screenName,
+      IconData icon
+      ) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 1.dp),
+      child: CupertinoButton(
+        padding: EdgeInsets.zero,
+        onPressed: () {
+          selectedLegalInformation = screenName;
+          ref
+              .read(MainScreenGlobalStateProvider.notifier)
+              .callNavigation(ScreenName.information);
+        },
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 15.dp, vertical: 13.dp),
+          color: Colors.white,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Icon(icon, size: 20.dp, color: const Color(0xFF000000)),
+              SizedBox(width: 5.dp),
+              objCommonWidgets.customText(
+                  context,
+                  title, 13.5,
+                  const Color(0xFF555250),
+                  objConstantFonts.montserratSemiBold
+              ),
+              const Spacer(),
+              Icon(Icons.keyboard_arrow_right, color: const Color(0xFF000000), size: 20.dp),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+
+  Widget _supportCard(
+      BuildContext context, {
+        required VoidCallback onTap,
+      }) {
+    return CupertinoButton(
+      onPressed: onTap,
+      padding: EdgeInsets.zero,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 22.dp, horizontal: 15.dp),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+
+              Color(0xFF0345DC),
+              Color(0xFF3264D3),
+              Color(0xFF5A8DF6),
+
+            ],
+            stops: [0.0, 0.55, 1.0],
+          ),
+          borderRadius: BorderRadius.circular(20.dp),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(85),
+              blurRadius: 10,
+              offset: const Offset(2, 5),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Icon(Icons.headset_mic, color: Colors.white, size: 30.dp),
+            SizedBox(width: 5.dp),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                objCommonWidgets.customText(context,
+                    'Customer Support',
+                    15, Colors.white, objConstantFonts.montserratSemiBold),
+                objCommonWidgets.customText(context,
+                    'Need any help?',
+                    10, Colors.white, objConstantFonts.montserratMedium),
+              ],
+            ),
+            const Spacer(),
+            Icon(Icons.keyboard_arrow_right, color: Colors.white, size: 20.dp),
+          ],
+        ),
+      ),
+    );
+  }
+
+
 
 
 }

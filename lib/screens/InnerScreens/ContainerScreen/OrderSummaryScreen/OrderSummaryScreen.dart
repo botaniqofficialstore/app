@@ -39,252 +39,255 @@ class OrderSummaryScreenState extends ConsumerState<OrderSummaryScreen> {
     final orderSummaryScreenNotifier = ref.watch(OrderSummaryScreenGlobalStateProvider.notifier);
     final cartItems = userScreenState.cartItems;
 
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: const Color(0xFFFFFFFF),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return SafeArea(
+      child: Scaffold(
+        key: _scaffoldKey,
+        backgroundColor: const Color(0xFFFFFFFF),
+        body: Column(
+          children: [
 
-          Padding(
-            padding: EdgeInsets.only(top: 5.dp),
-            child: Stack(
-              children: [
-                CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    child: Image.asset(
-                      objConstantAssest.backIcon,
-                      height: 20.dp,
-                      color: objConstantColor.navyBlue,
-                    ),
-                    onPressed: () {
-                      userScreenNotifier.callNavigation(ScreenName.cart);
-                    }),
-
-
-                Align(
-                  alignment: Alignment.center,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 5.dp),
-                    child: objCommonWidgets.customText(
-                      context,
-                      'Checkout',
-                      18,
-                      objConstantColor.navyBlue,
-                      ConstantAssests.montserratSemiBold,
-                    ),
-                  ),
+        Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10.dp),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            /// Back button (left aligned)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: CupertinoButton(
+                minimumSize: const Size(0, 0),
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  userScreenNotifier.callNavigation(ScreenName.cart);
+                },
+                child: Image.asset(
+                  objConstantAssest.backIcon,
+                  height: 20.dp,
+                  color: objConstantColor.navyBlue,
                 ),
-
-
-              ],
+              ),
             ),
-          ),
 
-          /// Scrollable content
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+            /// Center title
+            objCommonWidgets.customText(
+              context,
+              'Checkout',
+              18,
+              objConstantColor.navyBlue,
+              ConstantAssests.montserratSemiBold,
+            ),
+          ],
+        ),
+      ),
 
-                  SizedBox(height: 5.dp),
+            SizedBox(height: 10.dp),
 
-                  /// Purchase Details Card
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 10.dp),
-                    decoration: BoxDecoration(
-                      color: objConstantColor.white,
-                      borderRadius: BorderRadius.circular(10.dp),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 5,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        /// Expandable Purchase Details
-                        Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF373737),
-                            borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(10.dp),
-                              topLeft: Radius.circular(10.dp),
-                              bottomLeft: Radius.circular(_isExpanded ? 2.dp : 10.dp),
-                              bottomRight: Radius.circular(_isExpanded ? 2.dp : 10.dp),
-                            ),
+
+      /// Scrollable content
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+      
+                    SizedBox(height: 5.dp),
+      
+                    /// Purchase Details Card
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 10.dp),
+                      decoration: BoxDecoration(
+                        color: objConstantColor.white,
+                        borderRadius: BorderRadius.circular(10.dp),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 5,
+                            offset: const Offset(0, 1),
                           ),
-                          child: CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              setState(() {
-                                _isExpanded = !_isExpanded;
-                              });
-                            },
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 6.dp),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  SizedBox(width: 2.dp),
-                                  objCommonWidgets.customText(
-                                    context,
-                                    'Purchase Details',
-                                    15,
-                                    objConstantColor.white,
-                                    ConstantAssests.montserratSemiBold,
-                                  ),
-                                  const Spacer(),
-                                  AnimatedRotation(
-                                    turns: _isExpanded ? 0.5 : 0,
-                                    duration: const Duration(milliseconds: 300),
-                                    child: Icon(
-                                      Icons.keyboard_arrow_down,
-                                      size: 35.dp,
-                                      color: objConstantColor.white,
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          /// Expandable Purchase Details
+                          Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF373737),
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(10.dp),
+                                topLeft: Radius.circular(10.dp),
+                                bottomLeft: Radius.circular(_isExpanded ? 2.dp : 10.dp),
+                                bottomRight: Radius.circular(_isExpanded ? 2.dp : 10.dp),
+                              ),
+                            ),
+                            child: CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              onPressed: () {
+                                setState(() {
+                                  _isExpanded = !_isExpanded;
+                                });
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 6.dp),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SizedBox(width: 2.dp),
+                                    objCommonWidgets.customText(
+                                      context,
+                                      'Purchase Details',
+                                      15,
+                                      objConstantColor.white,
+                                      ConstantAssests.montserratSemiBold,
                                     ),
-                                  ),
-                                ],
+                                    const Spacer(),
+                                    AnimatedRotation(
+                                      turns: _isExpanded ? 0.5 : 0,
+                                      duration: const Duration(milliseconds: 300),
+                                      child: Icon(
+                                        Icons.keyboard_arrow_down,
+                                        size: 35.dp,
+                                        color: objConstantColor.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-
-                        (_isExpanded)
-                            ? Divider(
-                          color: objConstantColor.gray.withOpacity(0.4),
-                          thickness: 1.5,
-                          height: 1.5,
-                        )
-                            : const SizedBox.shrink(),
-
-                        SizedBox(height: _isExpanded ? 10.dp : 0.dp),
-
-                        AnimatedSize(
-                          duration: const Duration(milliseconds: 400),
-                          curve: Curves.easeInCubic,
-                          child: _isExpanded
-                              ? Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10.dp),
-                            child: ListView.builder(
-                              physics: const NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: cartItems.length,
-                              itemBuilder: (context, index) {
-                                final item = cartItems[index];
-                                final details = item.productDetails!;
-                                bool isNotLast = index != cartItems.length - 1;
-
-                                return cell(
-                                  context,
-                                  index,
-                                  details.productName,
-                                  details.productSellingPrice.toString(),
-                                  details.productPrice.toString(),
-                                  details.gram.toString(),
-                                  item.productCount,
-                                  details.image,
-                                  isNotLast,
-                                );
-                              },
-                            ),
+      
+                          (_isExpanded)
+                              ? Divider(
+                            color: objConstantColor.gray.withOpacity(0.4),
+                            thickness: 1.5,
+                            height: 1.5,
                           )
                               : const SizedBox.shrink(),
+      
+                          SizedBox(height: _isExpanded ? 10.dp : 0.dp),
+      
+                          AnimatedSize(
+                            duration: const Duration(milliseconds: 400),
+                            curve: Curves.easeInCubic,
+                            child: _isExpanded
+                                ? Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10.dp),
+                              child: ListView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: cartItems.length,
+                                itemBuilder: (context, index) {
+                                  final item = cartItems[index];
+                                  final details = item.productDetails!;
+                                  bool isNotLast = index != cartItems.length - 1;
+      
+                                  return cell(
+                                    context,
+                                    index,
+                                    details.productName,
+                                    details.productSellingPrice.toString(),
+                                    details.productPrice.toString(),
+                                    details.gram.toString(),
+                                    item.productCount,
+                                    details.image,
+                                    isNotLast,
+                                  );
+                                },
+                              ),
+                            )
+                                : const SizedBox.shrink(),
+                          ),
+                        ],
+                      ),
+                    ),
+      
+                    SizedBox(height: 18.dp),
+      
+                    /// Payment
+                    Column(
+                      children: [
+      
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12.dp),
+                          child: paymentType(context),
                         ),
+                        SizedBox(height: 15.dp),
                       ],
                     ),
-                  ),
-
-                  SizedBox(height: 18.dp),
-
-                  /// Payment
-                  Column(
-                    children: [
-
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12.dp),
-                        child: paymentType(context),
-                      ),
-                      SizedBox(height: 15.dp),
-                    ],
-                  ),
-
-
-                  SizedBox(height: 10.dp),
-
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 13.dp),
-                    child: Divider(color: objConstantColor.navyBlue,
-                      height: 0.5, thickness: 0.5.dp,),
-                  ),
-
-
-
-                  /// Shipping Address Card
-                  ShippingAddressCard(
-                    name: userScreenState.userName,
-                    phone: "+91 ${userScreenState.mobileNumber}",
-                    email: userScreenState.email,
-                    address: userScreenState.address,
-                    onEdit: () {
-                      userScreenNotifier.callNavigation(ScreenName.editProfile);
-                    },
-                  ),
-
-
-                  SizedBox(height: 10.dp),
-
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 13.dp),
-                    child: Divider(color: objConstantColor.navyBlue,
-                    height: 0.5, thickness: 0.5.dp,),
-                  ),
-
-                  /// Price Details
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 13.dp, vertical: 10.dp),
-                    child: priceDetail(context, userScreenState),
-                  ),
-
-
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 13.dp, vertical: 10.dp),
-                    child: CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () async {
-                        orderSummaryScreenNotifier.callPlaceOrderAPI(context, userScreenNotifier);
+      
+      
+                    SizedBox(height: 10.dp),
+      
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 13.dp),
+                      child: Divider(color: objConstantColor.navyBlue,
+                        height: 0.5, thickness: 0.5.dp,),
+                    ),
+      
+      
+      
+                    /// Shipping Address Card
+                    ShippingAddressCard(
+                      name: userScreenState.userName,
+                      phone: "+91 ${userScreenState.mobileNumber}",
+                      email: userScreenState.email,
+                      address: userScreenState.address,
+                      onEdit: () {
+                        userScreenNotifier.callNavigation(ScreenName.editProfile);
                       },
-                      child: Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.symmetric(vertical: 15.dp, horizontal: 20.dp),
-                        decoration: BoxDecoration(
-                          color: objConstantColor.navyBlue,
-                          borderRadius: BorderRadius.circular(25.dp),
-                        ),
-                        child: Center(
-                          child: objCommonWidgets.customText(
-                            context,
-                            'Place Order',
-                            16,
-                            const Color(0xFF9CD100),
-                            ConstantAssests.montserratSemiBold,
+                    ),
+      
+      
+                    SizedBox(height: 10.dp),
+      
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 13.dp),
+                      child: Divider(color: objConstantColor.navyBlue,
+                      height: 0.5, thickness: 0.5.dp,),
+                    ),
+      
+                    /// Price Details
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 13.dp, vertical: 10.dp),
+                      child: priceDetail(context, userScreenState),
+                    ),
+      
+      
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 13.dp, vertical: 10.dp),
+                      child: CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () async {
+                          orderSummaryScreenNotifier.callPlaceOrderAPI(context, userScreenNotifier);
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(vertical: 15.dp, horizontal: 20.dp),
+                          decoration: BoxDecoration(
+                            color: objConstantColor.navyBlue,
+                            borderRadius: BorderRadius.circular(25.dp),
+                          ),
+                          child: Center(
+                            child: objCommonWidgets.customText(
+                              context,
+                              'Place Order',
+                              16,
+                              const Color(0xFF9CD100),
+                              ConstantAssests.montserratSemiBold,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-
-                  SizedBox(height: 10.dp),
-
-                ],
+      
+                    SizedBox(height: 10.dp),
+      
+                  ],
+                ),
               ),
             ),
-          ),
-
-        ],
+      
+          ],
+        ),
       ),
     );
   }

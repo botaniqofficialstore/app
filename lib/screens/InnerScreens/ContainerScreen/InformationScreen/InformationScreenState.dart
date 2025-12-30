@@ -16,8 +16,8 @@ class InformationScreenGlobalState {
     String? currentPage
   }) {
     return InformationScreenGlobalState(
-      currentModule: currentModule ?? this.currentModule,
-      currentPage: currentPage ?? this.currentPage
+        currentModule: currentModule ?? this.currentModule,
+        currentPage: currentPage ?? this.currentPage
     );
   }
 }

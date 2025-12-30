@@ -56,55 +56,61 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
     final userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
     var orderListData = userScreenState.orderList;
 
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: const Color(0xFFF4F4F4),
-      body: RefreshIndicator( onRefresh: () async {
-        final orderScreenNotifier = ref.read(OrderScreenGlobalStateProvider.notifier);
-        await orderScreenNotifier.callOrderListGepAPI(context);
-        },
-        child: Column(
-          children: [
-            /// Header - unchanged
-            Padding(
-              padding: EdgeInsets.only(top: 5.dp, bottom: 5.dp),
-              child: Row(
-                children: [
-                  CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      child: Image.asset(
-                        objConstantAssest.backIcon, width: 25.dp,),
-                      onPressed: () {
-                        userScreenNotifier.callNavigation(ScreenName.home);
-                      }),
-                  objCommonWidgets.customText(
-                    context, 'My Orders', 18,
-                    objConstantColor.navyBlue,
-                    ConstantAssests.montserratBold,
-                  ),
-                ],
-              ),
-            ),
-
-            /// 🔹 Tabs
-            Expanded(
-              child: SingleChildScrollView(
-                child: Container(
-                  child: _ordersSection(context, orderListData, userScreenState,
-                      userScreenNotifier),
+    return SafeArea(
+      child: Scaffold(
+        key: _scaffoldKey,
+        backgroundColor: objConstantColor.white,
+        body: RefreshIndicator( onRefresh: () async {
+          final orderScreenNotifier = ref.read(OrderScreenGlobalStateProvider.notifier);
+          await orderScreenNotifier.callOrderListGepAPI(context);
+          },
+          child: Column(
+            children: [
+              /// Header - unchanged
+              Padding(
+                padding: EdgeInsets.only(top: 5.dp, left: 10.dp, bottom: 5.dp),
+                child: Row(
+                  children: [
+                    CupertinoButton(
+                      minimumSize: const Size(0, 0),
+                        padding: EdgeInsets.zero,
+                        child: Image.asset(
+                          objConstantAssest.backIcon, width: 20.dp,),
+                        onPressed: () {
+                          userScreenNotifier.callNavigation(ScreenName.home);
+                        }),
+                    SizedBox(width: 5.dp),
+                    objCommonWidgets.customText(
+                      context, 'My Orders', 15,
+                      objConstantColor.navyBlue,
+                      ConstantAssests.montserratSemiBold,
+                    ),
+                  ],
                 ),
               ),
-            ),
 
-            SizedBox(height: 10.dp),
-
-
-
-
-          ],
+              SizedBox(height: 5.dp),
+      
+              /// 🔹 Tabs
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Container(
+                    child: _ordersSection(context, orderListData, userScreenState,
+                        userScreenNotifier),
+                  ),
+                ),
+              ),
+      
+              SizedBox(height: 10.dp),
+      
+      
+      
+      
+            ],
+          ),
         ),
+      
       ),
-
     );
   }
 

@@ -69,6 +69,7 @@ class CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
         key: _scaffoldKey,
         backgroundColor: Colors.white,
         body: SafeArea(
+          top: false,
           bottom: false,
           child:SingleChildScrollView(
               child: createAccountView(context)
@@ -94,22 +95,24 @@ class CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                 fit: BoxFit.cover, // adjust image scaling
               ),
 
-              Positioned(top: 10.dp,
-                  left: 5.dp,child: CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    child: Image.asset(
-                      objConstantAssest.backIcon,
-                      color: objConstantColor.white,
-                      height: 30.dp,
-                    ),
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginScreen()),
-                      );
-                    },
-                  )),
+              SafeArea(
+                child: Positioned(top: 0.dp,
+                    left: 5.dp,child: CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      child: Image.asset(
+                        objConstantAssest.backIcon,
+                        color: objConstantColor.white,
+                        height: 30.dp,
+                      ),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginScreen()),
+                        );
+                      },
+                    )),
+              ),
 
               Positioned(left: 15.dp, bottom: 5.dp, child:
               Column(
@@ -118,14 +121,14 @@ class CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                   objCommonWidgets.customText(
                     context,
                     'Create',
-                    40,
+                    35,
                     objConstantColor.white,
                     objConstantFonts.montserratBold,
                   ),
                   objCommonWidgets.customText(
                     context,
                     'Account',
-                    40,
+                    35,
                     objConstantColor.white,
                     objConstantFonts.montserratBold,
                   ),

@@ -63,7 +63,7 @@ class EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       objCommonWidgets.customText(
                         context,
                         'Edit Profile',
-                        35,
+                        25,
                         objConstantColor.white,
                         objConstantFonts.montserratSemiBold,
                       ),
@@ -73,26 +73,28 @@ class EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
                 /// Back Button
                 Positioned(
-                  top: 10.dp,
+                  top: 0.dp,
                   left: 15.dp,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: CupertinoButton(
-                      padding: EdgeInsets.all(4.dp),
-                      minSize: 35.dp,
-                      borderRadius: BorderRadius.circular(30),
-                      child: Image.asset(
-                        objConstantAssest.backIcon,
-                        color: objConstantColor.white,
-                        width: 25.dp,
+                  child: SafeArea(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(30),
                       ),
-                      onPressed: () {
-                        ref.watch(MainScreenGlobalStateProvider.notifier)
-                            .callNavigation(ScreenName.profile);
-                      },
+                      child: CupertinoButton(
+                        padding: EdgeInsets.all(4.dp),
+                        minimumSize: const Size(0, 0),
+                        borderRadius: BorderRadius.circular(30),
+                        child: Image.asset(
+                          objConstantAssest.backIcon,
+                          color: objConstantColor.white,
+                          width: 25.dp,
+                        ),
+                        onPressed: () {
+                          ref.watch(MainScreenGlobalStateProvider.notifier)
+                              .callNavigation(ScreenName.profile);
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -199,63 +201,15 @@ class EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 10.dp,),
 
-
-
-                  objCommonWidgets.customText(context, 'Address', 15, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
-                  SizedBox(height: 5.dp,),
-
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: 5.dp,),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 5,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
-                      border: Border.all(color: Colors.grey, width: 1),
-                    ),
-                    child: Row(
-                      children: [
-                        /// Animated Location Icon
-                        Lottie.asset(
-                          objConstantAssest.locationIcon,
-                          width: 35.dp,
-                          repeat: true,
-                        ),
-                        /// Address Text
-                        Expanded(
-                          child: objCommonWidgets.customText(context, (exactAddress.isEmpty ? 'Select delivery address' : exactAddress), 13, (exactAddress.isEmpty ? objConstantColor.gray : objConstantColor.navyBlue), objConstantFonts.montserratMedium),
-                        ),
-                        CupertinoButton(
-                          borderRadius: BorderRadius.circular(8.dp),
-                          onPressed: (){
-                            userFrom = ScreenName.editProfile;
-                            userScreenNotifier.callNavigation(ScreenName.map);
-                          }, padding: EdgeInsets.zero,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 8.dp, vertical: 6.dp),
-                            child: Image.asset(objConstantAssest.editImage, width: 20.dp,),
-                          ),
-                        ),
-
-                        SizedBox(width: 5.dp,)
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 10.dp,),
+                  SizedBox(height: 15.dp,),
 
                   Padding(
                     padding: EdgeInsets.only(top: 10.dp, bottom: 20.dp),
                     child: SizedBox(
                       width: double.infinity,
                       child: CupertinoButton(
-                        padding: EdgeInsets.symmetric(vertical: 13.dp),
+                        padding: EdgeInsets.symmetric(vertical: 10.dp),
                         color: objConstantColor.orange,
                         borderRadius: BorderRadius.circular(25.dp),
                         onPressed: () {

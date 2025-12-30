@@ -18,6 +18,9 @@ class ProfileScreenGlobalState {
   final String mobileNumber;
   final String address;
   final int wishListCount;
+  final bool isSms;
+  final bool isWhatsAPP;
+  final bool isPushNotification;
 
   ProfileScreenGlobalState({
     this.currentModule = ScreenName.home,
@@ -27,6 +30,9 @@ class ProfileScreenGlobalState {
     required this.mobileNumber,
     required this.address,
     required this.wishListCount,
+    required this.isSms,
+    required this.isWhatsAPP,
+    required this.isPushNotification
   });
 
   ProfileScreenGlobalState copyWith({
@@ -36,16 +42,22 @@ class ProfileScreenGlobalState {
     String? email,
     String? mobileNumber,
     String? address,
-    int? wishListCount
+    int? wishListCount,
+    bool? isSms,
+    bool? isWhatsAPP,
+    bool? isPushNotification
   }) {
     return ProfileScreenGlobalState(
-      currentModule: currentModule ?? this.currentModule,
-      firstName: firstName ?? this.firstName,
-      lastName: lastName ?? this.lastName,
-      email: email ?? this.email,
-      mobileNumber: mobileNumber ?? this.mobileNumber,
-      address: address ?? this.address,
-      wishListCount: wishListCount ?? this.wishListCount,
+        currentModule: currentModule ?? this.currentModule,
+        firstName: firstName ?? this.firstName,
+        lastName: lastName ?? this.lastName,
+        email: email ?? this.email,
+        mobileNumber: mobileNumber ?? this.mobileNumber,
+        address: address ?? this.address,
+        wishListCount: wishListCount ?? this.wishListCount,
+        isSms: isSms ?? this.isSms,
+        isWhatsAPP: isWhatsAPP ?? this.isWhatsAPP,
+        isPushNotification: isPushNotification ?? this.isPushNotification
     );
   }
 }
@@ -58,7 +70,10 @@ class ProfileScreenGlobalStateNotifier
       email: '',
       mobileNumber: '',
       address: '',
-      wishListCount: 0
+      wishListCount: 0,
+      isSms: true,
+      isWhatsAPP: true,
+      isPushNotification: true
   ));
 
   @override
@@ -76,6 +91,18 @@ class ProfileScreenGlobalStateNotifier
     final userAddress = exactAddress;
 
     state = state.copyWith(firstName: userFirstName, lastName: userLastName, email: userEmailID, mobileNumber: userMobileNumber, address: userAddress);
+  }
+
+  void updateSms(bool status){
+    state = state.copyWith(isSms: status);
+  }
+
+  void updateWhatsApp(bool status){
+    state = state.copyWith(isWhatsAPP: status);
+  }
+
+  void updatePushNotification(bool status){
+    state = state.copyWith(isPushNotification: status);
   }
 
 
@@ -128,17 +155,19 @@ class ProfileScreenGlobalStateNotifier
     final Uri emailUri = Uri(
       scheme: 'mailto',
       path: 'botaniqofficialstore@gmail.com',
-      query: Uri.encodeFull(
-          'subject=BotaniQ Customer Support&body=Hello BotaniQ Team, Please describe your issue here. Order ID (if any):'
-      ),
+      queryParameters: {
+        'subject': 'BotaniQ Customer Support',
+        'body':
+        'Hello BotaniQ Team,\n\nPlease describe your issue here.\nOrder ID (if any):',
+      },
     );
 
-    if (await canLaunchUrl(emailUri)) {
-      await launchUrl(emailUri);
-    } else {
-      debugPrint('Could not open email app');
-    }
+    await launchUrl(
+      emailUri,
+      mode: LaunchMode.externalApplication,
+    );
   }
+
 
 }
 

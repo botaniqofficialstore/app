@@ -70,15 +70,15 @@ class _SplashScreenState extends State<SplashScreen>
       bool isLoggedIn = pref.getBooleanValue(PreferenceKeys.isUserLogged);
 
 
-      /*pref.setStringValue(PreferenceKeys.userID, 'USER-1762509292801');
+      pref.setStringValue(PreferenceKeys.userID, 'user-1763288528185');
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const MainScreen()),
-      );*/
+      );
 
-      if (isLoggedIn){
+      /*if (isLoggedIn){
         Navigator.pushReplacement(
-          context,
+          context,|
           MaterialPageRoute(builder: (context) => const MainScreen()),
         );
       } else {
@@ -86,7 +86,7 @@ class _SplashScreenState extends State<SplashScreen>
           context,
           MaterialPageRoute(builder: (context) => const LoginScreen()),
         );
-      }
+      }*/
     });
 
   }
