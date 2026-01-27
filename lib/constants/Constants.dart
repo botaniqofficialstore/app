@@ -179,8 +179,8 @@ class ProductDetailStatus {
 final steps = [
   "Order Placed",
   "Order Confirmed",
-  "Harvested",
-  "Packed & Shipped",
+  "Packed",
+  "Shipped",
   "Out for Delivery",
   "Delivered",
 ];

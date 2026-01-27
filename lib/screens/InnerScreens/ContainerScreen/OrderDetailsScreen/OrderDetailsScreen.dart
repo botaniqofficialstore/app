@@ -1,9 +1,11 @@
-import 'package:botaniqmicrogreens/Utility/Logger.dart';
+import 'package:botaniqmicrogreens/screens/commonViews/ProductRatingScreen.dart';
+import 'package:botaniqmicrogreens/screens/commonViews/ReviewSuccessPopup.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import '../../../../CodeReusable/CodeReusability.dart';
+import '../../../../Utility/NetworkImageLoader.dart';
 import '../../../../constants/ConstantAssests.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../../../constants/Constants.dart';
@@ -75,7 +77,7 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                   SizedBox(width: 5.dp),
                   objCommonWidgets.customText(
                     context,
-                    'Track Order',
+                    'Order Details',
                     15,
                     objConstantColor.navyBlue,
                     ConstantAssests.montserratSemiBold,
@@ -93,6 +95,7 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                 thickness: 6,
                 radius: Radius.circular(10.dp),
                 child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
                   child: Padding(
                     padding: EdgeInsets.symmetric(
                         vertical: 5.dp, horizontal: 15.dp),
@@ -101,63 +104,8 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                       children: [
 
 
-                        /// Order Details Section
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            objCommonWidgets.customText(
-                                context, 'Order Details', 16,
-                                objConstantColor.navyBlue,
-                                objConstantFonts.montserratSemiBold),
+                        orderDetailsWidget(context),
 
-                            SizedBox(height: 5.dp),
-
-                            titleAndValueRow(
-                                context,
-                                'Order ID :',
-                                orderDetails?.orderId ?? '',
-                                objConstantColor.navyBlue,
-                                objConstantColor.navyBlue,
-                                11.5,
-                                12.5,
-                                ConstantAssests.montserratSemiBold,
-                                ConstantAssests.montserratBold),
-
-                            titleAndValueRow(
-                                context,
-                                'Ordered Date :',
-                                CodeReusability().convertUTCToIST(
-                                    orderDetails?.orderDate ?? ''),
-                                objConstantColor.navyBlue,
-                                objConstantColor.navyBlue,
-                                11.5,
-                                12.5,
-                                ConstantAssests.montserratSemiBold,
-                                ConstantAssests.montserratBold),
-
-                            titleAndValueRow(
-                                context,
-                                'Order Status :',
-                                steps[orderDetails?.currentOrderStatus ?? 0],
-                                objConstantColor.navyBlue,
-                                objConstantColor.green,
-                                11.5,
-                                12.5,
-                                ConstantAssests.montserratSemiBold,
-                                ConstantAssests.montserratBold),
-
-                            titleAndValueRow(
-                                context,
-                                'Delivery Date :',
-                                'Not Confirmed',
-                                objConstantColor.navyBlue,
-                                objConstantColor.navyBlue,
-                                11.5,
-                                12.5,
-                                ConstantAssests.montserratSemiBold,
-                                ConstantAssests.montserratBold),
-                          ],
-                        ),
 
                         Divider(
                             color: objConstantColor.navyBlue, thickness: 0.5.dp),
@@ -194,10 +142,60 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                           },
                         ),
 
-                        SizedBox(height: 10.dp),
-                        Divider(
-                            color: objConstantColor.navyBlue, thickness: 0.5.dp),
-                        SizedBox(height: 10.dp),
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10.dp),
+                          child: Divider(color: Colors.black, thickness: 0.5.dp),
+                        ),
+
+
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            /// ⭐ Title
+                            objCommonWidgets.customText(
+                                context, 'Add Your Rating & Review', 15, objConstantColor.black,
+                                objConstantFonts.montserratSemiBold),
+
+                            SizedBox(height: 5.dp),
+
+                            /// 📄 Description
+                            objCommonWidgets.customText(
+                                context, 'Please rate the product and delivery experience. '
+                                'Your honest feedback helps maintain quality and service standards.', 10, objConstantColor.black,
+                                objConstantFonts.montserratMedium),
+
+                            SizedBox(height: 10.dp),
+
+                            /// 🚀 Action Button
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                CupertinoButton(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: Size.zero,
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black,
+                                        borderRadius: BorderRadius.circular(20.dp)
+                                      ),
+                                  child: Center(
+                                    child: objCommonWidgets.customText(
+                                        context, 'Write a Review', 10, objConstantColor.white,
+                                        objConstantFonts.montserratSemiBold),
+                                  ),
+                                ), onPressed: ()=> openRatingsAndReview(context)),
+                              ],
+                            )
+                          ],
+                        ),
+
+
+
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10.dp),
+                          child: Divider(color: Colors.black, thickness: 0.5.dp),
+                        ),
 
                         objCommonWidgets.customText(
                             context, 'Purchase List', 16,
@@ -211,8 +209,7 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                           shrinkWrap: true,
                           itemCount: orderDetails?.orderDetails.length,
                           itemBuilder: (context, index) {
-                            var productDetails = orderDetails
-                                ?.orderDetails[index];
+                            var productDetails = orderDetails?.orderDetails[index];
                             return cell(
                               context,
                               index,
@@ -310,38 +307,173 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
     );
   }
 
-  /// Title and Value Row Widget
-  Widget titleAndValueRow(
+  Widget orderDetailsWidget(BuildContext context) {
+    var orderDetails = savedOrderData;
+
+    // Define status-specific colors for a premium feel
+    Color statusColor = Colors.green;
+    Color statusBgColor = Colors.green.withAlpha(20);
+
+    return Container(
+
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16.dp),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Row with Icon
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  objCommonWidgets.customText(
+                      context, 'Order Summary', 15, objConstantColor.navyBlue,
+                      objConstantFonts.montserratSemiBold),
+                ],
+              ),
+              // Premium Status Badge
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.dp, vertical: 4.dp),
+                decoration: BoxDecoration(
+                  color: statusBgColor,
+                  borderRadius: BorderRadius.circular(20.dp),
+                ),
+                child: objCommonWidgets.customText(
+                    context,
+                    steps[orderDetails?.currentOrderStatus ?? 0].toUpperCase(),
+                    10,
+                    statusColor,
+                    objConstantFonts.montserratBold),
+              ),
+            ],
+          ),
+
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 10.dp),
+            child: Divider(color: Colors.black, thickness: 0.5.dp),
+          ),
+
+          // Data Grid
+          _modernInfoRow(
+            context,
+            'Order ID',
+            '#${orderDetails?.orderId ?? 'N/A'}',
+            Icons.tag_rounded,
+          ),
+
+          SizedBox(height: 16.dp),
+
+          _modernInfoRow(
+            context,
+            'Placed On',
+            CodeReusability().convertUTCToIST(orderDetails?.orderDate ?? ''),
+            Icons.calendar_today_rounded,
+          ),
+
+          SizedBox(height: 16.dp),
+
+          _modernInfoRow(
+            context,
+            'Delivery Estimation',
+            'Not Confirmed',
+            Icons.local_shipping_outlined,
+            valueColor: Colors.orange.shade700,
+          ),
+
+          SizedBox(height: 10.dp),
+
+          // Optional: Progress Tracker Placeholder
+          // (Great for "Pro" UIs to show a visual timeline)
+          _buildMiniProgressTracker(orderDetails?.currentOrderStatus ?? 0),
+
+          SizedBox(height: 10.dp),
+        ],
+      ),
+    );
+  }
+
+  /// Helper for modern info rows with icons
+  Widget _modernInfoRow(
       BuildContext context,
-      String title,
+      String label,
       String value,
-      Color titleColor,
-      Color valueColor,
-      double titleSize,
-      double valueSize,
-      String titleFontFamily,
-      String valueFontFamily) {
+      IconData icon, {
+        Color? valueColor,
+      }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        objCommonWidgets.customText(
-          context,
-          title,
-          titleSize,
-          titleColor,
-          titleFontFamily,
+        /// Icon
+        Container(
+          padding: EdgeInsets.all(8.dp),
+          decoration: BoxDecoration(
+            color: objConstantColor.navyBlue.withOpacity(0.05),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            icon,
+            size: 14.dp,
+            color: objConstantColor.navyBlue,
+          ),
         ),
-        SizedBox(width: 3.dp),
-        Flexible(
-          child: objCommonWidgets.customText(
-            context,
-            value,
-            valueSize,
-            valueColor,
-            valueFontFamily,
+
+        SizedBox(width: 12.dp),
+
+        /// Text Section (Expandable for multi-line)
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              objCommonWidgets.customText(
+                context,
+                label,
+                11,
+                Colors.grey.shade600,
+                objConstantFonts.montserratMedium,
+              ),
+              SizedBox(height: 2.dp),
+
+              /// ✅ Multi-line Value Text
+              objCommonWidgets.customText(
+                context,
+                value,
+                10,
+                valueColor ?? objConstantColor.navyBlue,
+                objConstantFonts.montserratSemiBold,
+                textAlign: TextAlign.start,
+              ),
+            ],
           ),
         ),
       ],
+    );
+  }
+
+
+  Widget _buildMiniProgressTracker(int statusIndex) {
+    return Container(
+      padding: EdgeInsets.all(12.dp),
+      decoration: BoxDecoration(
+          color: Colors.deepOrange.shade50,
+          borderRadius: BorderRadius.circular(12.dp),
+          border: Border.all(color: Colors.deepOrange.shade200)
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, size: 16.dp, color: Colors.deepOrange),
+          SizedBox(width: 5.dp),
+          Flexible(
+            child: objCommonWidgets.customText(
+                context, "Your order is currently being processed. You will receive an update once it's shipped.", 8,
+                Colors.deepOrange,
+                objConstantFonts.montserratMedium),
+          ),
+
+        ],
+      ),
     );
   }
 
@@ -361,32 +493,22 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
+              width: 80.dp,
+              height: 80.dp,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5.dp),
                 border: Border.all(color: objConstantColor.navyBlue, width: 0.5),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(5.dp),
-                child: Image.network(
-                  '${ConstantURLs.baseUrl}$image',
-                  width: 80.dp,
-                  height: 80.dp,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
-                      objConstantAssest.placeHolder,
-                      width: 80.dp,
-                      height: 80.dp,
-                      fit: BoxFit.cover,
-                      color: objConstantColor.liteGray2,
-                    );
-                  },
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CupertinoActivityIndicator(color: objConstantColor.navyBlue),
-                    );
-                  },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(5.dp),
+                  child: NetworkImageLoader(
+                    imageUrl: '${ConstantURLs.baseUrl}$image',
+                    placeHolder: objConstantAssest.placeHolder,
+                    size: 60.dp,
+                    imageSize: 80.dp,
+                  ),
                 ),
               ),
             ),
@@ -400,7 +522,7 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                     objCommonWidgets.customText(
                       context,
                       CodeReusability().cleanProductName(productName),
-                      17,
+                      15,
                       objConstantColor.navyBlue,
                       objConstantFonts.montserratSemiBold,
                     ),
@@ -444,6 +566,48 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
       ],
     );
   }
+
+
+  void openRatingsAndReview(BuildContext context) async {
+    final Map<String, dynamic>? result =
+    await showGeneralDialog<Map<String, dynamic>>(
+      context: context,
+      barrierDismissible: false,
+      barrierLabel: 'Benefits',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, anim1, anim2) =>
+      const ProductRatingScreen(),
+      transitionBuilder: (context, anim1, anim2, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 1),
+            end: Offset.zero,
+          ).animate(
+            CurvedAnimation(
+              parent: anim1,
+              curve: Curves.easeOutCubic,
+            ),
+          ),
+          child: child,
+        );
+      },
+    );
+
+    /// ✅ User clicked Submit
+    if (result != null) {
+      final int rating = result['rating'];
+      final String review = result['review'];
+
+      debugPrint("User submitted review");
+      debugPrint("Rating: $rating");
+      debugPrint("Review: $review");
+
+      // Call API / show success popup
+      ReviewSuccessPopup.show(context);
+    }
+  }
+
+
 }
 
 class AnimatedOrderTrackStep extends StatefulWidget {
@@ -613,5 +777,6 @@ class _AnimatedOrderTrackStepState extends State<AnimatedOrderTrackStep>
       ],
     );
   }
+
 }
 

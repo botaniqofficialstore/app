@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
-import 'package:lottie/lottie.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../../API/CommonAPI.dart';
 import '../../../../CodeReusable/CodeReusability.dart';
 import '../../../../CodeReusable/utilities.dart';
 import '../../../../Utility/AnimatedCarouselSlider.dart';
+import '../../../../Utility/NetworkImageLoader.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../../../constants/Constants.dart';
 import '../../MainScreen/MainScreenState.dart';
@@ -30,6 +30,8 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   // ✅ GlobalKey for wishlist button (target)
   final GlobalKey wishButtonKey = GlobalKey();
   final ScrollController categoryScrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
+
 
   final List<Map<String, String>> productCategories = [
     {"title": "All", "image": objConstantAssest.allIcon},
@@ -45,362 +47,397 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200 &&
+          !ref.read(HomeScreenGlobalStateProvider).isLoading &&
+          ref.read(HomeScreenGlobalStateProvider).hasMore) {
+        ref
+            .read(HomeScreenGlobalStateProvider.notifier)
+            .callProductListGepAPI(context, loadMore: true);
+      }
+    });
+
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
       if (isConnected) {
         Future.microtask(() {
           CommonAPI().callUserProfileAPI();
-          ref.watch(MainScreenGlobalStateProvider.notifier).callFooterCountGETAPI();
-          final homeScreenNotifier = ref.read(
-              HomeScreenGlobalStateProvider.notifier);
-          homeScreenNotifier.callProductListGepAPI(context);
+          ref
+              .read(MainScreenGlobalStateProvider.notifier)
+              .callFooterCountGETAPI();
+          ref
+              .read(HomeScreenGlobalStateProvider.notifier)
+              .callProductListGepAPI(context);
         });
       }
     });
   }
 
 
+
   @override
   Widget build(BuildContext context) {
-    var homeScreenState = ref.watch(HomeScreenGlobalStateProvider);
-    var homeScreenNotifier = ref.watch(HomeScreenGlobalStateProvider.notifier);
-    final userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
+    final homeScreenState = ref.watch(HomeScreenGlobalStateProvider);
+    final homeScreenNotifier =
+    ref.watch(HomeScreenGlobalStateProvider.notifier);
+    final userScreenNotifier =
+    ref.watch(MainScreenGlobalStateProvider.notifier);
 
     return Scaffold(
-        key: _scaffoldKey,
+      key: _scaffoldKey,
+      backgroundColor: Colors.transparent,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await homeScreenNotifier.callProductListGepAPI(context);
+        },
+        color: objConstantColor.navyBlue,
         backgroundColor: objConstantColor.white,
-        body: RefreshIndicator(
-          onRefresh: () async {
-            await homeScreenNotifier.callProductListGepAPI(context);
-          },
-          color: objConstantColor.navyBlue,
-          backgroundColor: objConstantColor.white,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        child: Column(
+          children: [
 
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 15.dp),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-
-                      Color(0xFFFFA600),
-                      Color(0xFFFF6A00),
-                      Color(0xFFFF3D00),
-                      Color(0xFFFF3D00),
-
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30.dp),
-                    bottomRight: Radius.circular(30.dp),
-                  ),
+            /// 🔥 HEADER
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 15.dp),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFFFFA600),
+                    Color(0xFFFF6A00),
+                    Color(0xFFFF3D00),
+                    Color(0xFFFF3D00),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
-                child: SafeArea(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                  
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              objCommonWidgets.customText(context, 'Good to see you again',
-                                  18, objConstantColor.white, objConstantFonts.montserratBold),
-                  
-                              objCommonWidgets.customText(context, 'Let’s find something natural today.',
-                                  10, objConstantColor.white, objConstantFonts.montserratSemiBold),
-                            ],
-                          ),
-                  
-                          CupertinoButton(
-                            key: wishButtonKey,
-                            padding: EdgeInsets.zero,
-                            child: Image.asset(
-                              objConstantAssest.wishlist,
-                              width: 28.dp,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              userScreenNotifier.callNavigation(ScreenName.wishList);
-                            },
-                          ),
-                        ],
-                      ),
-                  
-                      SizedBox(height: 15.dp),
-                  
-                      Row(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              objCommonWidgets.customText(context,
-                                  'Delivery Location', 13, Colors.white,
-                                  objConstantFonts.montserratBold),
-                              GestureDetector(
-                                onTap: (){
-                                  userFrom = ScreenName.home;
-                                  userScreenNotifier.callNavigation(ScreenName.map);
-                                },
-                                child: (exactAddress.isNotEmpty) ? Row(
-                                  children: [
-                                    Icon(Icons.location_on,color: Colors.white, size: 18.dp,),
-                                    SizedBox(
-                                      width: 120.dp,
-                                      child: Text(exactAddress, style: TextStyle(color: Colors.white,
-                                      fontFamily: objConstantFonts.montserratSemiBold,
-                                      fontSize: 10.5.dp,
-                                      ),maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,),
-                                    ),
-                                    Icon(Icons.keyboard_arrow_down_rounded,color: Colors.white, size: 20.dp,),
-                                  ],
-                                ) :
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10.dp)
-                                  ),
-                                  padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 7.dp),
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.my_location_outlined,color: objConstantColor.orange, size: 15.dp,),
-                                      SizedBox(width: 2.dp,),
-                                      objCommonWidgets.customText(context,
-                                          'Update Location', 10, objConstantColor.orange,
-                                          objConstantFonts.montserratBold),
-                  
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                  
-                  
-                  
-                        ],
-                      ),
-                  
-                      SizedBox(height: 15.dp),
-                  
-                      // ✅ Header Row (fixed at top)
-                      CommonSearchField(
-                        controller: TextEditingController(),
-                        hintText: 'Search',
-                        onChanged: (value) {
-                          debugPrint("Searching: $value");
-                        },
-                      ),
-                  
-                      SizedBox(height: 15.dp,),
-                  
-                  
-                  
-                    ],
-                  ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30.dp),
+                  bottomRight: Radius.circular(30.dp),
                 ),
               ),
+              child: SafeArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
 
-
-              SizedBox(height: 15.dp,),
-
-              Padding(
-                padding: EdgeInsets.only(left: 15.dp),
-                child: objCommonWidgets.customText(context,
-                    'Categories', 15, objConstantColor.navyBlue,
-                    objConstantFonts.montserratSemiBold),
-              ),
-
-              Padding(
-                padding: EdgeInsets.only(left: 15.dp, right: 5.dp, top: 5.dp),
-                child: SizedBox(
-                  height: 50.dp,
-                  child: ListView.separated(
-                    controller: categoryScrollController,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: productCategories.length,
-                    separatorBuilder: (_, __) => SizedBox(width: 10.dp),
-                    itemBuilder: (context, index) {
-                      bool isSelected = homeScreenState.selectedIndex == index;
-
-                      return CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          homeScreenNotifier.updateSelectedIndex(index);
-
-                          categoryScrollController.animateTo(
-                            index * 60.0,
-                            duration: Duration(milliseconds: 300),
-                            curve: Curves.easeOut,
-                          );
-                        },
-                        child: Container(
-                          width: 45.dp,
-                          height: 50.dp,
-                          padding: EdgeInsets.symmetric(horizontal: 5.dp,),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? objConstantColor.yellow
-                                : objConstantColor.navyBlue,
-                            borderRadius: BorderRadius.circular(8.dp),
-                            border: Border.all(
-                              color: isSelected
-                                  ? objConstantColor.navyBlue
-                                  : Colors.transparent,
-                              width: 1.5,
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                width: 23.dp,
-                                height: 23.dp,
-                                child: Image.asset(
-                                  productCategories[index]['image']!,
-                                  fit: BoxFit.fill,
-                                  color: isSelected ? Colors.black : Colors
-                                      .white,
-                                ),
-                              ),
-                              SizedBox(height: 2.5.dp),
-                              Text(
-                                productCategories[index]['title']!,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 10.dp,
-                                  color: isSelected ? Colors.black : Colors
-                                      .white,
-                                  fontFamily: objConstantFonts.montserratMedium,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-
-
-              SizedBox(height: 15.dp,),
-
-              Expanded(
-                child: NotificationListener<ScrollNotification>(
-                  onNotification: (scrollInfo) {
-                    if (scrollInfo.metrics.pixels ==
-                        scrollInfo.metrics.maxScrollExtent &&
-                        !homeScreenState.isLoading &&
-                        homeScreenState.hasMore)
-                    {
-                      homeScreenNotifier.callProductListGepAPI(
-                        context,
-                        loadMore: true,
-                      );
-                    }
-                    return false;
-                  },
-                  child: CustomScrollView(
-                    slivers: [
-
-                      /// 🔥 Banner Carousel
-                      SliverToBoxAdapter(
-                        child: Column(
+                    /// Top Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(
-                              height: 180.dp,
-                              child: AnimatedCarouselSlider(
-                                imageList: [
-                                  objConstantAssest.add2,
-                                  objConstantAssest.add3,
-                                  objConstantAssest.add1,
-                                  objConstantAssest.add4,
-                                  objConstantAssest.add5,
-                                ],
-                                fallbackImage: "assets/images/placeholder.png",
-                              ),
+                            objCommonWidgets.customText(
+                              context,
+                              'Good to see you again',
+                              15,
+                              objConstantColor.white,
+                              objConstantFonts.montserratBold,
                             ),
-                            SizedBox(height: 20.dp),
+                            objCommonWidgets.customText(
+                              context,
+                              'Let’s find something natural today.',
+                              8,
+                              objConstantColor.white,
+                              objConstantFonts.montserratSemiBold,
+                            ),
                           ],
                         ),
-                      ),
 
-                      /// 🔥 Product Grid With Sliver
-                      Consumer(builder: (context, ref, _) {
-                        if (homeScreenState.isLoading &&
-                            homeScreenState.productList.isEmpty) {
-                          return SliverToBoxAdapter(
-                            child: Padding(
-                              padding: EdgeInsets.all(16.dp),
-                              child: buildProductShimmer(),
-                            ),
-                          );
-                        }
-
-                        return SliverPadding(
-                          padding: EdgeInsets.symmetric(horizontal: 14.dp, vertical: 10.dp),
-                          sliver: SliverGrid(
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 12,
-                              crossAxisSpacing: 12,
-                              childAspectRatio: 0.60,
-                            ),
-                            delegate: SliverChildBuilderDelegate(
-                                  (context, index) {
-                                if (index == homeScreenState.productList.length) {
-                                  return const Center(
-                                    child: CupertinoActivityIndicator(),
-                                  );
-                                }
-
-                                final product =
-                                homeScreenState.productList[index];
-                                return _buildProductCard(
-                                    product, index, homeScreenNotifier);
-                              },
-                              childCount: homeScreenState.productList.length +
-                                  (homeScreenState.isLoading ? 1 : 0),
-                            ),
+                        CupertinoButton(
+                          key: wishButtonKey,
+                          padding: EdgeInsets.zero,
+                          child: Image.asset(
+                            objConstantAssest.wishlist,
+                            width: 25.dp,
+                            color: Colors.white,
                           ),
-                        );
-                      }),
+                          onPressed: () {
+                            userScreenNotifier
+                                .callNavigation(ScreenName.wishList);
+                          },
+                        ),
+                      ],
+                    ),
 
+                    SizedBox(height: 15.dp),
 
+                    /// Location
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        objCommonWidgets.customText(
+                          context,
+                          'Delivery Location',
+                          12,
+                          Colors.white,
+                          objConstantFonts.montserratBold,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            userFrom = ScreenName.home;
+                            userScreenNotifier
+                                .callNavigation(ScreenName.map);
+                          },
+                          child: exactAddress.isNotEmpty
+                              ? Row(
+                            children: [
+                              Icon(Icons.location_on,
+                                  color: Colors.white, size: 15.dp),
+                              SizedBox(
+                                width: 120.dp,
+                                child: Text(
+                                  exactAddress,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 9.5.dp,
+                                    fontFamily: objConstantFonts
+                                        .montserratSemiBold,
+                                  ),
+                                ),
+                              ),
+                              Icon(Icons.keyboard_arrow_down_rounded,
+                                  color: Colors.white, size: 20.dp),
+                            ],
+                          )
+                              : Padding(
+                                padding: EdgeInsets.only(top: 5.dp),
+                                child: Container(
+                                                            padding: EdgeInsets.symmetric(
+                                  vertical: 6.dp, horizontal: 7.dp),
+                                                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                BorderRadius.circular(10.dp),
+                                                            ),
+                                                            child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.my_location_outlined,
+                                      color: objConstantColor.orange,
+                                      size: 15.dp),
+                                  SizedBox(width: 4.dp),
+                                  objCommonWidgets.customText(
+                                    context,
+                                    'Update Location',
+                                    10,
+                                    objConstantColor.orange,
+                                    objConstantFonts.montserratBold,
+                                  ),
+                                ],
+                                                            ),
+                                                          ),
+                              ),
+                        ),
+                      ],
+                    ),
 
-                    ],
-                  ),
+                    SizedBox(height: 15.dp),
+
+                    /// Search
+                    CommonSearchField(
+                      controller: TextEditingController(),
+                      hintText: 'Search',
+                      onChanged: (value) {},
+                    ),
+
+                    SizedBox(height: 10.dp),
+                  ],
                 ),
               ),
+            ),
+
+            SizedBox(height: 5.dp),
+
+            Expanded(
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
 
 
 
+                    SizedBox(height: 15.dp),
 
+                    /// Categories title
+                    Padding(
+                      padding: EdgeInsets.only(left: 15.dp),
+                      child: objCommonWidgets.customText(
+                        context,
+                        'Categories',
+                        13,
+                        objConstantColor.navyBlue,
+                        objConstantFonts.montserratSemiBold,
+                      ),
+                    ),
 
+                    /// Categories list
+                    Padding(
+                      padding: EdgeInsets.only(left: 15.dp, top: 5.dp),
+                      child: SizedBox(
+                        height: 45.dp,
+                        child: ListView.separated(
+                          padding: EdgeInsets.only(right: 10.dp),
+                          controller: categoryScrollController,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: productCategories.length,
+                          separatorBuilder: (_, __) =>
+                              SizedBox(width: 10.dp),
+                          itemBuilder: (context, index) {
+                            final isSelected =
+                                homeScreenState.selectedIndex == index;
 
+                            return CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              onPressed: () {
+                                homeScreenNotifier.updateSelectedIndex(index);
+                                categoryScrollController.animateTo(
+                                  index * 60,
+                                  duration:
+                                  const Duration(milliseconds: 300),
+                                  curve: Curves.easeOut,
+                                );
+                              },
+                              child: Container(
+                                width: 40.dp,
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? objConstantColor.yellow
+                                      : objConstantColor.navyBlue,
+                                  borderRadius:
+                                  BorderRadius.circular(8.dp),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      productCategories[index]['image']!,
+                                      width: 20.dp,
+                                      height: 20.dp,
+                                      color: isSelected
+                                          ? Colors.black
+                                          : Colors.white,
+                                    ),
+                                    SizedBox(height: 2.dp),
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 5.dp),
+                                      child: Text(
+                                        productCategories[index]['title']!,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 10.dp,
+                                          color: isSelected
+                                              ? Colors.black
+                                              : Colors.white,
+                                          fontFamily: objConstantFonts
+                                              .montserratMedium,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
 
+                    SizedBox(height: 20.dp),
 
+                    /// Banner
+                    SizedBox(
+                      height: 150.dp,
+                      child: AnimatedCarouselSlider(
+                        imageList: [
+                          objConstantAssest.add2,
+                          objConstantAssest.add3,
+                          objConstantAssest.add1,
+                          objConstantAssest.add4,
+                          objConstantAssest.add5,
+                        ],
+                        fallbackImage:
+                        "assets/images/placeholder.png",
+                      ),
+                    ),
 
-            ],
-          ),
-        )
+                    SizedBox(height: 20.dp),
+
+                    Padding(
+                      padding: EdgeInsets.only(left: 15.dp),
+                      child: objCommonWidgets.customText(
+                        context,
+                        'Products',
+                        13,
+                        objConstantColor.navyBlue,
+                        objConstantFonts.montserratSemiBold,
+                      ),
+                    ),
+
+                    /// Product Grid
+                    if (homeScreenState.isLoading && homeScreenState.productList.isEmpty)...{
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 14.dp, vertical: 5.dp),
+                        child: buildProductShimmer(),
+                      )
+                    } else...{
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 14.dp),
+                        child: GridView.builder(
+                          padding: EdgeInsets.zero,
+                          primary: false,
+                          shrinkWrap: true,
+                          physics:
+                          const NeverScrollableScrollPhysics(),
+                          itemCount:
+                          homeScreenState.productList.length +
+                              (homeScreenState.isLoading ? 1 : 0),
+                          gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            childAspectRatio: 0.60,
+                          ),
+                          itemBuilder: (context, index) {
+                            if (index ==
+                                homeScreenState.productList.length) {
+                              return const Center(
+                                child: CupertinoActivityIndicator(),
+                              );
+                            }
+                            final product =
+                            homeScreenState.productList[index];
+                            return _buildProductCard(
+                                product, index, homeScreenNotifier);
+                          },
+                        ),
+                      ),
+                    },
+
+                    SizedBox(height: 10.dp),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
 
+
   // ✅ Product Card Widget
   Widget _buildProductCard(ProductData product, int index, HomeScreenGlobalStateNotifier notifier, ) {
-    final GlobalKey sourceKey = GlobalKey(); // 👈 unique key per product heart
+    final GlobalKey sourceKey = GlobalKey();
 
     return GestureDetector(
       onTap: () {
@@ -415,249 +452,221 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
         ref.watch(MainScreenGlobalStateProvider.notifier).callNavigation(
             ScreenName.productDetail);
       },
-      child: Stack(children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-                color: objConstantColor.navyBlue.withOpacity(0.2)),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 6,
-                offset: Offset(5, 4),
-              )
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
+      child: Stack(
+        children: [
+
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.dp),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withAlpha(35), blurRadius: 15, offset: const Offset(0, 8)),
+              ],
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ✅ Fixed height image
-                SizedBox(
-                  height: 130.dp,
-                  width: double.infinity,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.dp),
-                    child: Stack(
-                      children: [
-                        // ✅ Background Image
-                        Positioned.fill(
-                          child: Image.network(
-                            '${ConstantURLs.baseUrl}${product.image}',
-                            width: 120.dp,
-                            height: 120.dp,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Image.asset(
-                                objConstantAssest.placeHolder,
-                                // fallback image from assets
-                                width: 130.dp,
-                                height: 130.dp,
-                                fit: BoxFit.cover,
-                              );
-                            },
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Center(
-                                child: CupertinoActivityIndicator(
-                                  color: objConstantColor.gray,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-
-                        // ✅ Top-right heart button
-                        Positioned(
-                          right: 6.dp,
-                          top: 6.dp,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.6),
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: CupertinoButton(
-                              key: sourceKey,
-                              padding: EdgeInsets.all(4.dp),
-                              minSize: 28.dp,
-                              borderRadius: BorderRadius.circular(30),
-                              child: Image.asset(
-                                (product.isWishlisted == 1)
-                                    ? objConstantAssest.wishRed
-                                    : objConstantAssest.wishUnCheckWhite,
-                                width: 15.dp,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  if (product.isWishlisted == 1) {
-                                    notifier.callRemoveFromWishList(
-                                        context, product.productId, index);
-                                  } else {
-                                    notifier.callAddToWishList(
-                                        context, product.productId, index);
-                                    _animateToWishlist(
-                                        context, wishButtonKey, sourceKey);
-                                  }
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-
-                        Positioned(bottom: 5.dp, left: 5.dp, child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.green,
-                              borderRadius: BorderRadius.circular(5.dp)
-                          ),
-                          padding: EdgeInsets.symmetric(
-                              vertical: 1.dp, horizontal: 5.dp),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              objCommonWidgets.customText(context, 'Verified',
-                                  10, Colors.white,
-                                  objConstantFonts.montserratSemiBold),
-                              SizedBox(width: 1.dp),
-                              SizedBox(
-                                width: 10.dp,
-                                child: Image.asset(
-                                    objConstantAssest.verify,
-                                    color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),)
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                // ✅ Name
-                Text(CodeReusability().cleanProductName(product.productName),
-                  style: TextStyle(
-                    color: objConstantColor.black,
-                    fontSize: 15.dp,
-                    fontFamily: ConstantAssests.montserratSemiBold,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 2.dp),
-                  child: Row(
+                Expanded(
+                  child: Stack(
                     children: [
-                      Text(
-                        "₹${product.productSellingPrice}/_",
-                        style: TextStyle(
-                          color: objConstantColor.green,
-                          fontSize: 14.dp,
-                          fontFamily: ConstantAssests.montserratSemiBold,
+                      Padding(
+                        padding: EdgeInsets.only(left: 5.dp, right: 5.dp, top: 5.dp),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.only(topLeft: Radius.circular(8.dp), topRight: Radius.circular(8.dp)),
+                          child: NetworkImageLoader(
+                            imageUrl: '${ConstantURLs.baseUrl}${product.image}',
+                            placeHolder: objConstantAssest.placeHolder,
+                            size: double.infinity,
+                            imageSize: double.infinity,
+                          ),
                         ),
                       ),
-                      SizedBox(width: 3.dp),
-                      Text(
-                        "₹${product.productPrice}/_",
-                        style: TextStyle(
-                          color: objConstantColor.gray,
-                          fontSize: 14.dp,
-                          fontFamily: ConstantAssests.montserratMedium,
-                          decoration: TextDecoration.lineThrough,
-                          decorationColor: objConstantColor.gray,
-                          decorationThickness: 1,
+
+
+                      // ✅ Top-right heart button
+                      Positioned(
+                        right: 10.dp,
+                        top: 10.dp,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: CupertinoButton(
+                            key: sourceKey,
+                            padding: EdgeInsets.all(4.dp),
+                            minSize: 25.dp,
+                            borderRadius: BorderRadius.circular(30),
+                            child: Image.asset(
+                              (product.isWishlisted == 1)
+                                  ? objConstantAssest.wishRed
+                                  : objConstantAssest.wishUnCheckWhite,
+                              width: 15.dp,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                if (product.isWishlisted == 1) {
+                                  notifier.callRemoveFromWishList(
+                                      context, product.productId, index);
+                                } else {
+                                  notifier.callAddToWishList(
+                                      context, product.productId, index);
+                                  _animateToWishlist(
+                                      context, wishButtonKey, sourceKey);
+                                }
+                              });
+                            },
+                          ),
                         ),
                       ),
+
+
+                      Positioned(bottom: 5.dp, left: 12.dp, child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(5.dp)
+                        ),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 1.dp, horizontal: 5.dp),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            objCommonWidgets.customText(context, 'Verified',
+                                10, Colors.white,
+                                objConstantFonts.montserratSemiBold),
+                            SizedBox(width: 1.dp),
+                            SizedBox(
+                              width: 10.dp,
+                              child: Image.asset(
+                                  objConstantAssest.verify,
+                                  color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),)
                     ],
                   ),
                 ),
 
-                Text(
-                  "${product.gram}gm",
-                  style: TextStyle(
-                    color: objConstantColor.navyBlue,
-                    fontSize: 14.dp,
-                    fontFamily: ConstantAssests.montserratSemiBold,
-                  ),
-                ),
 
+                Padding(padding: EdgeInsets.symmetric(horizontal: 10.dp),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 6.dp),
 
-                const Spacer(),
+                      // ✅ Name
+                      objCommonWidgets.customText(context,
+                          CodeReusability().cleanProductName(product.productName),
+                          12, Colors.black, objConstantFonts.montserratSemiBold),
 
-                // ✅ Add to cart button
-                SizedBox(
-                  height: 35.dp,
-                  width: double.infinity,
-                  child: CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    color: (product.inCart == 0)
-                        ? objConstantColor.navyBlue
-                        : objConstantColor.orange,
-                    borderRadius: BorderRadius.circular(5.dp),
-                    child: Text(
-                      (product.inCart == 0)
-                          ? "Add to Cart"
-                          : 'View in Cart',
-                      style: TextStyle(
-                        color: objConstantColor.white,
-                        fontSize: 13.dp,
-                        fontFamily: ConstantAssests.montserratSemiBold,
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 2.dp),
+                        child: Row(
+                          children: [
+                            objCommonWidgets.customText(context,
+                                "₹${product.productSellingPrice}/_",
+                                14, objConstantColor.green, objConstantFonts.montserratSemiBold),
+                            SizedBox(width: 3.dp),
+                            Text(
+                              "₹${product.productPrice}/_",
+                              style: TextStyle(
+                                color: objConstantColor.gray,
+                                fontSize: 14.dp,
+                                fontFamily: ConstantAssests.montserratMedium,
+                                decoration: TextDecoration.lineThrough,
+                                decorationColor: objConstantColor.gray,
+                                decorationThickness: 1,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        if (product.inCart == 0) {
-                          var mainNotifier = ref.watch(
-                              MainScreenGlobalStateProvider.notifier);
-                          notifier.callAddToCartAPI(
-                              context, product.productId, index, mainNotifier);
-                        } else {
-                          ref.watch(MainScreenGlobalStateProvider.notifier)
-                              .callNavigation(
-                              ScreenName.cart);
-                        }
-                      });
-                    },
-                  ),
-                ),
+
+                      objCommonWidgets.customText(context,
+                          "${product.gram}gm",
+                          12, objConstantColor.black, objConstantFonts.montserratSemiBold),
+
+                      SizedBox(height: 10.dp),
+
+                      // ✅ Add to cart button
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(vertical: 8.dp),
+                          decoration: BoxDecoration(
+                            color: (product.inCart == 0)
+                                ? objConstantColor.navyBlue
+                                : objConstantColor.orange,
+                            borderRadius: BorderRadius.circular(5.dp),
+                          ),
+                          child: Center(
+                            child: objCommonWidgets.customText(context,
+                                (product.inCart == 0)
+                                    ? "Add to Cart"
+                                    : 'View in Cart',
+                                12, objConstantColor.white, objConstantFonts.montserratSemiBold),
+                          )
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            if (product.inCart == 0) {
+                              var mainNotifier = ref.watch(
+                                  MainScreenGlobalStateProvider.notifier);
+                              notifier.callAddToCartAPI(
+                                  context, product.productId, index, mainNotifier);
+                            } else {
+                              ref.watch(MainScreenGlobalStateProvider.notifier)
+                                  .callNavigation(
+                                  ScreenName.cart);
+                            }
+                          });
+                        },
+                      ),
+
+                      SizedBox(height: 10.dp),
+
+                    ],
+                  ))
+
+
               ],
             ),
           ),
-        ),
 
-        // ✅ Offer label
-        Positioned(
-            top: 8.dp,
-            left: 1.dp,
-            child: Container(
-              color: objConstantColor.yellow,
-              child: Padding(
-                padding: EdgeInsets.only(
-                    left: 5.dp, top: 1.dp, bottom: 1.dp, right: 10.dp),
-                child: Text(
-                  "${PriceHelper.getDiscountPercentage(
-                    productPrice: product.productPrice ?? 0,
-                    sellingPrice: product.productSellingPrice ?? 0,
-                  )} OFF",
-                  style: TextStyle(
-                    color: objConstantColor.black,
-                    fontSize: 12.dp,
-                    fontFamily: ConstantAssests.montserratSemiBold,
+          // ✅ Offer label
+          Positioned(
+              top: 5.dp,
+              left: 0.dp,
+              child: Container(
+                color: objConstantColor.yellow,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      left: 5.dp, top: 1.dp, bottom: 1.dp, right: 10.dp),
+                  child: Text(
+                    "${PriceHelper.getDiscountPercentage(
+                      productPrice: product.productPrice ?? 0,
+                      sellingPrice: product.productSellingPrice ?? 0,
+                    )} OFF",
+                    style: TextStyle(
+                      color: objConstantColor.black,
+                      fontSize: 10.dp,
+                      fontFamily: ConstantAssests.montserratSemiBold,
+                    ),
                   ),
                 ),
-              ),
-            ))
-      ]),
+              ))
+        ],
+      ),
     );
   }
 
   Widget buildProductShimmer() {
     return GridView.builder(
       itemCount: 6, // Number of shimmer placeholders
+      padding: EdgeInsets.zero,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

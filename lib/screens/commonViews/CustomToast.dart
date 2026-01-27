@@ -54,7 +54,7 @@ class CustomToast {
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.7),
+                      color: Colors.black.withAlpha(10),
                       blurRadius: 16,
                       spreadRadius: 2,
                       offset: const Offset(0, 6),
@@ -62,7 +62,7 @@ class CustomToast {
                   ],
                   border: Border.all(
                     color: ConstantColors().navyBlue,
-                    width: 1.5,
+                    width: 1,
                   ),
                 ),
                 child: Row(
@@ -74,7 +74,7 @@ class CustomToast {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: ConstantColors().navyBlue,
-                          fontSize: 13.dp,
+                          fontSize: 10.dp,
                           height: 1,
                           fontFamily: objConstantFonts.montserratSemiBold,
                         ),

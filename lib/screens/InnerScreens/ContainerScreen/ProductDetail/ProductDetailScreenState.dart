@@ -15,6 +15,24 @@ import '../WishListScreen/WishListRepository.dart';
 import 'ProductDetailModel.dart';
 import 'ProductDetailsRepository.dart';
 
+
+
+class ProductReview {
+  final String userName;
+  final String userImage;
+  final double rating;
+  final String date;
+  final String comment;
+
+  ProductReview({
+    required this.userName,
+    required this.userImage,
+    required this.rating,
+    required this.date,
+    required this.comment,
+  });
+}
+
 /// --- STATE CLASS ---
 class ProductDetailScreenGlobalState {
   final ScreenName currentModule;

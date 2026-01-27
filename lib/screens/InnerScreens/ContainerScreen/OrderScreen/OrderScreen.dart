@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../../CodeReusable/CodeReusability.dart';
+import '../../../../Utility/NetworkImageLoader.dart';
 import '../../../../constants/ConstantAssests.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../../../constants/Constants.dart';
@@ -21,9 +22,7 @@ class OrderScreen extends ConsumerStatefulWidget {
 
 class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProviderStateMixin{
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final Map<String, bool> _expandedMap = {};
   final ScrollController _scrollController = ScrollController();
-  late TabController _tabController;
 
   @override
   void initState() {
@@ -37,16 +36,11 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
       }
     });
 
-    _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() {
-      setState(() {});
-    });
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
-    _tabController.dispose();
     super.dispose();
   }
 
@@ -308,7 +302,7 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
 
 
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5.dp),
+                  padding: EdgeInsets.symmetric(vertical: 0.dp),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -320,7 +314,7 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
                             borderRadius: BorderRadius.circular(10.dp),
                           ),
                           padding: EdgeInsets.symmetric(
-                              vertical: 15.dp, horizontal: 20.dp),
+                              vertical: 15.dp, horizontal: 10.dp),
                           child: Row(
                             children: [
                               Container(
@@ -353,7 +347,7 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
                         ),
                       ),
 
-                      SizedBox(width: 15.dp), // space between both boxes
+                      SizedBox(width: 10.dp), // space between both boxes
 
                       Expanded(
                         child: Container(
@@ -362,7 +356,7 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
                             borderRadius: BorderRadius.circular(10.dp),
                           ),
                           padding: EdgeInsets.symmetric(
-                              vertical: 15.dp, horizontal: 20.dp),
+                              vertical: 15.dp, horizontal: 10.dp),
                           child: Row(
                             children: [
                               Container(
@@ -471,37 +465,22 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
           children: [
             /// Image
             Container(
+              width: 70.dp,
+              height: 70.dp,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5.dp),
                 border: Border.all(
-                  color: objConstantColor.navyBlue,
+                  color: objConstantColor.black,
                   width: 0.5,
                 ),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(5.dp),
-                child: Image.network(
-                  '${ConstantURLs.baseUrl}$image',
-                  width: 70.dp,
-                  height: 70.dp,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
-                      objConstantAssest.placeHolder, // fallback image from assets
-                      width: 70.dp,
-                      height: 70.dp,
-                      fit: BoxFit.cover,
-                      color: objConstantColor.liteGray2,
-                    );
-                  },
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CupertinoActivityIndicator(
-                        color: objConstantColor.navyBlue,
-                      ),
-                    );
-                  },
+                child: NetworkImageLoader(
+                  imageUrl: '${ConstantURLs.baseUrl}$image',
+                  placeHolder: objConstantAssest.placeHolder,
+                  size: 50.dp,
+                  imageSize: 70.dp,
                 ),
               ),
             ),
@@ -596,31 +575,6 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
     );
   }
 
-  ///This Widget is used to load Title and Value in a row
-  Widget titleAndValueRow(BuildContext context, String title, String value, Color titleColor, Color valueColor, double titleSize, double valueSize, String titleFontFamily, String valueFontFamily){
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        objCommonWidgets.customText(
-          context,
-          title,
-          titleSize,
-          titleColor,
-          titleFontFamily,
-        ),
-        SizedBox(width: 3.dp),
-        Flexible(
-          child: objCommonWidgets.customText(
-            context,
-            value,
-            valueSize,
-            valueColor,
-            valueFontFamily,
-          ),
-        ),
-      ],
-    );
-  }
 
   /// Shimmer placeholder for order list
   Widget _buildShimmerPlaceholder() {

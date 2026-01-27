@@ -59,55 +59,63 @@ class HomeScreenGlobalStateNotifier extends StateNotifier<HomeScreenGlobalState>
   }
 
   /// This method is used to get Product List from GET API
-  Future<void> callProductListGepAPI(BuildContext context, {bool loadMore = false}) async {
+  Future<void> callProductListGepAPI(
+      BuildContext context, {
+        bool loadMore = false,
+      }) async {
     if (state.isLoading || (!state.hasMore && loadMore)) return;
 
     state = state.copyWith(isLoading: true);
-    bool isConnected = await CodeReusability().isConnectedToNetwork();
 
+    bool isConnected = await CodeReusability().isConnectedToNetwork();
     if (!isConnected) {
-      CodeReusability().showAlert(context, 'Please Check Your Internet Connection');
       state = state.copyWith(isLoading: false);
+      CodeReusability()
+          .showAlert(context, 'Please Check Your Internet Connection');
       return;
     }
 
     try {
       var prefs = await PreferencesManager.getInstance();
-      String userID = prefs.getStringValue(PreferenceKeys.userID) ?? '';
+      String userID =
+          prefs.getStringValue(PreferenceKeys.userID) ?? '';
 
-      const int limit = 10; // ✅ fixed constant limit
+      const int limit = 10;
       int nextPage = loadMore ? state.currentPage + 1 : 1;
 
-      String url = '${ConstantURLs.productListUrl}userId=$userID&page=$nextPage&limit=$limit';
+      String url =
+          '${ConstantURLs.productListUrl}userId=$userID&page=$nextPage&limit=$limit';
 
-      HomeScreenRepository().callProductListGETApi(url, (statusCode, response) async {
-        final productResponse = ProductListResponse.fromJson(response);
+      HomeScreenRepository().callProductListGETApi(
+        url,
+            (statusCode, response) async {
+              final productResponse =
+              ProductListResponse.fromJson(response);
+          if (statusCode == 200) {
+            final newProducts = productResponse.data;
+            final hasMore = newProducts.length >= limit;
 
-        if (statusCode == 200) {
-          Logger().log('###---> Product List API Response Page $nextPage: $response');
-
-          final newProducts = productResponse.data;
-
-          final hasMore = newProducts.isNotEmpty && newProducts.length >= limit;
-
-          // ✅ If first page, replace list; else append
-          state = state.copyWith(
-            productList: loadMore
-                ? [...state.productList, ...newProducts]
-                : newProducts,
-            currentPage: nextPage,
-            hasMore: hasMore,
-          );
-        } else {
-          CodeReusability().showAlert(context, productResponse.message);
-        }
-      });
+            state = state.copyWith(
+              productList: loadMore
+                  ? [...state.productList, ...newProducts]
+                  : newProducts,
+              currentPage: nextPage,
+              hasMore: hasMore,
+              isLoading: false, // ✅ shimmer stops EXACTLY here
+            );
+          } else {
+            state = state.copyWith(isLoading: false);
+            CodeReusability()
+                .showAlert(context, productResponse.message);
+          }
+        },
+      );
     } catch (e) {
-      Logger().log("### Error in callProductListGepAPI: $e");
-    } finally {
       state = state.copyWith(isLoading: false);
+      Logger().log("### Error in Product API: $e");
     }
   }
+
 
 
 

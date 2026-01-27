@@ -23,7 +23,6 @@ class MainScreenState extends ConsumerState<MainScreen> {
   @override
   void initState() {
     super.initState();
-    BackButtonInterceptor.add(mainInterceptor);
 
     //Fetch count data when app starts
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -33,7 +32,6 @@ class MainScreenState extends ConsumerState<MainScreen> {
 
   @override
   void dispose() {
-    BackButtonInterceptor.remove(mainInterceptor);
     super.dispose();
   }
 
@@ -42,42 +40,50 @@ class MainScreenState extends ConsumerState<MainScreen> {
     var userScreenState = ref.watch(MainScreenGlobalStateProvider);
     var userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
 
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus();
+    return PopScope(
+      canPop: false, // 🔥 We fully control back navigation
+      onPopInvokedWithResult: (didPop, dynamic) {
+        if (didPop) return;
+        _handleBack(context);
       },
-      child: SafeArea(
-        bottom: false,
-        top: false,
-        child: Scaffold(
-          key: _scaffoldKey,
-          backgroundColor: objConstantColor.white,
+      child: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: SafeArea(
+          top: false,
+          bottom: false,
+          child: Scaffold(
+            key: _scaffoldKey,
+            backgroundColor: objConstantColor.white,
 
-          body: Center(
-            child: userScreenNotifier.getChildContainer(),
+            body: Center(
+              child: userScreenNotifier.getChildContainer(),
+            ),
+
+            // UPDATED: Footer shows live cart & wishlist count
+            bottomNavigationBar: ((userScreenState.currentModule != ScreenName.reels) && (userScreenState.currentModule != ScreenName.map))
+
+                ? UserFooterView(
+              currentModule: userScreenState.currentModule,
+              cartCount: userScreenState.cartCount,
+              wishlistCount: userScreenState.wishlistCount,
+              selectedFooterIndex: (index) {
+                userScreenNotifier.setFooterSelection(index);
+              },
+            )
+                : const SizedBox.shrink(),
           ),
-
-          // UPDATED: Footer shows live cart & wishlist count
-          bottomNavigationBar: ((userScreenState.currentModule != ScreenName.reels) && (userScreenState.currentModule != ScreenName.map))
-
-              ? UserFooterView(
-            currentModule: userScreenState.currentModule,
-            cartCount: userScreenState.cartCount,
-            wishlistCount: userScreenState.wishlistCount,
-            selectedFooterIndex: (index) {
-              userScreenNotifier.setFooterSelection(index);
-            },
-          )
-              : const SizedBox.shrink(),
         ),
       ),
     );
   }
 
-  bool mainInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
-    if (kDebugMode) {
-      print("Back button intercepted!");
-    }
+
+  /// 🔥 SAFE BACK HANDLER
+  Future<void> _handleBack(BuildContext context) async {
+    if (!context.mounted) return;
+
     var state = ref.watch(MainScreenGlobalStateProvider);
     var userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
 
@@ -95,8 +101,9 @@ class MainScreenState extends ConsumerState<MainScreen> {
         userScreenNotifier.callBackNavigation(context, state.currentModule);
       }
     });
-    return true;
+    return;
   }
+
 }
 
 class UserFooterView extends ConsumerStatefulWidget {
@@ -156,105 +163,113 @@ class UserFooterViewState extends ConsumerState<UserFooterView> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
+    double screenWidth = MediaQuery.of(context).size.width - 20.dp;
     double tabWidth = screenWidth / inactiveIcons.length;
     double indicatorWidth = 22.5.dp;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: objConstantColor.white,
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 8, spreadRadius: 1),
-        ],
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          if (widget.currentModule == ScreenName.home ||
-              widget.currentModule == ScreenName.orders ||
-              widget.currentModule == ScreenName.reels ||
-              widget.currentModule == ScreenName.cart ||
-              widget.currentModule == ScreenName.profile)
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              top: 6.dp,
-              left: currentIndex * tabWidth + (tabWidth - indicatorWidth) / 2,
-              child: Container(
-                height: 4.dp,
-                width: indicatorWidth,
-                decoration: BoxDecoration(
-                  color: objConstantColor.navyBlue,
-                  borderRadius: BorderRadius.circular(20.dp),
+    return SafeArea(
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.dp),
+        decoration: BoxDecoration(
+          color: objConstantColor.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(10),
+              blurRadius: 1,
+              offset: const Offset(0, -2), // push shadow upward
+            ),
+          ],
+        ),
+
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            if (widget.currentModule == ScreenName.home ||
+                widget.currentModule == ScreenName.orders ||
+                widget.currentModule == ScreenName.reels ||
+                widget.currentModule == ScreenName.cart ||
+                widget.currentModule == ScreenName.profile)
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                top: 6.dp,
+                left: currentIndex * tabWidth + (tabWidth - indicatorWidth) / 2,
+                child: Container(
+                  height: 4.dp,
+                  width: indicatorWidth,
+                  decoration: BoxDecoration(
+                    color: objConstantColor.navyBlue,
+                    borderRadius: BorderRadius.circular(20.dp),
+                  ),
                 ),
               ),
-            ),
-
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(height: 10.dp),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.generate(inactiveIcons.length, (index) {
-                  final isSelected = currentIndex == index;
-                  return Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-
-                      CupertinoButton(
-                        onPressed: () => widget.selectedFooterIndex(index),
-                        padding: EdgeInsets.zero,
-                        child: Column(
-                          children: [
-                            SizedBox(height: 5.dp),
-                            Image.asset(
-                              isSelected ? activeIcons[index] : inactiveIcons[index],
-                              height: 24.dp,
-                              width: 24.dp,
-                            ),
-                            SizedBox(height: 5.dp),
-                            objCommonWidgets.customText(
-                                context,
-                                modules[index],
-                                10,
-                                objConstantColor.navyBlue,
-                                objConstantFonts.montserratSemiBold
-                            ),
-                            SizedBox(height: 2.dp),
-                          ],
+      
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(height: 10.dp),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: List.generate(inactiveIcons.length, (index) {
+                    final isSelected = currentIndex == index;
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+      
+                        CupertinoButton(
+                          onPressed: () => widget.selectedFooterIndex(index),
+                          padding: EdgeInsets.zero,
+                          child: Column(
+                            children: [
+                              SizedBox(height: 5.dp),
+                              Image.asset(
+                                isSelected ? activeIcons[index] : inactiveIcons[index],
+                                height: 20.dp,
+                                width: 20.dp,
+                              ),
+                              SizedBox(height: 2.5.dp),
+                              objCommonWidgets.customText(
+                                  context,
+                                  modules[index],
+                                  10,
+                                  objConstantColor.navyBlue,
+                                  objConstantFonts.montserratSemiBold
+                              ),
+                              SizedBox(height: 2.5.dp),
+                            ],
+                          ),
                         ),
-                      ),
-
-                      //Badge for Cart
-                      if (index == 3 && widget.cartCount > 0)
-                        Positioned(
-                          right: 1.dp,
-                          top: 2.dp,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 0.8.dp, horizontal: 5.dp),
-                            decoration: BoxDecoration(
-                              color: objConstantColor.redd,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              '${widget.cartCount}',
-                              style: TextStyle(
-                                fontSize: 10.dp,
-                                color: Colors.white,
-                                fontFamily: objConstantFonts.montserratBold,
+      
+                        //Badge for Cart
+                        if (index == 3 && widget.cartCount > 0)
+                          Positioned(
+                            right: 1.dp,
+                            top: 2.dp,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 0.8.dp, horizontal: 5.dp),
+                              decoration: BoxDecoration(
+                                color: objConstantColor.redd,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                '${widget.cartCount}',
+                                style: TextStyle(
+                                  fontSize: 10.dp,
+                                  color: Colors.white,
+                                  fontFamily: objConstantFonts.montserratBold,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                    ],
-                  );
-                }),
-              ),
-            ],
-          ),
-        ],
+                      ],
+                    );
+                  }),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

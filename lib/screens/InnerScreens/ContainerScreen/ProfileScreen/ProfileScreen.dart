@@ -49,7 +49,7 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
     var userScreenState = ref.watch(ProfileScreenGlobalStateProvider);
 
     return Scaffold(
-      backgroundColor: Colors.black.withAlpha(10),
+      backgroundColor: const Color(0xFFF4F4F4),
       body: SafeArea(
         child: Column(
           children: [
@@ -88,32 +88,18 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
                   CupertinoButton(
                       minimumSize: const Size(0, 0),
                       padding: EdgeInsets.zero,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 8.dp),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.dp),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withAlpha(20),
-                              blurRadius: 10,
-                              offset: const Offset(2, 3),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            objCommonWidgets.customText(
-                              context,
-                              'Logout',
-                              12.5,
-                              Colors.red,
-                              objConstantFonts.montserratSemiBold,
-                            ),
-                            SizedBox(width: 2.5.dp),
-                            Icon(Icons.power_settings_new_outlined, color: Colors.red, size: 19.9.dp),
-                          ],
-                        ),
+                      child: Row(
+                        children: [
+                          objCommonWidgets.customText(
+                            context,
+                            'Logout',
+                            12.5,
+                            Colors.red,
+                            objConstantFonts.montserratSemiBold,
+                          ),
+                          SizedBox(width: 2.5.dp),
+                          Icon(Icons.power_settings_new_outlined, color: Colors.red, size: 19.9.dp),
+                        ],
                       ),
                       onPressed: (){
                         PreferencesManager.getInstance().then((pref) {
@@ -140,8 +126,6 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
-
-                    SizedBox(height: 15.dp),
 
                     /// PROFILE + LOCATION
                     Padding(
@@ -413,9 +397,9 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
           borderRadius: BorderRadius.circular(20.dp),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(45),
+              color: Colors.black.withAlpha(25),
               blurRadius: 10,
-              offset: const Offset(2, 5),
+              offset: const Offset(1, 2),
             ),
           ],
         ),
@@ -510,9 +494,9 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
           borderRadius: BorderRadius.circular(20.dp),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(85),
+              color: Colors.black.withAlpha(25),
               blurRadius: 10,
-              offset: const Offset(2, 5),
+              offset: const Offset(1, -2),
             ),
           ],
         ),

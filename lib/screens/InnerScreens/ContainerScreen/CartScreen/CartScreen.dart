@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../../CodeReusable/CodeReusability.dart';
+import '../../../../Utility/NetworkImageLoader.dart';
 import '../../../../constants/ConstantAssests.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../../../constants/Constants.dart';
@@ -82,7 +83,7 @@ class CartScreenState extends ConsumerState<CartScreen> {
                   thumbVisibility: true,
                   thickness: 6,
                   child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
+                    physics: const BouncingScrollPhysics(),
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 18.dp),
                       child: Builder(
@@ -205,7 +206,7 @@ class CartScreenState extends ConsumerState<CartScreen> {
                     color: objConstantColor.white,
                     boxShadow: const [
                       BoxShadow(
-                          color: Colors.black12, blurRadius: 8, spreadRadius: 1),
+                          color: Colors.black12, blurRadius: 5, spreadRadius: 1),
                     ],
                   ),
                   child: Padding(
@@ -218,13 +219,13 @@ class CartScreenState extends ConsumerState<CartScreen> {
                             customeText(
                               '₹${userScreenState.totalPayableAmount}/_',
                               20,
-                              objConstantColor.navyBlue,
-                              ConstantAssests.montserratBold,
+                              objConstantColor.black,
+                              ConstantAssests.montserratSemiBold,
                             ),
                             customeText(
                               'Inc. of all taxes',
-                              10,
-                              objConstantColor.navyBlue,
+                              8,
+                              objConstantColor.black,
                               ConstantAssests.montserratMedium,
                             )
                           ],
@@ -239,14 +240,14 @@ class CartScreenState extends ConsumerState<CartScreen> {
                             },
                             child: Container(
                               padding: EdgeInsets.symmetric(
-                                  vertical: 10.dp, horizontal: 20.dp),
+                                  vertical: 10.dp, horizontal: 15.dp),
                               decoration: BoxDecoration(
                                 color: objConstantColor.orange,
                                 borderRadius: BorderRadius.circular(5.dp),
                               ),
                               child: customeText(
                                 'Checkout',
-                                18,
+                                15,
                                 objConstantColor.white,
                                 ConstantAssests.montserratSemiBold,
                               ),
@@ -339,39 +340,27 @@ class CartScreenState extends ConsumerState<CartScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             /// Image
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5.dp),
-                border: Border.all(
-                  color: objConstantColor.navyBlue,
-                  width: 1,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(5.dp),
+              child: Container(
+                width: 100.dp,
+                height: 100.dp,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5.dp),
+                  border: Border.all(
+                    color: Colors.black,
+                    width: 1,
+                  ),
                 ),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(5.dp),
-                child: Image.network(
-                  '${ConstantURLs.baseUrl}$image',
-                  width: 120.dp,
-                  height: 120.dp,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
-                      objConstantAssest.placeHolder, // fallback image from assets
-                      width: 130.dp,
-                      height: 130.dp,
-                      fit: BoxFit.cover,
-                    );
-                  },
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CupertinoActivityIndicator(
-                        color: objConstantColor.gray,
-                      ),
-                    );
-                  },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(5.dp),
+                  child: NetworkImageLoader(
+                    imageUrl: '${ConstantURLs.baseUrl}$image',
+                    placeHolder: objConstantAssest.placeHolder,
+                    size: 60.dp,
+                    imageSize: 100.dp,
+                  ),
                 ),
-
               ),
             ),
 

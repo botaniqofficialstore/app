@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import 'package:lottie/lottie.dart';
 import '../../../../CodeReusable/CodeReusability.dart';
+import '../../../../Utility/NetworkImageLoader.dart';
 import '../../../../constants/ConstantAssests.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../../../constants/Constants.dart';
@@ -86,6 +87,7 @@ class OrderSummaryScreenState extends ConsumerState<OrderSummaryScreen> {
       /// Scrollable content
             Expanded(
               child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -271,7 +273,7 @@ class OrderSummaryScreenState extends ConsumerState<OrderSummaryScreen> {
                               context,
                               'Place Order',
                               16,
-                              const Color(0xFF9CD100),
+                              Colors.white,
                               ConstantAssests.montserratSemiBold,
                             ),
                           ),
@@ -440,6 +442,8 @@ class OrderSummaryScreenState extends ConsumerState<OrderSummaryScreen> {
           children: [
             /// Image
             Container(
+              width: 70.dp,
+              height: 70.dp,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5.dp),
                 border: Border.all(
@@ -449,27 +453,11 @@ class OrderSummaryScreenState extends ConsumerState<OrderSummaryScreen> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(5.dp),
-                child: Image.network(
-                  '${ConstantURLs.baseUrl}$image',
-                  width: 80.dp,
-                  height: 80.dp,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
-                      objConstantAssest.placeHolder, // fallback image from assets
-                      width: 80.dp,
-                      height: 80.dp,
-                      fit: BoxFit.cover,
-                    );
-                  },
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CupertinoActivityIndicator(
-                        color: objConstantColor.gray,
-                      ),
-                    );
-                  },
+                child: NetworkImageLoader(
+                  imageUrl: '${ConstantURLs.baseUrl}$image',
+                  placeHolder: objConstantAssest.placeHolder,
+                  size: 40.dp,
+                  imageSize: 70.dp,
                 ),
               ),
             ),
@@ -486,7 +474,7 @@ class OrderSummaryScreenState extends ConsumerState<OrderSummaryScreen> {
                     objCommonWidgets.customText(
                       context,
                       CodeReusability().cleanProductName(productName),
-                      15,
+                      14,
                       objConstantColor.navyBlue,
                       objConstantFonts.montserratSemiBold,
                     ),
@@ -498,7 +486,7 @@ class OrderSummaryScreenState extends ConsumerState<OrderSummaryScreen> {
                         objCommonWidgets.customText(
                           context,
                           'Price:',
-                          12,
+                          11,
                           objConstantColor.navyBlue,
                           objConstantFonts.montserratSemiBold,
                         ),
@@ -506,7 +494,7 @@ class OrderSummaryScreenState extends ConsumerState<OrderSummaryScreen> {
                         objCommonWidgets.customText(
                           context,
                           '₹$price/_',
-                          12,
+                          11,
                           objConstantColor.green,
                           objConstantFonts.montserratSemiBold,
                         ),
@@ -523,7 +511,7 @@ class OrderSummaryScreenState extends ConsumerState<OrderSummaryScreen> {
                           child: objCommonWidgets.customText(
                             context,
                             'Quantity: $count',
-                            12,
+                            11,
                             objConstantColor.navyBlue,
                             objConstantFonts.montserratSemiBold,
                           ),
@@ -542,7 +530,7 @@ class OrderSummaryScreenState extends ConsumerState<OrderSummaryScreen> {
                               objCommonWidgets.customText(
                                 context,
                                 'Net Wt (per item): $gram',
-                                12,
+                                11,
                                 objConstantColor.navyBlue,
                                 objConstantFonts.montserratSemiBold,
                               ),

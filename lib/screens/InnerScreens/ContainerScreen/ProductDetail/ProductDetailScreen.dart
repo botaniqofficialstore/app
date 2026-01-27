@@ -11,6 +11,7 @@ import 'package:shimmer/shimmer.dart';
 import '../../../../CodeReusable/CodeReusability.dart';
 import '../../../../CodeReusable/utilities.dart';
 import '../../../../Utility/DeliveryUtils.dart';
+import '../../../../Utility/NetworkImageLoader.dart';
 import '../../../../Utility/TimerUtils.dart';
 import '../../../../constants/ConstantAssests.dart';
 import '../../../../constants/ConstantVariables.dart';
@@ -193,7 +194,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
 
                   if (detailsScreenState.inCart == 0) ...{
-                    SizedBox(height: 20.dp),
+                    SizedBox(height: 5.dp),
                     customSectionTitle(context, "Add to cart"),
                     SizedBox(height: 5.dp),
                     addCart(context),
@@ -203,11 +204,21 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       buyNow(context)
                     },
 
-                  SizedBox(height: 30.dp),
-
+                  SizedBox(height: 20.dp),
                   customSectionTitle(context, "Nutritional Benefits"),
                   SizedBox(height: 5.dp),
                   productDetails(context),
+
+
+                  SizedBox(height: 20.dp),
+                  customSectionTitle(context, "Seller Details"),
+                  SizedBox(height: 5.dp),
+                  sellerDetails(context),
+
+                  SizedBox(height: 20.dp),
+                  customSectionTitle(context, "Ratings & Reviews"),
+                  SizedBox(height: 5.dp),
+                  ratingAndReviewDetails(context),
 
 
                   SizedBox(height: 20.dp),
@@ -247,13 +258,13 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           /// 🔰 3. SIMILAR PRODUCT GRID
           similarProduct(context, homeScreenState, homeScreenNotifier),
 
-          SliverToBoxAdapter(
-            child: SizedBox(height: 15.dp),
-          )
+
         ],
       ),
     );
   }
+
+
 
 
 
@@ -483,7 +494,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       width: double.infinity,
       padding: EdgeInsets.only(left: 15.dp, right: 15.dp, bottom: 10.dp, top: 5.dp),
       decoration: BoxDecoration(
-        color: Colors.black.withAlpha(15),
+        color: Colors.black.withAlpha(10),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(10.dp),
           bottomRight: Radius.circular(10.dp),
@@ -548,7 +559,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       width: double.infinity,
       padding: EdgeInsets.only(left: 15.dp, right: 15.dp, bottom: 5.dp, top: 10.dp),
       decoration: BoxDecoration(
-        color: Colors.black.withAlpha(15),
+        color: Colors.black.withAlpha(10),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(10.dp),
           topRight: Radius.circular(10.dp),
@@ -587,7 +598,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   Widget customSectionTitle(BuildContext context, String title) {
     return objCommonWidgets.customText(
       context, title, 16,
-      objConstantColor.navyBlue, objConstantFonts.montserratSemiBold,
+      objConstantColor.black, objConstantFonts.montserratSemiBold,
     );
   }
 
@@ -607,7 +618,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         },
         child: SliverToBoxAdapter(
           child: SizedBox(
-            height: 270.dp, // 👈 required fixed height
+            height: 250.dp, // 👈 required fixed height
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: homeScreenState.productList.length +
@@ -624,8 +635,8 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 final product = homeScreenState.productList[index];
 
                 return Container(
-                  width: 165.dp, // 👈 card width
-                  margin: EdgeInsets.only(right: 12.dp),
+                  width: 145.dp, // 👈 card width
+                  margin: EdgeInsets.only(right: 12.dp, bottom: 10.dp),
                   child: _buildProductCard(product, index, homeScreenNotifier),
                 );
               },
@@ -666,237 +677,210 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         homeScreenNotifier.callProductListGepAPI(context);
 
       },
-      child: Stack(children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-                color: objConstantColor.navyBlue.withOpacity(0.2)),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 6,
-                offset: Offset(5, 4),
-              )
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
+      child: Stack(
+        children: [
+
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.dp),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withAlpha(35), blurRadius: 15, offset: const Offset(0, 8)),
+              ],
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ✅ Fixed height image
-                SizedBox(
-                  height: 130.dp,
-                  width: double.infinity,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.dp),
-                    child: Stack(
-                      children: [
-                        // ✅ Background Image
-                        Positioned.fill(
-                          child: Image.network(
-                            '${ConstantURLs.baseUrl}${product.image}',
-                            width: 120.dp,
-                            height: 120.dp,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Image.asset(
-                                objConstantAssest.placeHolder,
-                                // fallback image from assets
-                                width: 130.dp,
-                                height: 130.dp,
-                                fit: BoxFit.cover,
-                              );
-                            },
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Center(
-                                child: CupertinoActivityIndicator(
-                                  color: objConstantColor.gray,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-
-                        // ✅ Top-right heart button
-                        Positioned(
-                          top: 6.dp,
-                          right: 6.dp,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.6),
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: CupertinoButton(
-                              key: sourceKey,
-                              padding: EdgeInsets.all(4.dp),
-                              minSize: 28.dp,
-                              borderRadius: BorderRadius.circular(30),
-                              child: Image.asset(
-                                (product.isWishlisted == 1)
-                                    ? objConstantAssest.wishRed
-                                    : objConstantAssest.wishUnCheckWhite,
-                                width: 15.dp,
-                              ),
-                              onPressed: () {
-                                if (product.isWishlisted == 1) {
-                                  notifier.callRemoveFromWishList(
-                                      context, product.productId, index);
-                                } else {
-                                  notifier.callAddToWishList(
-                                      context, product.productId, index);
-                                }
-                              },
-                            ),
-                          ),
-                        ),
-
-                        Positioned(bottom: 5.dp, left: 5.dp, child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.green,
-                              borderRadius: BorderRadius.circular(5.dp)
-                          ),
-                          padding: EdgeInsets.symmetric(
-                              vertical: 1.dp, horizontal: 5.dp),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              objCommonWidgets.customText(context, 'Verified',
-                                  10, Colors.white,
-                                  objConstantFonts.montserratSemiBold),
-                              SizedBox(width: 1.dp),
-                              SizedBox(
-                                width: 10.dp,
-                                child: Image.asset(
-                                    objConstantAssest.verify,
-                                    color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),)
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                // ✅ Name
-                Text(CodeReusability().cleanProductName(product.productName),
-                  style: TextStyle(
-                    color: objConstantColor.black,
-                    fontSize: 15.dp,
-                    fontFamily: ConstantAssests.montserratSemiBold,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 2.dp),
-                  child: Row(
+                Expanded(
+                  child: Stack(
                     children: [
-                      Text(
-                        "₹${product.productSellingPrice}/_",
-                        style: TextStyle(
-                          color: objConstantColor.green,
-                          fontSize: 14.dp,
-                          fontFamily: ConstantAssests.montserratSemiBold,
+                      Padding(
+                        padding: EdgeInsets.only(left: 5.dp, right: 5.dp, top: 5.dp),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.only(topLeft: Radius.circular(8.dp), topRight: Radius.circular(8.dp)),
+                          child: NetworkImageLoader(
+                            imageUrl: '${ConstantURLs.baseUrl}${product.image}',
+                            placeHolder: objConstantAssest.placeHolder,
+                            size: double.infinity,
+                            imageSize: double.infinity,
+                          ),
                         ),
                       ),
-                      SizedBox(width: 3.dp),
-                      Text(
-                        "₹${product.productPrice}/_",
-                        style: TextStyle(
-                          color: objConstantColor.gray,
-                          fontSize: 14.dp,
-                          fontFamily: ConstantAssests.montserratMedium,
-                          decoration: TextDecoration.lineThrough,
-                          decorationColor: objConstantColor.gray,
-                          decorationThickness: 1,
+
+
+                      // ✅ Top-right heart button
+                      Positioned(
+                        right: 10.dp,
+                        top: 10.dp,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: CupertinoButton(
+                            key: sourceKey,
+                            padding: EdgeInsets.all(4.dp),
+                            minSize: 28.dp,
+                            borderRadius: BorderRadius.circular(30),
+                            child: Image.asset(
+                              (product.isWishlisted == 1)
+                                  ? objConstantAssest.wishRed
+                                  : objConstantAssest.wishUnCheckWhite,
+                              width: 15.dp,
+                            ),
+                            onPressed: () {
+                              if (product.isWishlisted == 1) {
+                                notifier.callRemoveFromWishList(
+                                    context, product.productId, index);
+                              } else {
+                                notifier.callAddToWishList(
+                                    context, product.productId, index);
+                              }
+                            },
+                          ),
                         ),
                       ),
+
+
+                      Positioned(bottom: 5.dp, left: 12.dp, child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(5.dp)
+                        ),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 1.dp, horizontal: 5.dp),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            objCommonWidgets.customText(context, 'Verified',
+                                10, Colors.white,
+                                objConstantFonts.montserratSemiBold),
+                            SizedBox(width: 1.dp),
+                            SizedBox(
+                              width: 10.dp,
+                              child: Image.asset(
+                                  objConstantAssest.verify,
+                                  color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),)
                     ],
                   ),
                 ),
 
-                Text(
-                  "${product.gram}gm",
-                  style: TextStyle(
-                    color: objConstantColor.navyBlue,
-                    fontSize: 14.dp,
-                    fontFamily: ConstantAssests.montserratSemiBold,
-                  ),
-                ),
+
+                Padding(padding: EdgeInsets.symmetric(horizontal: 10.dp),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 6.dp),
+
+                        // ✅ Name
+                        objCommonWidgets.customText(context,
+                            CodeReusability().cleanProductName(product.productName),
+                            12, Colors.black, objConstantFonts.montserratSemiBold),
+
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 2.dp),
+                          child: Row(
+                            children: [
+                              objCommonWidgets.customText(context,
+                                  "₹${product.productSellingPrice}/_",
+                                  14, objConstantColor.green, objConstantFonts.montserratSemiBold),
+                              SizedBox(width: 3.dp),
+                              Text(
+                                "₹${product.productPrice}/_",
+                                style: TextStyle(
+                                  color: objConstantColor.gray,
+                                  fontSize: 14.dp,
+                                  fontFamily: ConstantAssests.montserratMedium,
+                                  decoration: TextDecoration.lineThrough,
+                                  decorationColor: objConstantColor.gray,
+                                  decorationThickness: 1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        objCommonWidgets.customText(context,
+                            "${product.gram}gm",
+                            12, objConstantColor.black, objConstantFonts.montserratSemiBold),
+
+                        SizedBox(height: 10.dp),
+
+                        // ✅ Add to cart button
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                          child: Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.symmetric(vertical: 8.dp),
+                              decoration: BoxDecoration(
+                                color: (product.inCart == 0)
+                                    ? objConstantColor.navyBlue
+                                    : objConstantColor.orange,
+                                borderRadius: BorderRadius.circular(5.dp),
+                              ),
+                              child: Center(
+                                child: objCommonWidgets.customText(context,
+                                    (product.inCart == 0)
+                                        ? "Add to Cart"
+                                        : 'View in Cart',
+                                    12, objConstantColor.white, objConstantFonts.montserratSemiBold),
+                              )
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              if (product.inCart == 0) {
+                                var mainNotifier = ref.watch(
+                                    MainScreenGlobalStateProvider.notifier);
+                                notifier.callAddToCartAPI(
+                                    context, product.productId, index, mainNotifier);
+                              } else {
+                                ref.watch(MainScreenGlobalStateProvider.notifier)
+                                    .callNavigation(
+                                    ScreenName.cart);
+                              }
+                            });
+                          },
+                        ),
+
+                        SizedBox(height: 10.dp),
+
+                      ],
+                    ))
 
 
-                const Spacer(),
-
-                // ✅ Add to cart button
-                SizedBox(
-                  height: 35.dp,
-                  width: double.infinity,
-                  child: CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    color: (product.inCart == 0)
-                        ? objConstantColor.navyBlue
-                        : objConstantColor.orange,
-                    borderRadius: BorderRadius.circular(5.dp),
-                    child: Text(
-                      (product.inCart == 0)
-                          ? "Add to Cart"
-                          : 'View in Cart',
-                      style: TextStyle(
-                        color: objConstantColor.white,
-                        fontSize: 13.dp,
-                        fontFamily: ConstantAssests.montserratSemiBold,
-                      ),
-                    ),
-                    onPressed: () {
-                      if (product.inCart == 0) {
-                        var mainNotifier = ref.watch(
-                            MainScreenGlobalStateProvider.notifier);
-                        notifier.callAddToCartAPI(
-                            context, product.productId, index, mainNotifier);
-                      } else {
-                        ref.watch(MainScreenGlobalStateProvider.notifier)
-                            .callNavigation(
-                            ScreenName.cart);
-                      }
-                    },
-                  ),
-                ),
               ],
             ),
           ),
-        ),
 
-        // ✅ Offer label
-        Positioned(
-            top: 9.dp,
-            left: 1.dp,
-            child: Container(
-              color: objConstantColor.yellow,
-              child: Padding(
-                padding: EdgeInsets.only(
-                    left: 5.dp, top: 1.dp, bottom: 1.dp, right: 10.dp),
-                child: Text(
-                  "${PriceHelper.getDiscountPercentage(
-                    productPrice: product.productPrice ?? 0,
-                    sellingPrice: product.productSellingPrice ?? 0,
-                  )} OFF",
-                  style: TextStyle(
-                    color: objConstantColor.black,
-                    fontSize: 12.dp,
-                    fontFamily: ConstantAssests.montserratSemiBold,
+          // ✅ Offer label
+          Positioned(
+              top: 5.dp,
+              left: 0.dp,
+              child: Container(
+                color: objConstantColor.yellow,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      left: 5.dp, top: 1.dp, bottom: 1.dp, right: 10.dp),
+                  child: Text(
+                    "${PriceHelper.getDiscountPercentage(
+                      productPrice: product.productPrice ?? 0,
+                      sellingPrice: product.productSellingPrice ?? 0,
+                    )} OFF",
+                    style: TextStyle(
+                      color: objConstantColor.black,
+                      fontSize: 10.dp,
+                      fontFamily: ConstantAssests.montserratSemiBold,
+                    ),
                   ),
                 ),
-              ),
-            ))
-      ]),
+              ))
+        ],
+      ),
     );
   }
 
@@ -1165,6 +1149,520 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
+  Widget sellerDetails(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        Row(
+          children: [
+
+            Container(
+              width: 35.dp, // slightly bigger than avatar
+              height: 35.dp,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.black, // 🔥 black border
+                  width: 1.2,          // stroke thickness
+                ),
+              ),
+              child: CircleAvatar(
+                radius: 18.dp,
+                backgroundColor: Colors.grey.shade200,
+                child: ClipOval(
+                  child: Image.network(
+                    'https://drive.google.com/uc?id=1Rmn4MxWtMaV7sEXqxGszVWud8XuyeRnv',
+                    width: 36.dp,
+                    height: 36.dp,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+
+                      return Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Image.asset(
+                            objConstantAssest.placeHolder,
+                            width: 30.dp,
+                            height: 30.dp,
+                            fit: BoxFit.cover,
+                          ),
+                          SizedBox(
+                            width: 10.dp,
+                            height: 10.dp,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 1.5,
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                                  : null,
+                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                              backgroundColor: Colors.white24,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        objConstantAssest.profileIcon,
+                        width: 30.dp,
+                        height: 30.dp,
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+
+            SizedBox(width: 8.dp),
+
+            Column(
+              children: [
+                objCommonWidgets.customText(
+                    context, 'Nourish Organics', 12, Colors.black,
+                    objConstantFonts.montserratSemiBold),
+                Row(
+                  children: [
+                    Icon(Icons.verified_rounded,
+                        color: Colors.blueAccent, size: 12.dp),
+                    SizedBox(width: 2.dp),
+                    objCommonWidgets.customText(context,
+                        'Verified Merchant', 10, Colors.black,
+                        objConstantFonts.montserratRegular),
+                  ],
+                ),
+              ],
+            )
+          ],
+        ),
+
+        SizedBox(height: 10.dp),
+
+        RichText(
+          textAlign: TextAlign.justify,
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: 'About: ',
+                style: TextStyle(
+                  fontSize: 12.dp,
+                  color: Colors.black,
+                  fontFamily: objConstantFonts.montserratSemiBold,
+                ),
+              ),
+              TextSpan(
+                text: "Nourish Organics offers a premium selection of 100% organic products sourced responsibly from certified farms. Our mission is to provide clean, chemical-free, and naturally nourishing products that support a healthier lifestyle and a sustainable future.",
+                style: TextStyle(
+                  fontSize: 11.dp,
+                  color: Colors.black87,
+                  fontFamily: objConstantFonts.montserratMedium,
+                ),
+              ),
+
+            ],
+          ),
+        )
+
+
+      ],
+    );
+  }
+
+
+  Widget ratingAndReviewDetails(BuildContext context) {
+    const rating = 4.2;
+    ProductReview(
+    userName: "Maria Garcia",
+    userImage: "https://i.pravatar.cc/150?u=2",
+    rating: 4.5,
+    date: "1 week ago",
+    comment: "Fast delivery and great packaging. The flavor is very intense and earthy. Will definitely order again.",
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(width: 20.dp),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                objCommonWidgets.customText(
+                  context,
+                  rating.toString(),
+                  35,
+                  objConstantColor.black,
+                  objConstantFonts.montserratSemiBold,
+                ),
+                objCommonWidgets.customText(
+                  context,
+                  "1.2k Reviews",
+                  11,
+                  Colors.black,
+                  objConstantFonts.montserratMedium,
+                ),
+              ],
+            ),
+            const Spacer(),
+
+            _buildStars(rating, Colors.amber),
+            SizedBox(width: 20.dp),
+
+          ],
+        ),
+
+        SizedBox(height: 20.dp),
+
+        _buildReviewCard(ProductReview(
+          userName: "Alex Johnson",
+          userImage: "https://i.pravatar.cc/150?u=1",
+          rating: 5.0,
+          date: "2 days ago",
+          comment: "The quality of these microgreens is exceptional! Extremely fresh and arrived in perfect condition. Highly recommended for garnish.",
+        ),),
+
+        SizedBox(height: 10.dp),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            CupertinoButton(padding: EdgeInsets.zero,
+                minimumSize: Size.zero,
+                child: Container(
+                    padding: EdgeInsets.only(bottom: 0.3.dp),
+                    // 👈 space between text & underline
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: objConstantColor.black,
+                          width: 1.dp, // underline thickness
+                        ),
+                      ),
+                    ),
+                    child: objCommonWidgets.customText(
+                      context, "View all reviews's", 11,
+                      objConstantColor.black, objConstantFonts
+                        .montserratMedium,
+                    )
+                ), onPressed: ()=> showReviewsBottomSheet(context)),
+          ],
+        )
+
+      ],
+    );
+  }
+
+
+
+  Widget _buildStars(double rating, Color color) {
+    return Row(
+      children: List.generate(5, (index) {
+        return Icon(
+          index < rating.floor() ? Icons.star_rounded : Icons.star_outline_rounded,
+          color: color,
+          size: 25.dp,
+        );
+      }),
+    );
+  }
+
+
+  Widget _buildReviewCard(ProductReview review) {
+    return Container(
+      padding: EdgeInsets.all(15.dp),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18.dp),
+          border: Border.all(color: Colors.black.withOpacity(0.05)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(15),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            )
+          ]
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // User Info Row
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 18.dp,
+                backgroundColor: Colors.grey.shade200,
+                child: ClipOval(
+                  child: Image.network(
+                    review.userImage,
+                    width: 36.dp, // Diameter (radius * 2)
+                    height: 36.dp, // Diameter (radius * 2)
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+
+                      return Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // 1. Local Placeholder Image
+                          Image.asset(
+                            objConstantAssest.placeHolder,
+                            width: 36.dp,
+                            height: 36.dp,
+                            fit: BoxFit.cover,
+                          ),
+                          // 2. Small White Circular Progress Bar
+                          SizedBox(
+                            width: 12.dp, // Scaled down for the small avatar
+                            height: 12.dp,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 1.5,
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                  : null,
+                              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                              backgroundColor: Colors.white24,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        objConstantAssest.profileIcon,
+                        width: 36.dp,
+                        height: 36.dp,
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  ),
+                ),
+              ),
+              SizedBox(width: 12.dp),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    objCommonWidgets.customText(context, review.userName, 13, objConstantColor.black, objConstantFonts.montserratSemiBold),
+                    objCommonWidgets.customText(context, review.date, 10, Colors.grey, objConstantFonts.montserratMedium),
+                  ],
+                ),
+              ),
+              // Stars for individual rating
+              Row(
+                children: List.generate(5, (index) {
+                  return Icon(
+                    index < review.rating.floor() ? Icons.star_rounded : Icons.star_outline_rounded,
+                    color: Colors.amber,
+                    size: 14.dp,
+                  );
+                }),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.dp),
+          // Review Text
+          objCommonWidgets.customText(
+              context,
+              review.comment,
+              10,
+              Colors.black.withOpacity(0.75),
+              objConstantFonts.montserratMedium
+          ),
+        ],
+      ),
+    );
+  }
+
+
+
+  void showReviewsBottomSheet(BuildContext context) {
+    final List<ProductReview> reviews = [
+      ProductReview(
+        userName: "Alex Johnson",
+        userImage: "https://i.pravatar.cc/150?u=1",
+        rating: 5.0,
+        date: "2 days ago",
+        comment: "The quality of these microgreens is exceptional! Extremely fresh and arrived in perfect condition. Highly recommended for garnish.",
+      ),
+      ProductReview(
+        userName: "Maria Garcia",
+        userImage: "https://i.pravatar.cc/150?u=2",
+        rating: 4.5,
+        date: "1 week ago",
+        comment: "Fast delivery and great packaging. The flavor is very intense and earthy. Will definitely order again.",
+      ),
+      ProductReview(
+        userName: "James Wilson",
+        userImage: "https://i.pravatar.cc/150?u=3",
+        rating: 4.0,
+        date: "2 weeks ago",
+        comment: "Very good quality, though I wish the portion size was slightly larger for the price point.",
+      ),
+      ProductReview(
+        userName: "Sarah Miller",
+        userImage: "https://i.pravatar.cc/150?u=4",
+        rating: 5.0,
+        date: "1 month ago",
+        comment: "Absolutely love these! They stayed fresh in my fridge for over a week. Perfect for my morning smoothies.",
+      ),
+      ProductReview(
+        userName: "David Chen",
+        userImage: "https://i.pravatar.cc/150?u=5",
+        rating: 4.8,
+        date: "1 month ago",
+        comment: "Incredible vibrant color. Used these for a dinner party and everyone asked where I got them. A bit pricey but worth it for the premium feel.",
+      ),
+      ProductReview(
+        userName: "Emily Watson",
+        userImage: "https://i.pravatar.cc/150?u=6",
+        rating: 3.5,
+        date: "2 months ago",
+        comment: "The product itself is 5 stars, but the delivery took two days longer than promised. The greens were still cold, so no harm done.",
+      ),
+      ProductReview(
+        userName: "Michael Ross",
+        userImage: "https://i.pravatar.cc/150?u=7",
+        rating: 5.0,
+        date: "2 months ago",
+        comment: "Consistency is key for my restaurant, and Botaniq delivers every single time. Best microgreens in the city, hands down.",
+      ),
+      ProductReview(
+        userName: "Jessica Alba",
+        userImage: "https://i.pravatar.cc/150?u=8",
+        rating: 4.2,
+        date: "3 months ago",
+        comment: "Great crunch and peppery taste. I appreciate the eco-friendly packaging they used.",
+      ),
+      ProductReview(
+        userName: "Robert Fox",
+        userImage: "https://i.pravatar.cc/150?u=9",
+        rating: 5.0,
+        date: "3 months ago",
+        comment: "Super healthy addition to my diet. I love how these are grown locally.",
+      ),
+      ProductReview(
+        userName: "Linda Thorne",
+        userImage: "https://i.pravatar.cc/150?u=10",
+        rating: 2.0,
+        date: "4 months ago",
+        comment: "I received the wrong variety of Amaranthus. Customer support was helpful in fixing it, but it was still a bit frustrating.",
+      ),
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.3,
+          minChildSize: 0.25,
+          maxChildSize: 0.85,
+          expand: false,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(35.dp),
+                ),
+              ),
+              child: Column(
+                children: [
+                  /// 🔹 Drag Handle (FIXED)
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 14.dp),
+                    child: Container(
+                      width: 40.dp,
+                      height: 4.dp,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade400,
+                        borderRadius: BorderRadius.circular(10.dp),
+                      ),
+                    ),
+                  ),
+
+                  /// 🔹 Title (FIXED)
+                  Padding(
+                    padding:
+                    EdgeInsets.symmetric(horizontal: 16.dp, vertical: 6.dp),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        customSectionTitle(context, "Ratings & Reviews"),
+
+                        CupertinoButton(
+                          minimumSize: Size.zero,
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          padding: EdgeInsets.zero,
+                          child: Container(
+                            padding: EdgeInsets.all(6.dp),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.black.withAlpha(30),),
+                            child: Icon(Icons.close_rounded,
+                                size: 18.dp,
+                                color: Colors.black),
+                          ),)
+                      ],
+                    ),
+                  ),
+
+                  /// 🔹 Divider (optional but nice)
+                  Divider(height: 1, color: Colors.grey.shade200),
+
+                  /// 🔹 Scrollable Reviews
+                  Expanded(
+                    child: SafeArea(
+                      child: ListView.separated(
+                        controller: scrollController, // ✅ REQUIRED
+                        physics: const BouncingScrollPhysics(),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 16.dp, vertical: 12.dp),
+                        itemCount: reviews.length,
+                        separatorBuilder: (_, __) =>
+                            SizedBox(height: 12.dp),
+                        itemBuilder: (context, index) {
+                          final review = reviews[index];
+                      
+                          return TweenAnimationBuilder<double>(
+                            tween: Tween(begin: 0.0, end: 1.0),
+                            duration:
+                            Duration(milliseconds: 350 + (index * 120)),
+                            curve: Curves.easeOutCubic,
+                            builder: (context, value, child) {
+                              return Opacity(
+                                opacity: value,
+                                child: Transform.translate(
+                                  offset: Offset(0, 20 * (1 - value)),
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: _buildReviewCard(review),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
 
 
