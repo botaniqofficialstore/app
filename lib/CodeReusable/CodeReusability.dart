@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:intl/intl.dart';
 import 'package:botaniqmicrogreens/Utility/Logger.dart';
@@ -129,6 +130,26 @@ class CodeReusability {
       print("❌ Invalid input: neither mobile number nor Gmail");
       return false;
     }
+  }
+
+  bool isNotValidUrl(String url) {
+    // 1. Try to parse the string into a Uri object
+    final uri = Uri.tryParse(url);
+
+    // 2. Check if parsing was successful and if it contains necessary components
+    if (uri != null && uri.hasAbsolutePath && uri.scheme.startsWith('http')) {
+      // Optional: Ensure there is a dot in the host (e.g., "google.com" vs "localhost")
+      if (uri.host.contains('.')) {
+        return false;
+      }
+
+      // Allow 'localhost' for development purposes if needed
+      if (uri.host == 'localhost') {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   ///This function is used to check the password is valid or noyt
@@ -348,4 +369,503 @@ class CodeReusability {
     }
   }
 
+
+  ///Custom TextField Widget
+  Widget customTextField(
+      BuildContext context,
+      String hint,
+      String label,
+      IconData icon,
+      TextEditingController? controller, {
+        int maxLines = 1,
+        void Function(String)? onChanged,
+        List<TextInputFormatter>? inputFormatters,
+        String? prefixText,
+        Widget? suffixWidget,
+        CustomInputType inputType = CustomInputType.normal,
+        description = ''
+      }) {
+
+    /// 🔹 Keyboard type decision
+    TextInputType keyboardType = TextInputType.text;
+
+    /// 🔹 Input formatters decision
+    List<TextInputFormatter> finalInputFormatters = [];
+
+    switch (inputType) {
+      case CustomInputType.mobile:
+        keyboardType = TextInputType.number;
+        finalInputFormatters = [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(10),
+        ];
+        break;
+
+      case CustomInputType.pincode:
+        keyboardType = TextInputType.number;
+        finalInputFormatters = [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(6),
+        ];
+        break;
+
+      case CustomInputType.aadhaar:
+        keyboardType = TextInputType.number;
+        finalInputFormatters = [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(12),
+        ];
+        break;
+
+      case CustomInputType.bankAccount:
+        keyboardType = TextInputType.number;
+        finalInputFormatters = [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(18),
+        ];
+        break;
+
+      case CustomInputType.fssai:
+        keyboardType = TextInputType.number;
+        finalInputFormatters = [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(14),
+        ];
+        break;
+
+      case CustomInputType.pan:
+        keyboardType = TextInputType.visiblePassword; // Prevents unwanted suggestions
+        finalInputFormatters = [
+          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+          UpperCaseTextFormatter(),
+          LengthLimitingTextInputFormatter(10),
+        ];
+        break;
+
+      case CustomInputType.gst:
+        keyboardType = TextInputType.visiblePassword;
+        finalInputFormatters = [
+          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+          UpperCaseTextFormatter(),
+          LengthLimitingTextInputFormatter(15),
+        ];
+        break;
+
+      case CustomInputType.ifsc:
+        keyboardType = TextInputType.visiblePassword;
+        finalInputFormatters = [
+          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+          UpperCaseTextFormatter(),
+          LengthLimitingTextInputFormatter(11),
+        ];
+        break;
+
+      case CustomInputType.normal:
+        keyboardType = TextInputType.text;
+        if (inputFormatters != null) finalInputFormatters.addAll(inputFormatters);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Label text using your custom text widget
+        objCommonWidgets.customText(
+          context,
+          hint,
+          12,
+          Colors.black,
+          objConstantFonts.montserratMedium,
+        ),
+
+        SizedBox(height: 5.dp),
+
+        if (description.isNotEmpty)...{
+          objCommonWidgets.customText(
+            context,
+            description,
+            10,
+            Colors.black,
+            objConstantFonts.montserratRegular,
+          ),
+          SizedBox(height: 10.dp),
+        },
+
+        AnimatedBuilder(
+          animation: controller ?? TextEditingController(),
+          builder: (context, _) {
+            final text = controller?.text ?? '';
+
+            return TextField(
+              controller: controller,
+              maxLines: maxLines,
+              keyboardType: keyboardType,
+              inputFormatters: finalInputFormatters,
+              cursorColor: Colors.black,
+              textAlignVertical: TextAlignVertical.center,
+
+              onChanged: (value) {
+                onChanged?.call(value);
+
+                /// 🔹 Auto close keyboard only when max length reached for numeric IDs
+                bool isFullLength =
+                    (inputType == CustomInputType.mobile && value.length == 10) ||
+                        (inputType == CustomInputType.pincode && value.length == 6) ||
+                        (inputType == CustomInputType.aadhaar && value.length == 12) ||
+                        (inputType == CustomInputType.fssai && value.length == 14);
+
+                if (isFullLength) {
+                  FocusScope.of(context).unfocus();
+                }
+              },
+
+              style: TextStyle(
+                fontSize: _getFontSize(text),
+                fontFamily: objConstantFonts.montserratMedium,
+                color: Colors.black,
+              ),
+
+              decoration: InputDecoration(
+                hintText: label,
+                hintStyle: TextStyle(
+                    fontSize: 12.dp,
+                    fontFamily: objConstantFonts.montserratRegular,
+                    color: Colors.black.withAlpha(150)),
+
+                prefixIcon: prefixText != null
+                    ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(icon, color: Colors.black, size: 20),
+                      const SizedBox(width: 5),
+                      Text(
+                        prefixText,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontFamily: objConstantFonts.montserratMedium,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+                    : Icon(icon, color: Colors.black, size: 20),
+
+                suffixIconConstraints: const BoxConstraints(
+                  minWidth: 0,
+                  minHeight: 0,
+                ),
+                suffixIcon: suffixWidget != null
+                    ? Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: suffixWidget,
+                )
+                    : null,
+
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: const BorderSide(color: Colors.black, width: 0.5),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: const BorderSide(color: Colors.deepOrange, width: 1),
+                ),
+                contentPadding: EdgeInsets.symmetric(vertical: _getPadding(text)),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+
+
+
+  double _getFontSize(String text) {
+    if (text.length <= 20) return 15.dp;
+    if (text.length <= 30) return 13.dp;
+    return 12.dp;
+  }
+
+  double _getPadding(String text){
+    if (text.length <= 20) return 12.dp;
+    if (text.length <= 30) return 13.dp;
+    return 14.dp;
+  }
+
+
+  Widget verified(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.green,
+        shape: BoxShape.circle,
+      ),
+      padding: EdgeInsets.all(3.dp), // 👈 reduce padding
+      child: Icon(
+        Icons.check_rounded,
+        color: Colors.white,
+        size: 10.dp, // 👈 reduce icon size
+      ),
+    );
+  }
+
+
+  ///Date Picker TextField
+  Widget datePickerTextField(BuildContext context,
+      String hint,
+      String label,
+      IconData icon,
+      TextEditingController controller, {
+        void Function(String)? onChanged,
+        int minimumAge = 18,
+      }){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        objCommonWidgets.customText(
+          context,
+          hint,
+          12,
+          Colors.black,
+          objConstantFonts.montserratMedium,
+        ),
+
+        SizedBox(height: 5.dp),
+
+        TextField(
+          controller: controller,
+          maxLines: 1,
+          readOnly: true, // 👈 Disable keyboard
+          keyboardType: TextInputType.none,
+          cursorColor: Colors.black,
+          onTap: () => pickDateOfBirth(
+              context: context,
+              controller: controller,
+              minimumAge: minimumAge
+          ),
+          style: TextStyle(
+            fontSize: 15.dp,
+            fontFamily: objConstantFonts.montserratMedium,
+            color: Colors.black,
+          ),
+          decoration: InputDecoration(
+            hintText: label,
+            hintStyle: TextStyle(
+              fontSize: 12.dp,
+              fontFamily: objConstantFonts.montserratRegular,
+              color: Colors.black.withAlpha(150),
+            ),
+            prefixIcon: Icon(Icons.calendar_today_rounded, color: Colors.black, size: 20.dp),
+            suffixIconConstraints: const BoxConstraints(
+              minWidth: 0,
+              minHeight: 0,
+            ),
+            filled: true,
+            fillColor: Colors.white,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.dp),
+              borderSide: const BorderSide(color: Colors.black, width: 0.5),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.dp),
+              borderSide: const BorderSide(color: Colors.black, width: 0.5),
+            ),
+            contentPadding: EdgeInsets.symmetric(vertical: 12.dp),
+          ),
+        ),
+      ],
+    );
+  }
+
+  ///Date Picker for DOB Widget...
+  Future<void> pickDateOfBirth({
+    required BuildContext context,
+    required TextEditingController controller,
+    int minimumAge = 18,
+  }) async {
+    final DateTime today = DateTime.now();
+
+    final DateTime initialDate = DateTime(
+      today.year - minimumAge,
+      today.month,
+      today.day,
+    );
+
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(1900),
+      lastDate: initialDate,
+      helpText: "Select Date of Birth",
+      cancelText: "Cancel",
+      confirmText: "Confirm",
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Colors.deepOrange,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+
+            // 👇 Font styling (SUPPORTED)
+            textTheme: TextTheme(
+              headlineSmall: TextStyle(
+                fontFamily: objConstantFonts.montserratSemiBold,
+                fontSize: 18,
+              ),
+              titleMedium: TextStyle(
+                fontFamily: objConstantFonts.montserratMedium,
+                fontSize: 14,
+              ),
+              bodyMedium: TextStyle(
+                fontFamily: objConstantFonts.montserratRegular,
+                fontSize: 14,
+              ),
+            ),
+
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.deepOrange,
+                textStyle: TextStyle(
+                  fontFamily: objConstantFonts.montserratMedium,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (pickedDate != null) {
+      controller.text =
+      "${pickedDate.day.toString().padLeft(2, '0')}-"
+          "${pickedDate.month.toString().padLeft(2, '0')}-"
+          "${pickedDate.year}";
+    }
+  }
+
+  Widget customSingleDropdownField({
+    required BuildContext context,
+    required String placeholder,
+    required List<String> items,
+    required String? selectedValue,
+    required Function(String?) onChanged,
+    IconData? prefixIcon,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // ⭐ Label
+        objCommonWidgets.customText(
+          context,
+          placeholder,
+          12,
+          Colors.black,
+          objConstantFonts.montserratMedium,
+        ),
+
+        SizedBox(height: 5.dp),
+
+        // ⭐ Dropdown container
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.dp, vertical: 2.dp),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(13.dp),
+            border:  BoxBorder.all(color: Colors.black, width: 0.5),
+          ),
+          child: Row(
+            children: [
+              // Optional prefix icon
+              if (prefixIcon != null)
+                Padding(
+                  padding: EdgeInsets.only(right: 8.dp),
+                  child: Icon(prefixIcon, color: Colors.black, size: 20.dp,),
+                ),
+
+              SizedBox(width: 5.dp,),
+
+              // Dropdown
+              Expanded(
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: selectedValue,
+                    icon: const SizedBox.shrink(),
+                    dropdownColor: Colors.white,
+
+                    hint: objCommonWidgets.customText(
+                      context,
+                      placeholder,
+                      13,
+                      Colors.grey,
+                      objConstantFonts.montserratMedium,
+                    ),
+
+                    items: items.map((value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                          value,
+                          style: TextStyle(
+                            fontSize: 15.dp,
+                            color: (selectedValue == value) ? Colors.black : Colors.black.withAlpha(200),
+                            fontFamily: (selectedValue == value) ? objConstantFonts.montserratMedium : objConstantFonts.montserratRegular,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+
+                    onChanged: onChanged,
+                  ),
+                ),
+              ),
+
+              const Icon(
+                Icons.keyboard_arrow_down,
+                color: Colors.black,
+              ),
+
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+}
+
+enum CustomInputType {
+  normal,
+  mobile,
+  pincode,
+  gst,
+  pan,
+  ifsc,
+  bankAccount,
+  aadhaar,
+  fssai
+}
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+      ) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
+  }
 }

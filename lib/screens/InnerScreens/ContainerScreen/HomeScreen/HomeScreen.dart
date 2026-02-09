@@ -93,170 +93,169 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
         },
         color: objConstantColor.navyBlue,
         backgroundColor: objConstantColor.white,
-        child: Column(
-          children: [
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          child: Column(
+            children: [
 
-            /// 🔥 HEADER
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 15.dp),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFFFFA600),
-                    Color(0xFFFF6A00),
-                    Color(0xFFFF3D00),
-                    Color(0xFFFF3D00),
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+              /// 🔥 HEADER
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 15.dp),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFFFA600),
+                      Color(0xFFFF6A00),
+                      Color(0xFFFF3D00),
+                      Color(0xFFFF3D00),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30.dp),
+                    bottomRight: Radius.circular(30.dp),
+                  ),
                 ),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(30.dp),
-                  bottomRight: Radius.circular(30.dp),
-                ),
-              ),
-              child: SafeArea(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                child: SafeArea(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
 
-                    /// Top Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            objCommonWidgets.customText(
-                              context,
-                              'Good to see you again',
-                              15,
-                              objConstantColor.white,
-                              objConstantFonts.montserratBold,
-                            ),
-                            objCommonWidgets.customText(
-                              context,
-                              'Let’s find something natural today.',
-                              8,
-                              objConstantColor.white,
-                              objConstantFonts.montserratSemiBold,
-                            ),
-                          ],
-                        ),
-
-                        CupertinoButton(
-                          key: wishButtonKey,
-                          padding: EdgeInsets.zero,
-                          child: Image.asset(
-                            objConstantAssest.wishlist,
-                            width: 25.dp,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {
-                            userScreenNotifier
-                                .callNavigation(ScreenName.wishList);
-                          },
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: 15.dp),
-
-                    /// Location
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        objCommonWidgets.customText(
-                          context,
-                          'Delivery Location',
-                          12,
-                          Colors.white,
-                          objConstantFonts.montserratBold,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            userFrom = ScreenName.home;
-                            userScreenNotifier
-                                .callNavigation(ScreenName.map);
-                          },
-                          child: exactAddress.isNotEmpty
-                              ? Row(
+                      /// Top Row
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(Icons.location_on,
-                                  color: Colors.white, size: 15.dp),
-                              SizedBox(
-                                width: 120.dp,
-                                child: Text(
-                                  exactAddress,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 9.5.dp,
-                                    fontFamily: objConstantFonts
-                                        .montserratSemiBold,
+                              objCommonWidgets.customText(
+                                context,
+                                'Good to see you again',
+                                15,
+                                objConstantColor.white,
+                                objConstantFonts.montserratBold,
+                              ),
+                              objCommonWidgets.customText(
+                                context,
+                                'Let’s find something natural today.',
+                                8,
+                                objConstantColor.white,
+                                objConstantFonts.montserratSemiBold,
+                              ),
+                            ],
+                          ),
+
+                          CupertinoButton(
+                            key: wishButtonKey,
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size.zero,
+                            child: Image.asset(
+                              objConstantAssest.wishlist,
+                              width: 25.dp,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              userScreenNotifier
+                                  .callNavigation(ScreenName.wishList);
+                            },
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 10.dp),
+
+                      /// Location
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          objCommonWidgets.customText(
+                            context,
+                            'Delivery Location',
+                            12,
+                            Colors.white,
+                            objConstantFonts.montserratBold,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              userFrom = ScreenName.home;
+                              userScreenNotifier
+                                  .callNavigation(ScreenName.map);
+                            },
+                            child: exactAddress.isNotEmpty
+                                ? Row(
+                              children: [
+                                Icon(Icons.location_on,
+                                    color: Colors.white, size: 15.dp),
+                                SizedBox(
+                                  width: 120.dp,
+                                  child: Text(
+                                    exactAddress,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 9.5.dp,
+                                      fontFamily: objConstantFonts
+                                          .montserratSemiBold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Icon(Icons.keyboard_arrow_down_rounded,
-                                  color: Colors.white, size: 20.dp),
-                            ],
-                          )
-                              : Padding(
-                                padding: EdgeInsets.only(top: 5.dp),
-                                child: Container(
-                                                            padding: EdgeInsets.symmetric(
-                                  vertical: 6.dp, horizontal: 7.dp),
-                                                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                BorderRadius.circular(10.dp),
+                                Icon(Icons.keyboard_arrow_down_rounded,
+                                    color: Colors.white, size: 20.dp),
+                              ],
+                            )
+                                : Padding(
+                                  padding: EdgeInsets.only(top: 5.dp),
+                                  child: Container(
+                                                              padding: EdgeInsets.symmetric(
+                                    vertical: 6.dp, horizontal: 7.dp),
+                                                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius:
+                                  BorderRadius.circular(10.dp),
+                                                              ),
+                                                              child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.my_location_outlined,
+                                        color: objConstantColor.orange,
+                                        size: 15.dp),
+                                    SizedBox(width: 4.dp),
+                                    objCommonWidgets.customText(
+                                      context,
+                                      'Update Location',
+                                      10,
+                                      objConstantColor.orange,
+                                      objConstantFonts.montserratBold,
+                                    ),
+                                  ],
+                                                              ),
                                                             ),
-                                                            child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.my_location_outlined,
-                                      color: objConstantColor.orange,
-                                      size: 15.dp),
-                                  SizedBox(width: 4.dp),
-                                  objCommonWidgets.customText(
-                                    context,
-                                    'Update Location',
-                                    10,
-                                    objConstantColor.orange,
-                                    objConstantFonts.montserratBold,
-                                  ),
-                                ],
-                                                            ),
-                                                          ),
-                              ),
-                        ),
-                      ],
-                    ),
+                                ),
+                          ),
+                        ],
+                      ),
 
-                    SizedBox(height: 15.dp),
+                      SizedBox(height: 10.dp),
 
-                    /// Search
-                    CommonSearchField(
-                      controller: TextEditingController(),
-                      hintText: 'Search',
-                      onChanged: (value) {},
-                    ),
+                      /// Search
+                      CommonSearchField(
+                        controller: TextEditingController(),
+                        hintText: 'Search',
+                        onChanged: (value) {},
+                      ),
 
-                    SizedBox(height: 10.dp),
-                  ],
+                      SizedBox(height: 10.dp),
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-            SizedBox(height: 5.dp),
+              SizedBox(height: 5.dp),
 
-            Expanded(
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                physics: const BouncingScrollPhysics(),
-                child: Column(
+               Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
@@ -425,9 +424,9 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                     SizedBox(height: 10.dp),
                   ],
                 ),
-              ),
-            ),
-          ],
+
+            ],
+          ),
         ),
       ),
     );
@@ -862,14 +861,15 @@ class CommonSearchField extends StatelessWidget {
                   fontFamily: ConstantAssests.montserratRegular,
                 ),
                 onChanged: onChanged,
+                animationDuration: const Duration(milliseconds: 1220),
                 hintTexts: const [
-                  'Beetroot Microgreens',
-                  'Sunflower Microgreens',
-                  'Red Radish Microgreens',
-                  'White Radish Microgreens',
-                  'Pakchoi Microgreens',
-                  'Amaranthus Microgreens',
-                  'Green Mustard Microgreens',
+                  ' Micro greens',
+                  'Hair Oil',
+                  'Body Lotion',
+                  'White Radish Micro greens',
+                  'Ayurvedic Products',
+                  'Saffron',
+                  'Protein Rich',
                 ],
                 decoration: const InputDecoration(
                   isDense: true,

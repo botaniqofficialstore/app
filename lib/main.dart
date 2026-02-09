@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'Utility/Logger.dart';
+import 'package:flutter/services.dart';
 import 'Utility/PushNotificationService/NotificationService.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -12,6 +13,10 @@ Future<void> main() async {
   await Firebase.initializeApp();
   await NotificationService.init();
   FirebaseMessaging.onBackgroundMessage(_backgroundHandler);
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
 
   runApp(
     const ProviderScope(child: BotaniQ()),

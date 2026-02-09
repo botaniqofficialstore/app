@@ -1,7 +1,10 @@
+import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/EditProfileScreen/EditProfilePopupVIew.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../../CodeReusable/CodeReusability.dart';
 import '../../../../CodeReusable/CommonWidgets.dart';
+import '../../../../Utility/MediaHandler.dart';
 import '../../../../Utility/PreferencesManager.dart';
 import '../../../../constants/Constants.dart';
 import '../../../commonViews/ProfileUpdateSuccessPopup.dart';
@@ -16,6 +19,11 @@ class EditProfileScreenGlobalState {
   final TextEditingController emailController;
   final TextEditingController mobileNumberController;
   final TextEditingController addressController;
+  final bool showEdit;
+  final bool isExpandedButton;
+  final String profileImage;
+  final TextEditingController dobController;
+  final String? gender;
 
   EditProfileScreenGlobalState({
     this.currentModule = ScreenName.home,
@@ -24,6 +32,11 @@ class EditProfileScreenGlobalState {
     required this.emailController,
     required this.mobileNumberController,
     required this.addressController,
+    this.showEdit = false,
+    this.isExpandedButton = false,
+    required this.profileImage,
+    required this.dobController,
+    this.gender,
   });
 
   EditProfileScreenGlobalState copyWith({
@@ -33,6 +46,11 @@ class EditProfileScreenGlobalState {
     TextEditingController? emailController,
     TextEditingController? mobileNumberController,
     TextEditingController? addressController,
+    bool? showEdit,
+    bool? isExpandedButton,
+    String? profileImage,
+    TextEditingController? dobController,
+    String? gender,
   }) {
     return EditProfileScreenGlobalState(
       currentModule: currentModule ?? this.currentModule,
@@ -41,6 +59,11 @@ class EditProfileScreenGlobalState {
       emailController: emailController ?? this.emailController,
       mobileNumberController: mobileNumberController ?? this.mobileNumberController,
       addressController: addressController ?? this.addressController,
+      showEdit: showEdit ?? this.showEdit,
+      isExpandedButton: isExpandedButton ?? this.isExpandedButton,
+        profileImage: profileImage ?? this.profileImage,
+      dobController: dobController ?? this.dobController,
+      gender: gender ?? this.gender,
     );
   }
 }
@@ -53,12 +76,25 @@ class EditProfileScreenGlobalStateNotifier
     emailController: TextEditingController(),
     mobileNumberController: TextEditingController(),
     addressController: TextEditingController(),
+    profileImage: '', dobController: TextEditingController(),
+
   ));
 
-  @override
-  void dispose() {
-    super.dispose();
 
+  void onChanged() {
+    state = state.copyWith();
+  }
+
+  void toggleEdit(bool value) => state = state.copyWith(showEdit: value);
+  void toggleExpandBtn(bool value) => state = state.copyWith(isExpandedButton: value);
+  void updateGender(String type) => state = state.copyWith(gender: type);
+
+  ///Mark:-  Profile Image Upload
+  Future<void> uploadImage(BuildContext context) async {
+    final imagePath = await MediaHandler().handleCommonMediaPicker(context, ImageSource.gallery);
+    if (imagePath != null) {
+      state = state.copyWith(profileImage: imagePath);
+    }
   }
 
   ///This method is used to get the user profile details from local
@@ -76,11 +112,13 @@ class EditProfileScreenGlobalStateNotifier
       emailController: TextEditingController(text: userEmailID),
       mobileNumberController: TextEditingController(text: userMobileNumber),
       addressController: TextEditingController(text: userAddress),
+        profileImage: 'https://i.pravatar.cc/150?u=123',
+      gender: 'Male',
     );
   }
 
   ///This method is used to check empty validation
-  void checkEmptyValidation(BuildContext context, MainScreenGlobalStateNotifier notifier){
+  void checkEmptyValidation(BuildContext context){
     if (!context.mounted) return;
     CodeReusability.hideKeyboard(context);
 
@@ -97,14 +135,14 @@ class EditProfileScreenGlobalStateNotifier
     } else if (!CodeReusability.isValidMobileNumber(state.mobileNumberController.text)){
       CodeReusability().showAlert(context, 'Please Enter a valid mobile number');
     } else {
-      callEditProfileAPI(context, notifier);
+      callEditProfileAPI(context);
     }
 
   }
 
 
   ///This method used to call Edit Profile PUT API
-  void callEditProfileAPI(BuildContext context, MainScreenGlobalStateNotifier notifier) {
+  void callEditProfileAPI(BuildContext context) {
     if (!context.mounted) return;
 
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
@@ -134,7 +172,9 @@ class EditProfileScreenGlobalStateNotifier
             prefs.setStringValue(PreferenceKeys.userAddress, '${requestBody['address']}');
 
             CommonWidgets().showLoadingBar(false, context); //  Loading bar is disabled Here
-            callNavigation(context, notifier);
+            //callNavigation(context, notifier);
+            Navigator.pop(context);
+            callOrderSuccessPopup(context);
           } else {
             CommonWidgets().showLoadingBar(false, context);
             CodeReusability().showAlert(context, response.message ?? "something Went Wrong");
@@ -156,6 +196,16 @@ class EditProfileScreenGlobalStateNotifier
     callOrderSuccessPopup(context);
   }
 
+  void callEditProfilePopupView(BuildContext context){
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) => const EditProfilePopupView(
+        ),
+      ),
+    );
+  }
+
 
   //MARK:- Common Views
   ///
@@ -175,9 +225,193 @@ class EditProfileScreenGlobalStateNotifier
 
 
 
-final EditProfileScreenGlobalStateProvider = StateNotifierProvider.autoDispose<
+final editProfileScreenStateProvider = StateNotifierProvider.autoDispose<
     EditProfileScreenGlobalStateNotifier, EditProfileScreenGlobalState>((ref) {
   var notifier = EditProfileScreenGlobalStateNotifier();
   return notifier;
 });
 
+/// Header
+/*Stack(
+                      children: [
+                        Image.asset(
+                          objConstantAssest.addImage8,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: 180.dp,
+                        ),
+
+                        Positioned(
+                          left: 15.dp,
+                          bottom: 10.dp,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              objCommonWidgets.customText(
+                                context,
+                                'Edit Profile',
+                                25,
+                                objConstantColor.white,
+                                objConstantFonts.montserratSemiBold,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        /// Back Button
+                        Positioned(
+                          top: 0.dp,
+                          left: 15.dp,
+                          child: SafeArea(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.6),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: CupertinoButton(
+                                padding: EdgeInsets.all(4.dp),
+                                minimumSize: const Size(0, 0),
+                                borderRadius: BorderRadius.circular(30),
+                                child: Image.asset(
+                                  objConstantAssest.backIcon,
+                                  color: objConstantColor.white,
+                                  width: 25.dp,
+                                ),
+                                onPressed: () {
+                                  ref.watch(MainScreenGlobalStateProvider.notifier)
+                                      .callNavigation(ScreenName.profile);
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+
+
+                      ],
+                    ),
+
+                    SizedBox(height: 20.dp),
+
+                    /// Info Section
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 15.dp),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          objCommonWidgets.customText(context, 'First Name', 15, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+                          CommonTextField(
+                            controller: screenState.firstNameController,
+                            placeholder: "Enter First Name",
+                            textSize: 15,
+                            fontFamily: objConstantFonts.montserratMedium,
+                            textColor: objConstantColor.navyBlue,
+                            isNumber: false, // alphabetic
+                            onChanged: (value) {
+
+                            },
+                          ),
+                          SizedBox(height: 10.dp,),
+
+
+                          objCommonWidgets.customText(context, 'Last Name', 15, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+                          CommonTextField(
+                            controller: screenState.lastNameController,
+                            placeholder: "Enter Last Name",
+                            textSize: 15,
+                            fontFamily: objConstantFonts.montserratMedium,
+                            textColor: objConstantColor.navyBlue,
+                            isNumber: false, // alphabetic
+                            onChanged: (value) {
+
+                            },
+                          ),
+                          SizedBox(height: 10.dp,),
+
+
+                          objCommonWidgets.customText(context, 'Email Address', 15, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+                          CommonTextField(
+                            controller: screenState.emailController,
+                            placeholder: "Enter Email Address",
+                            textSize: 15,
+                            fontFamily: objConstantFonts.montserratMedium,
+                            textColor: objConstantColor.navyBlue,
+                            isNumber: false, // alphabetic
+                            onChanged: (value) {
+
+                            },
+                          ),
+                          SizedBox(height: 10.dp,),
+
+
+                          objCommonWidgets.customText(context, 'Mobile Number', 15, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+                          Row(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.symmetric(vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 5,
+                                      offset: const Offset(0, 1),
+                                    ),
+                                  ],
+                                  border: Border.all(color: Colors.grey, width: 1),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.all(10.dp),
+                                  child: objCommonWidgets.customText(context,
+                                      '+91', 15,
+                                      objConstantColor.navyBlue,
+                                      objConstantFonts.montserratSemiBold
+                                  ),
+                                ),
+                              ),
+
+                              SizedBox(width: 10.dp,),
+
+                              Expanded(
+                                child: CommonTextField(
+                                  controller: screenState.mobileNumberController,
+                                  placeholder: "Enter Mobile Number",
+                                  textSize: 15,
+                                  fontFamily: objConstantFonts.montserratMedium,
+                                  textColor: objConstantColor.navyBlue,
+                                  isNumber: true, // alphabetic
+                                  onChanged: (value) {
+
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: 15.dp,),
+
+                          Padding(
+                            padding: EdgeInsets.only(top: 10.dp, bottom: 20.dp),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: CupertinoButton(
+                                padding: EdgeInsets.symmetric(vertical: 10.dp),
+                                color: objConstantColor.orange,
+                                borderRadius: BorderRadius.circular(25.dp),
+                                onPressed: () {
+                                  screenNotifier.checkEmptyValidation(context, userScreenNotifier);
+                                },
+                                child: objCommonWidgets.customText(
+                                  context,
+                                  'Save',
+                                  18,
+                                  objConstantColor.white,
+                                  objConstantFonts.montserratSemiBold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),*/

@@ -19,97 +19,100 @@ class ProfileUpdateSuccesspopup extends StatelessWidget {
         borderRadius: BorderRadius.circular(25.dp),
       ),
       backgroundColor: Colors.transparent,
-      child: Container(
-        decoration: BoxDecoration(
-          color: objConstantColor.white,
-          borderRadius: BorderRadius.circular(25.dp),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(height: 30.dp),
-
-            // Success Animation
-            Lottie.asset(
-              objConstantAssest.profileSuccess,
-              animate: true,
-              repeat: false,
-              height: 120.dp,
-            ),
-            SizedBox(height: 10.dp),
-
-            // Headline
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.dp),
-              child: objCommonWidgets.customText(
-                context,
-                'Profile Updated!',
-                20,
-                objConstantColor.navyBlue,
-                objConstantFonts.montserratSemiBold,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25.dp),
+        child: Container(
+          decoration: BoxDecoration(
+            color: objConstantColor.white,
+            borderRadius: BorderRadius.circular(25.dp),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-            ),
-            SizedBox(height: 20.dp),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(height: 30.dp),
 
-            // Motivational / positive subtext
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.dp),
-              child: objCommonWidgets.customText(
-                context,
-                'Great! Your journey just got a fresh update.',
-                15,
-                objConstantColor.navyBlue,
-                objConstantFonts.montserratMedium,
-                textAlign: TextAlign.center,
+              // Success Animation
+              Lottie.asset(
+                objConstantAssest.profileSuccess,
+                animate: true,
+                repeat: false,
+                height: 120.dp,
               ),
-            ),
-            SizedBox(height: 8.dp),
+              SizedBox(height: 10.dp),
 
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.dp),
-              child: objCommonWidgets.customText(
-                context,
-                'Keep going, the best is yet to come!',
-                13,
-                objConstantColor.navyBlue,
-                objConstantFonts.montserratRegular,
-                textAlign: TextAlign.center,
-                //textAlign: TextAlign.center,
-              ),
-            ),
-
-            SizedBox(height: 30.dp),
-
-            // Full-width CTA button
-            SizedBox(
-              width: double.infinity,
-              child: CupertinoButton(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(25.dp),
-                  bottomRight: Radius.circular(25.dp),
-                ),
-                color: objConstantColor.navyBlue,
-                padding: EdgeInsets.symmetric(vertical: 18.dp),
+              // Headline
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.dp),
                 child: objCommonWidgets.customText(
                   context,
-                  'Got It',
-                  18,
-                  objConstantColor.white,
-                  objConstantFonts.montserratBold,
+                  'Profile Updated!',
+                  20,
+                  objConstantColor.navyBlue,
+                  objConstantFonts.montserratSemiBold,
                 ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
               ),
-            ),
-          ],
+              SizedBox(height: 20.dp),
+
+              // Motivational / positive subtext
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.dp),
+                child: objCommonWidgets.customText(
+                  context,
+                  'Great! Your journey just got a fresh update.',
+                  13,
+                  objConstantColor.navyBlue,
+                  objConstantFonts.montserratMedium,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              SizedBox(height: 8.dp),
+
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.dp),
+                child: objCommonWidgets.customText(
+                  context,
+                  'Keep going, the best is yet to come!',
+                  10,
+                  objConstantColor.black,
+                  objConstantFonts.montserratMedium,
+                  textAlign: TextAlign.center,
+                  //textAlign: TextAlign.center,
+                ),
+              ),
+
+              SizedBox(height: 30.dp),
+
+              // Full-width CTA button
+              SizedBox(
+                width: double.infinity,
+                child: CupertinoButton(
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(0),
+                    topLeft: Radius.circular(0),
+                  ),
+                  color: objConstantColor.navyBlue,
+                  padding: EdgeInsets.symmetric(vertical: 15.dp),
+                  child: objCommonWidgets.customText(
+                    context,
+                    'Close',
+                    18,
+                    objConstantColor.white,
+                    objConstantFonts.montserratSemiBold,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
