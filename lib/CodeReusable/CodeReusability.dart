@@ -587,10 +587,8 @@ class CodeReusability {
   }
 
 
-
-
   double _getFontSize(String text) {
-    if (text.length <= 20) return 15.dp;
+    if (text.length <= 20) return 13.dp;
     if (text.length <= 30) return 13.dp;
     return 12.dp;
   }

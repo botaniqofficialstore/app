@@ -15,19 +15,23 @@ import 'WishListRepository.dart';
 class WishListScreenGlobalState {
   final ScreenName currentModule;
   final List<WishListItem> wishListItems;
+  final bool isLoading;
 
   WishListScreenGlobalState({
     this.currentModule = ScreenName.home,
     this.wishListItems = const [],
+    this.isLoading = false,
   });
 
   WishListScreenGlobalState copyWith({
     ScreenName? currentModule,
     List<WishListItem>? wishListItems,
+    bool? isLoading,
   }) {
     return WishListScreenGlobalState(
       currentModule: currentModule ?? this.currentModule,
       wishListItems: wishListItems ?? this.wishListItems,
+      isLoading: isLoading ?? this.isLoading,
     );
   }
 }
@@ -53,9 +57,12 @@ class WishListScreenGlobalStateNotifier
 
   ///This method is used to get Wish list using GET API
   Future<void> callWishListGepAPI(BuildContext context) async {
+    if (state.isLoading) return;
+
+    state = state.copyWith(isLoading: true);
+
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
       if (isConnected) {
-        CommonWidgets().showLoadingBar(true, context);
         var prefs = await PreferencesManager.getInstance();
         String userID = prefs.getStringValue(PreferenceKeys.userID) ?? '';
         WishListRepository().callWishListApi(
@@ -66,17 +73,16 @@ class WishListScreenGlobalStateNotifier
                 Logger().log('###---> Wish List API Response: $response');
 
                 // ✅ Update the UI state with fetched data
-                state = state.copyWith(wishListItems: wishListResponse.data ?? []);
+                state = state.copyWith(wishListItems: wishListResponse.data ?? [], isLoading: false);
               } else {
                 Logger().log('###---> Response: $response');
                 CodeReusability().showAlert(context, wishListResponse.message ?? "something Went Wrong");
               }
 
-              CommonWidgets().showLoadingBar(false, context);
             });
       } else {
-        CodeReusability().showAlert(
-            context, 'Please Check Your Internet Connection');
+        state = state.copyWith(isLoading: false);
+        CodeReusability().showAlert(context, 'Please Check Your Internet Connection');
       }
     });
   }

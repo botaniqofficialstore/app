@@ -1,3 +1,4 @@
+import 'package:botaniqmicrogreens/Utility/Logger.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/EditProfileScreen/EditProfilePopupVIew.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -106,12 +107,15 @@ class EditProfileScreenGlobalStateNotifier
     final userMobileNumber = manager.getStringValue(PreferenceKeys.userMobileNumber);
     final userAddress = manager.getStringValue(PreferenceKeys.userAddress);
 
+    Logger().log('exactAddress ========> $exactAddress');
+
     state = state.copyWith(
       firstNameController: TextEditingController(text: userFirstName),
       lastNameController: TextEditingController(text: userLastName),
       emailController: TextEditingController(text: userEmailID),
       mobileNumberController: TextEditingController(text: userMobileNumber),
       addressController: TextEditingController(text: userAddress),
+        dobController: TextEditingController(text: '17/08/2000'),
         profileImage: 'https://i.pravatar.cc/150?u=123',
       gender: 'Male',
     );
@@ -213,7 +217,7 @@ class EditProfileScreenGlobalStateNotifier
   //////
   void callOrderSuccessPopup(BuildContext context) {
     if (!context.mounted) return;
-    ProfileUpdateSuccesspopup.showSuccessConfirmationPopup(
+    ProfileUpdateSuccessPopup.showSuccessConfirmationPopup(
         context, onDonePressed: () {
       Navigator.pop(context);
     });

@@ -4,8 +4,10 @@ import 'package:botaniqmicrogreens/screens/Authentication/LoginScreen/LoginScree
 import 'package:botaniqmicrogreens/screens/Authentication/OtpScreen/OtpScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/CartScreen/CartScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/EditProfileScreen/EditProfileScreen.dart';
+import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/FamilyLocationScreen/FamilyLocationScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/HomeScreen/HomeScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/InformationScreen/InformationScreen.dart';
+import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/LocationScreen/LocationScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/OrderDetailsScreen/OrderDetailsScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/OrderSummaryScreen/OrderSummaryScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/ProductDetail/ProductDetailScreen.dart';
@@ -120,9 +122,11 @@ class MainScreenGlobalStateNotifier
     } else if (state.currentModule == ScreenName.orderDetails) {
       return const OrderDetailsScreen();
     } else if (state.currentModule == ScreenName.map) {
-      return const MapScreen();
+      return const LocationScreen();
     } else if (state.currentModule == ScreenName.information){
       return const InformationScreen();
+    } else if (state.currentModule == ScreenName.familyAndFriends){
+      return const FamilyLocationScreen();
     } else {
       return const HomeScreen();
     }
@@ -138,10 +142,11 @@ class MainScreenGlobalStateNotifier
         module == ScreenName.reels ||
         module == ScreenName.orders ||
         module == ScreenName.profile ||
-        module == ScreenName.productDetail ||
-        module == ScreenName.wishList ) {
+        module == ScreenName.productDetail) {
       onScreen = ScreenName.home;
-    } else if (module == ScreenName.editProfile || module == ScreenName.information) {
+    } else if (module == ScreenName.editProfile ||
+        module == ScreenName.information ||
+    module == ScreenName.familyAndFriends) {
       onScreen = ScreenName.profile;
     } else if (module == ScreenName.orderSummary) {
       onScreen = ScreenName.cart;
@@ -157,9 +162,28 @@ class MainScreenGlobalStateNotifier
       } else {
         onScreen = ScreenName.home;
       }
+    } else if (module == ScreenName.wishList){
+      if (userFrom == ScreenName.home){
+        onScreen = ScreenName.home;
+      } else {
+        onScreen = ScreenName.profile;
+      }
     }
 
     state = state.copyWith(currentModule: onScreen);
+  }
+
+
+  void callBackNavigationFromLocationScreen(){
+    if (userFrom == ScreenName.home){
+      callNavigation(ScreenName.home);
+    } else if (userFrom == ScreenName.productDetail) {
+      callNavigation(ScreenName.productDetail);
+    } else if (userFrom == ScreenName.profile) {
+      callNavigation(ScreenName.profile);
+    } else{
+      callNavigation(ScreenName.editProfile);
+    }
   }
 
   ///This method is used to update product details screen UI

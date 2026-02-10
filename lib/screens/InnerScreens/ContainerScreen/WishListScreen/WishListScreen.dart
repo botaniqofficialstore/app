@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../../../CodeReusable/utilities.dart';
 import '../../../../Utility/NetworkImageLoader.dart';
 import '../../../../constants/ConstantAssests.dart';
@@ -62,7 +63,7 @@ class WishListScreenState extends ConsumerState<WishListScreen> {
                       padding: EdgeInsets.zero,
                       child: Image.asset(
                         objConstantAssest.backIcon,
-                        width: 20.dp,
+                        width: 15.dp,
                       ),
                       onPressed: () {
                         userScreenNotifier.callNavigation(ScreenName.home);
@@ -71,96 +72,161 @@ class WishListScreenState extends ConsumerState<WishListScreen> {
                     SizedBox(width: 5.dp),
                     CommonWidget().customeText(
                       'My WishList',
-                      15,
+                      13,
                       objConstantColor.navyBlue,
-                      ConstantAssests.montserratSemiBold,
+                      ConstantAssests.montserratMedium,
                     ),
                   ],
                 ),
               ),
             ),
       
-            SizedBox(height: 20.dp),
-      
-            /// Body (with pull to refresh)
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  await wishListScreenNotifier.callWishListGepAPI(context);
-                },
-                color: objConstantColor.navyBlue,
-                backgroundColor: objConstantColor.white,
-                child: wishListData.isNotEmpty
-                    ? GridView.builder(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 0),
-                  gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 0.60,
-                  ),
-                  itemCount: wishListData.length,
-                  itemBuilder: (context, index) {
-                    final item = wishListData[index];
-                    final product = item.productDetails!;
-                    return _buildProductCard(
-                        item, product, index, wishListScreenNotifier);
-                  },
-                )
-                    : SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.7,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            objConstantAssest.noWish,
-                            width: 65.dp,
-                          ),
-                          Text(
-                            "Your wishlist is empty.",
-                            style: TextStyle(
-                              color: objConstantColor.gray,
-                              fontSize: 13.dp,
-                              fontFamily:
-                              ConstantAssests.montserratMedium,
-                            ),
-                          ),
-      
-                          SizedBox(height: 20.dp),
-      
-                          CupertinoButton(padding: EdgeInsets.zero,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: objConstantColor.orange,
-                                    borderRadius: BorderRadius.circular(5.dp)
-                                ),
-                                padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
-                                child: objCommonWidgets.customText(context,
-                                    'Add New Products',
-                                    14, objConstantColor.white,
-                                    objConstantFonts.montserratBold),
-                              ),
-                              onPressed: (){
-                                userScreenNotifier.callNavigation(ScreenName.home);
-                              })
-                        ],
+            SizedBox(height: 10.dp),
+
+            if (wishListState.isLoading)...{
+              Expanded(
+                child: buildProductShimmer(),
+              )
+            } else if (!wishListState.isLoading && wishListData.isNotEmpty)...{
+              Expanded(
+                child: RefreshIndicator(
+                    onRefresh: () async {
+                      await wishListScreenNotifier.callWishListGepAPI(context);
+                    },
+                    color: objConstantColor.navyBlue,
+                    backgroundColor: objConstantColor.white,
+                    child: GridView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 0),
+                      gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                        childAspectRatio: 0.60,
                       ),
+                      itemCount: wishListData.length,
+                      itemBuilder: (context, index) {
+                        final item = wishListData[index];
+                        final product = item.productDetails!;
+                        return _buildProductCard(
+                            item, product, index, wishListScreenNotifier);
+                      },
+                    )
+                ),
+              ),
+            } else...{
+              SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          objConstantAssest.noWish,
+                          width: 65.dp,
+                        ),
+                        Text(
+                          "Your wishlist is empty.",
+                          style: TextStyle(
+                            color: objConstantColor.gray,
+                            fontSize: 13.dp,
+                            fontFamily:
+                            ConstantAssests.montserratMedium,
+                          ),
+                        ),
+
+                        SizedBox(height: 5.dp),
+
+                        CupertinoButton(padding: EdgeInsets.zero,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: objConstantColor.orange,
+                                  borderRadius: BorderRadius.circular(5.dp)
+                              ),
+                              padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                              child: objCommonWidgets.customText(context,
+                                  'Add New Products',
+                                  12, objConstantColor.white,
+                                  objConstantFonts.montserratSemiBold),
+                            ),
+                            onPressed: (){
+                              userScreenNotifier.callNavigation(ScreenName.home);
+                            })
+                      ],
                     ),
                   ),
                 ),
-              ),
-            ),
+              )
+            },
+      
+            /// Body (with pull to refresh)
+
       
             SizedBox(height: 10.dp),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget buildProductShimmer() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15.dp),
+      child: GridView.builder(
+        itemCount: 6, // Number of shimmer placeholders
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: 0.75,
+        ),
+        itemBuilder: (context, index) {
+          return Shimmer.fromColors(
+            baseColor: Colors.grey.shade300,
+            highlightColor: Colors.grey.shade100,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Image placeholder
+                  Container(
+                    height: 120,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Text placeholders
+                  Container(
+                    height: 14,
+                    width: 100,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    height: 14,
+                    width: 60,
+                    color: Colors.grey,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -188,7 +254,7 @@ class WishListScreenState extends ConsumerState<WishListScreen> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(10.dp),
               boxShadow: [
-                BoxShadow(color: Colors.black.withAlpha(35), blurRadius: 15, offset: const Offset(0, 8)),
+                BoxShadow(color: Colors.black.withAlpha(55), blurRadius: 5, offset: const Offset(0, 2)),
               ],
             ),
             child: Column(
@@ -301,7 +367,7 @@ class WishListScreenState extends ConsumerState<WishListScreen> {
 
                         objCommonWidgets.customText(context,
                             "${product.gram}gm",
-                            12, objConstantColor.black, objConstantFonts.montserratSemiBold),
+                            11, objConstantColor.black, objConstantFonts.montserratMedium),
 
                         SizedBox(height: 10.dp),
 

@@ -60,17 +60,14 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
                 children: [
 
 
-                  CupertinoButton(
-                    minimumSize: const Size(0, 0),
-                    padding: EdgeInsets.zero,
+                  CupertinoButton(padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    child: Icon(Icons.arrow_back_rounded,
+                        color: Colors.black,
+                        size: 18.dp),
                     onPressed: () {
                       mainScreenNotifier.callNavigation(ScreenName.home);
                     },
-                    child: Icon(
-                      Icons.arrow_back_sharp,
-                      size: 20.9.dp,
-                      color: Colors.black,
-                    ),
                   ),
 
                   SizedBox(width: 5.dp),
@@ -78,7 +75,7 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
                   objCommonWidgets.customText(
                     context,
                     'Account',
-                    18,
+                    15,
                     objConstantColor.navyBlue,
                     objConstantFonts.montserratSemiBold,
                   ),
@@ -128,7 +125,7 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
 
 
                     /// PROFILE + LOCATION
-                    Padding(
+                   /* Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10.dp),
                       child: Container(
                         padding: EdgeInsets.symmetric(vertical: 15.dp, horizontal: 10.dp),
@@ -146,8 +143,7 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     title: 'Profile',
                                     subtitle: 'View & edit details',
                                     onTap: () {
-                                      mainScreenNotifier
-                                          .callNavigation(ScreenName.editProfile);
+                                      mainScreenNotifier.callNavigation(ScreenName.editProfile);
                                     },
                                   ),
                                 ),
@@ -178,7 +174,37 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
                           ],
                         ),
                       ),
+                    ),*/
+
+                    SizedBox(height: 10.dp),
+
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.dp),
+                      child: objCommonWidgets.customText(
+                        context,
+                        'Personal & Quick actions',
+                        10,
+                        objConstantColor.navyBlue,
+                        objConstantFonts.montserratMedium,
+                      ),
                     ),
+                    SizedBox(height: 5.dp),
+
+                    Container(
+                      color: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                      child: objCommonWidgets.customText(
+                          context,
+                          'Access and control everything related to your account, orders, and shopping preferences.',
+                          10,
+                          objConstantColor.navyBlue,
+                          objConstantFonts.montserratMedium
+                      ),
+                    ),
+
+                    SizedBox(height: 10.dp),
+
+                    optionsView(),
 
                     SizedBox(height: 30.dp),
 
@@ -344,6 +370,56 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+
+  Widget optionsView(){
+    final mainScreenNotifier = ref.read(MainScreenGlobalStateProvider.notifier);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        commonBtn('Profile', (){
+          mainScreenNotifier.callNavigation(ScreenName.editProfile);
+        }),
+        SizedBox(height: 2.dp),
+        commonBtn('Delivery Location', (){
+          userFrom = ScreenName.profile;
+          mainScreenNotifier.callNavigation(ScreenName.map);
+        }),
+        SizedBox(height: 2.dp),
+        commonBtn('Order History', (){}),
+        SizedBox(height: 2.dp),
+        commonBtn('My Wishlist', (){
+          userFrom = ScreenName.profile;
+          mainScreenNotifier.callNavigation(ScreenName.wishList);
+        }),
+        SizedBox(height: 2.dp),
+        commonBtn('Buy for friends & Family', (){
+          mainScreenNotifier.callNavigation(ScreenName.familyAndFriends);
+        }),
+        SizedBox(height: 2.dp),
+        commonBtn('Delete Account', (){}),
+      ],
+    );
+  }
+
+  Widget commonBtn(String title, VoidCallback onClick){
+    return Container(
+      width: double.infinity,
+      color: Colors.white,
+      child: CupertinoButton(
+          padding: EdgeInsets.symmetric(vertical: 13.dp, horizontal: 15.dp),
+          minimumSize: Size.zero,
+          onPressed: onClick,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              objCommonWidgets.customText(context, title, 11.5, Colors.black, objConstantFonts.montserratMedium),
+              Icon(Icons.chevron_right, size: 18.dp, color: Colors.black,)
+            ],
+          )),
+    );
+  }
+
   Widget switchButton(BuildContext context, String title, bool status, ValueChanged<bool> action) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 15.dp),
@@ -356,9 +432,9 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
             child: objCommonWidgets.customText(
               context,
               title,
-              12.5,
-              objConstantColor.navyBlue,
-              objConstantFonts.montserratSemiBold,
+              11.5,
+              Colors.black,
+              objConstantFonts.montserratMedium,
             ),
           ),
           // Shrink the switch here
@@ -416,7 +492,7 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: Icon(icon, size: 20.dp, color: objConstantColor.orange),
             ),
             SizedBox(height: 14.dp),
-            objCommonWidgets.customText(context, title, 15, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+            objCommonWidgets.customText(context, title, 13, Colors.black, objConstantFonts.montserratMedium),
             SizedBox(height: 2.dp),
             objCommonWidgets.customText(context, subtitle, 10.5, Colors.grey.shade600, objConstantFonts.montserratMedium),
 
@@ -451,16 +527,16 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(icon, size: 20.dp, color: const Color(0xFF000000)),
+              Icon(icon, size: 16.dp, color: Colors.black),
               SizedBox(width: 5.dp),
               objCommonWidgets.customText(
                   context,
-                  title, 13.5,
-                  const Color(0xFF555250),
-                  objConstantFonts.montserratSemiBold
+                  title, 11.5,
+                  Colors.black,
+                  objConstantFonts.montserratMedium
               ),
               const Spacer(),
-              Icon(Icons.keyboard_arrow_right, color: const Color(0xFF000000), size: 20.dp),
+              Icon(Icons.chevron_right, size: 18.dp, color: Colors.black,)
             ],
           ),
         ),

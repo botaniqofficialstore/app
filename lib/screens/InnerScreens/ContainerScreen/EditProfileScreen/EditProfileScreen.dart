@@ -78,10 +78,6 @@ class EditProfileScreenState extends ConsumerState<EditProfileScreen> with Ticke
                           SizedBox(height: 15.dp),
                           contactDetailsView(),
                           SizedBox(height: 15.dp),
-                          addressDetailsView(),
-                          SizedBox(height: 40.dp),
-
-                          moreOptionsView(),
                         ],
                       ),
                     ),
@@ -144,42 +140,7 @@ class EditProfileScreenState extends ConsumerState<EditProfileScreen> with Ticke
     );
   }
 
-  Widget moreOptionsView(){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15.dp),
-          child: objCommonWidgets.customText(
-            context,
-            'More Options',
-            13,
-            objConstantColor.black,
-            objConstantFonts.montserratMedium,
-          ),
-        ),
-        SizedBox(height: 5.dp),
-        commonBtn('Order History', (){}),
-        Divider(color: Colors.black.withAlpha(85), thickness: 0.5.dp, height: 0,),
-        commonBtn('My Wishlist', (){}),
-        Divider(color: Colors.black.withAlpha(85), thickness: 0.5.dp, height: 0,),
-        commonBtn('Buy for friends & Family', (){}),
-      ],
-    );
-  }
 
-  Widget commonBtn(String title, VoidCallback onClick){
-    return Container(
-      width: double.infinity,
-      color: Colors.white,
-      child: CupertinoButton(
-          padding: EdgeInsets.symmetric(vertical: 13.dp, horizontal: 15.dp),
-          minimumSize: Size.zero,
-          onPressed: onClick,
-          child: Align(alignment: Alignment.centerLeft,
-              child: objCommonWidgets.customText(context, title, 12, Colors.black, objConstantFonts.montserratMedium))),
-    );
-  }
 
   Widget genderDobView(){
     return Column(
@@ -255,39 +216,6 @@ class EditProfileScreenState extends ConsumerState<EditProfileScreen> with Ticke
     );
   }
 
-  Widget addressDetailsView(){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15.dp),
-          child: objCommonWidgets.customText(
-            context,
-            'Delivery Address',
-            13,
-            objConstantColor.black,
-            objConstantFonts.montserratMedium,
-          ),
-        ),
-
-        SizedBox(height: 5.dp),
-
-        Container(
-          color: Colors.white,
-          width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              titleAndValue('Address', exactAddress),
-            ],
-          ),
-        )
-
-      ],
-    );
-  }
-
-
   Widget titleAndValue(String title, String value){
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15.dp, vertical: 7.dp),
@@ -326,7 +254,7 @@ class EditProfileScreenState extends ConsumerState<EditProfileScreen> with Ticke
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 20.dp),
+              SizedBox(height: 30.dp),
               Stack(
                 alignment: Alignment.center,
                 children: [

@@ -48,7 +48,7 @@ class EditProfilePopupViewState extends ConsumerState<EditProfilePopupView> {
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+            padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 15.dp),
             child: Column(
               children: [
                 

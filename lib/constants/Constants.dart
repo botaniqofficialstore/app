@@ -89,7 +89,8 @@ enum ScreenName {
   termsAndCondition,
   refundPolicy,
   shippingPolicy,
-  aboutUS
+  aboutUS,
+  familyAndFriends
 }
 
 

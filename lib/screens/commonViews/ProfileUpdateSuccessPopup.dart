@@ -5,10 +5,10 @@ import 'package:flutter_sizer/flutter_sizer.dart';
 import 'package:lottie/lottie.dart';
 
 
-class ProfileUpdateSuccesspopup extends StatelessWidget {
+class ProfileUpdateSuccessPopup extends StatelessWidget {
   final VoidCallback onDonePressed;
 
-  const ProfileUpdateSuccesspopup(
+  const ProfileUpdateSuccessPopup(
       {super.key, required this.onDonePressed});
 
 
@@ -153,7 +153,7 @@ class ProfileUpdateSuccesspopup extends StatelessWidget {
               onPopInvokedWithResult: (v, b) async {
 
               },
-              child: ProfileUpdateSuccesspopup(onDonePressed: onDonePressed ?? () {}),
+              child: ProfileUpdateSuccessPopup(onDonePressed: onDonePressed ?? () {}),
             );
           },
         );

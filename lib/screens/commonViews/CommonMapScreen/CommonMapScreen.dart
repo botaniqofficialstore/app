@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -10,25 +9,21 @@ import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../CodeReusable/CodeReusability.dart';
-import '../../CodeReusable/CommonWidgets.dart';
-import '../../../../constants/ConstantVariables.dart';
-import '../../Utility/Logger.dart';
-import '../../Utility/PreferencesManager.dart';
-import '../../constants/Constants.dart';
-import '../InnerScreens/ContainerScreen/EditProfileScreen/EditProfileModel.dart';
-import '../InnerScreens/ContainerScreen/EditProfileScreen/EditProfileRepository.dart';
-import '../InnerScreens/MainScreen/MainScreenState.dart';
-import 'DeliveryRestrictionPopup.dart';
+import '../../../CodeReusable/CodeReusability.dart';
+import '../../../CodeReusable/CommonWidgets.dart';
+import '../../../../../constants/ConstantVariables.dart';
+import '../../../Utility/Logger.dart';
+import '../../../constants/Constants.dart';
 
-class MapScreen extends ConsumerStatefulWidget {
-  const MapScreen({super.key});
+
+class CommonMapScreen extends ConsumerStatefulWidget {
+  const CommonMapScreen({super.key});
 
   @override
-  ConsumerState<MapScreen> createState() => _MapScreenState();
+  ConsumerState<CommonMapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends ConsumerState<MapScreen> {
+class _MapScreenState extends ConsumerState<CommonMapScreen> {
   final Completer<GoogleMapController> _controller = Completer();
 
   final LatLng _adminLocation = const LatLng(10.700282608343603, 76.73939956587711);
@@ -47,7 +42,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   Future<void> getSavedLocation() async {
-    var prefs = await PreferencesManager.getInstance();
+    /*var prefs = await PreferencesManager.getInstance();
     String position = prefs.getStringValue(PreferenceKeys.userAddress) ?? '';
     if (position.isNotEmpty){
       try {
@@ -74,24 +69,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       } catch (e) {
         print("Reverse geocoding error: $e");
       }
-    }
+    }*/
   }
 
 
   @override
   Widget build(BuildContext context) {
-    final userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
-
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent, // optional
-        statusBarIconBrightness: Brightness.light, // ANDROID → black icons
-        statusBarBrightness: Brightness.dark, // iOS → black icons
-      ),
+    return GestureDetector(
+      onTap: () => CodeReusability.hideKeyboard(context),
       child: Scaffold(
-        backgroundColor: objConstantColor.white,
+        backgroundColor: Colors.white,
         body: Stack(
           children: [
+            // --- The Map Layer ---
             GoogleMap(
               initialCameraPosition: CameraPosition(target: _adminLocation, zoom: 15),
               myLocationEnabled: true,
@@ -105,12 +95,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   circleId: const CircleId("radius"),
                   center: _adminLocation,
                   radius: _radiusKm * 1000,
-                  //fillColor: Colors.blue.withOpacity(0.1),
-                  strokeWidth: 0,
-                  strokeColor: Colors.transparent,
+                  fillColor: Colors.transparent, //Radius Color
+                  strokeWidth: 1,
+                  strokeColor: Colors.black12,
                 ),
               },
               onTap: (latLng) {
+
                 if (!_isWithinAllowed(latLng)) {
                   _showOutOfRangeAlert(context);
                   return;
@@ -119,6 +110,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               },
             ),
 
+            // --- Premium Floating Header ---
             Positioned(
               top: 0,
               left: 0,
@@ -126,30 +118,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               child: Container(
                 padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 10, bottom: 20),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF045DFD),
-
-                      Color(0xFF02A4FB),
-
-
-                    ],
-                  ),
+                  color: Colors.white,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(20.dp),
                     bottomRight: Radius.circular(20.dp),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withAlpha(50),
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
+                      color: Colors.black.withAlpha(10),
+                      blurRadius: 20,
+                      offset: Offset(0, 10),
                     ),
                   ],
                 ),
-
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -161,20 +142,20 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             onPressed: () => Navigator.pop(context),
                             padding: EdgeInsets.zero,
                             minimumSize: Size.zero,
-                            child:  Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 15.dp),
+                            child:  Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 18.dp),
                           ),
                           SizedBox(width: 5.dp),
                           objCommonWidgets.customText(
                             context,
-                            'Delivery Location',
+                            'Pickup Location',
                             15,
-                            Colors.white,
-                            objConstantFonts.montserratMedium,
+                            Colors.black,
+                            objConstantFonts.montserratSemiBold,
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 10.dp),
+                    SizedBox(height: 15.dp),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 15.dp),
                       child: GooglePlaceAutoCompleteTextField(
@@ -217,94 +198,87 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               ),
             ),
 
+            // --- Bottom Action Area ---
             Positioned(
-              bottom: 15.dp,
-              right: 15.dp,
-              left: 15.dp,
-              child: SafeArea(
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        const Spacer(),
-                        SizedBox(
-                          width: 45.dp,
-                          height: 45.dp,
-                          child: FloatingActionButton(
-                            onPressed: () => _goToCurrentLocation(context),
-                            backgroundColor: objConstantColor.white,
-                            shape: const CircleBorder(),
-                            child: Icon(
-                              Icons.my_location,
-                              color: Colors.black,
-                              size: 25.dp,
-                            ),
-                          ),
-                        )
+              bottom: 30,
+              left: 20,
+              right: 20,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  // Locate Me Button
+                  FloatingActionButton(
+                    onPressed: () => _goToCurrentLocation(context),
+                    backgroundColor: Colors.white,
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.dp)),
+                    child: Icon(Icons.my_location_rounded, color: Colors.black, size: 25.dp,),
+                  ),
+                  SizedBox(height: 20.dp),
 
-                      ],
-                    ),
-                    SizedBox(height: 10.dp),
-
-                    if (_selectedLocation != null) ...{
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: objConstantColor.white,
-                                borderRadius: BorderRadius.circular(5.dp),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8.dp, horizontal: 10.dp),
-                                child: objCommonWidgets.customText(
-                                  context,
-                                  _selectedAddress.isNotEmpty ? _selectedAddress : "Fetching address...",
-                                  12,
-                                  Colors.black,
-                                  objConstantFonts.montserratMedium,
-                                  textAlign: TextAlign.start,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 10.dp),
-                          CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              final screenNotifier = ref.read(MapScreenGlobalStateProvider.notifier);
-                              screenNotifier.callEditProfileAPI(context, userScreenNotifier, _selectedAddress, '${_selectedLocation?.latitude},${_selectedLocation?.longitude}');
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: objConstantColor.white,
-                                borderRadius: BorderRadius.circular(5.dp),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withAlpha(15),
-                                      blurRadius: 20,
-                                      offset: const Offset(0, 1),
-                                    ),
-                                  ]
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8.dp, horizontal: 10.dp),
-                                child: objCommonWidgets.customText(
-                                  context,
-                                  'Confirm',
-                                  13,
-                                  Colors.blueAccent,
-                                  objConstantFonts.montserratSemiBold,
-                                  textAlign: TextAlign.start,
-                                ),
-                              ),
-                            ),
+                  // Address Details Card
+                  if (_selectedLocation != null)
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                      decoration: BoxDecoration(
+                        color: Colors.white, // Dark Theme Card
+                        borderRadius: BorderRadius.circular(15.dp),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(20),
+                            blurRadius: 5,
+                            offset: const Offset(0, 8),
                           ),
                         ],
                       ),
-                    },
-                  ],
-                ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              objCommonWidgets.customText(context, 'Selected Location', 13, Colors.black, objConstantFonts.montserratSemiBold),
+                              Icon(Icons.location_on, size: 15.dp, color: Colors.black,),
+                            ],
+                          ),
+                          SizedBox(height: 5.dp),
+                          Divider(color: Colors.black, height: 0.2, thickness: 0.5,),
+                          SizedBox(height: 10.dp),
+                          objCommonWidgets.customText(
+                            context,
+                            _selectedAddress.isNotEmpty ? _selectedAddress : "Locating...",
+                            11.5,
+                            Colors.black,
+                            objConstantFonts.montserratMedium,
+                          ),
+                          SizedBox(height: 35.dp),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              CupertinoButton(padding: EdgeInsets.zero,
+                                  minimumSize: Size.zero,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.deepOrange,
+                                        borderRadius: BorderRadius.circular(20.dp)
+                                    ),
+                                    padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                                    child: Center(
+                                      child: objCommonWidgets.customText(context, 'Confirm', 12, Colors.white, objConstantFonts.montserratMedium),
+                                    ),
+                                  ), onPressed: (){
+                                    Navigator.pop(context, {
+                                      'location': _selectedLocation,
+                                      'address': _selectedAddress,
+                                    });
+
+                                  })
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                ],
               ),
             ),
           ],
@@ -330,22 +304,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   double _toRadians(double deg) => deg * pi / 180;
 
   void _showOutOfRangeAlert(BuildContext context) {
-    PreferencesManager.getInstance().then((pref) {
-      pref.setBooleanValue(PreferenceKeys.isDialogOpened, true);
-      showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (_) => const DeliveryRestrictionPopup(),
-      );
-    });
+
   }
 
   Future<void> _getAddressFromLatLng(LatLng position) async {
     try {
-      List<Placemark> placeMarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
 
-      if (placeMarks.isNotEmpty) {
-        final place = placeMarks.first;
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
         setState(() {
           final parts = [
             place.subLocality,
@@ -423,93 +390,3 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 }
 
-
-//Map Screen State
-class MapScreenGlobalState {
-  final ScreenName currentModule;
-
-  MapScreenGlobalState({
-    this.currentModule = ScreenName.home,
-  });
-
-  MapScreenGlobalState copyWith({
-    ScreenName? currentModule,
-  }) {
-    return MapScreenGlobalState(
-      currentModule: currentModule ?? this.currentModule,
-    );
-  }
-}
-
-class MapScreenGlobalStateNotifier extends StateNotifier<MapScreenGlobalState> {
-  MapScreenGlobalStateNotifier() : super(MapScreenGlobalState());
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-
-  ///This method used to call Edit Profile PUT API
-  void callEditProfileAPI(BuildContext context, MainScreenGlobalStateNotifier notifier, String address, String latLon) {
-    if (!context.mounted) return;
-
-    CodeReusability().isConnectedToNetwork().then((isConnected) async {
-      if (isConnected) {
-
-        Map<String, dynamic> requestBody = {
-          'address' : latLon
-        };
-
-        final manager = await PreferencesManager.getInstance();
-        String? userID = manager.getStringValue(PreferenceKeys.userID);
-        String url = '${ConstantURLs.updateCustomerUrl}$userID';
-
-        CommonWidgets().showLoadingBar(true, context); //  Loading bar is Enabled Here
-        EditProfileRepository().callEditProfileApi(url, requestBody, (statusCode, responseBody) async {
-          EditProfileResponse response = EditProfileResponse.fromJson(responseBody);
-
-          if (statusCode == 200 || statusCode == 201) {
-            exactAddress = address;
-            var prefs = await PreferencesManager.getInstance();
-            prefs.setStringValue(PreferenceKeys.userAddress, requestBody['address']);
-            CommonWidgets().showLoadingBar(false, context); //  Loading bar is disabled Here
-            callNavigation(context, notifier);
-          } else {
-            CommonWidgets().showLoadingBar(false, context);
-            CodeReusability().showAlert(context, response.message ?? "something Went Wrong");
-          }
-        });
-
-
-      } else {
-        CodeReusability().showAlert(
-            context, 'Please Check Your Internet Connection');
-      }
-    });
-
-  }
-
-  void callNavigation(BuildContext context, MainScreenGlobalStateNotifier notifier){
-    CodeReusability().showAlert(context, 'Delivery location updated successfully');
-    Navigator.pop(context);
-    /*if (userFrom == ScreenName.home){
-      notifier.callNavigation(ScreenName.home);
-    } else if (userFrom == ScreenName.productDetail){
-    notifier.callNavigation(ScreenName.productDetail);
-    } else if (userFrom == ScreenName.profile){
-      notifier.callNavigation(ScreenName.profile);
-    } else {
-      notifier.callNavigation(ScreenName.editProfile);
-    }*/
-  }
-
-
-}
-
-
-final MapScreenGlobalStateProvider = StateNotifierProvider.autoDispose<
-    MapScreenGlobalStateNotifier, MapScreenGlobalState>((ref) {
-  var notifier = MapScreenGlobalStateNotifier();
-  return notifier;
-});

@@ -101,7 +101,7 @@ class HomeScreenGlobalStateNotifier extends StateNotifier<HomeScreenGlobalState>
                   : newProducts,
               currentPage: nextPage,
               hasMore: hasMore,
-              isLoading: false, // ✅ shimmer stops EXACTLY here
+              isLoading: false,
             );
           } else {
             state = state.copyWith(isLoading: false);

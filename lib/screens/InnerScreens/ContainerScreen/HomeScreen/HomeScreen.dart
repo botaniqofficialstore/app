@@ -156,8 +156,8 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                               color: Colors.white,
                             ),
                             onPressed: () {
-                              userScreenNotifier
-                                  .callNavigation(ScreenName.wishList);
+                              userFrom = ScreenName.home;
+                              userScreenNotifier.callNavigation(ScreenName.wishList);
                             },
                           ),
                         ],
@@ -459,7 +459,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(10.dp),
               boxShadow: [
-                BoxShadow(color: Colors.black.withAlpha(35), blurRadius: 15, offset: const Offset(0, 8)),
+                BoxShadow(color: Colors.black.withAlpha(55), blurRadius: 5, offset: const Offset(0, 2)),
               ],
             ),
             child: Column(
@@ -584,9 +584,9 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
 
                       objCommonWidgets.customText(context,
                           "${product.gram}gm",
-                          12, objConstantColor.black, objConstantFonts.montserratSemiBold),
+                          11, objConstantColor.black, objConstantFonts.montserratMedium),
 
-                      SizedBox(height: 10.dp),
+                      SizedBox(height: 5.dp),
 
                       // ✅ Add to cart button
                       CupertinoButton(
