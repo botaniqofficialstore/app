@@ -50,11 +50,14 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
     final userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
     var orderListData = userScreenState.orderList;
 
-    return SafeArea(
-      child: Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: objConstantColor.white,
-        body: RefreshIndicator( onRefresh: () async {
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: const Color(0xFFF4F4F4),
+      body: SafeArea(
+        child: RefreshIndicator(
+          color: Colors.black,
+          backgroundColor: Colors.white,
+          onRefresh: () async {
           final orderScreenNotifier = ref.read(OrderScreenGlobalStateProvider.notifier);
           await orderScreenNotifier.callOrderListGepAPI(context);
           },
@@ -82,31 +85,31 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
                   ],
                 ),
               ),
-
+            
               SizedBox(height: 5.dp),
-      
+            
               /// 🔹 Tabs
               Expanded(
                 child: SingleChildScrollView(
-                  child: Container(
-                    child: _ordersSection(context, orderListData, userScreenState,
-                        userScreenNotifier),
+                  child: Column(
+                    children: [
+                      _ordersSection(context, orderListData, userScreenState,
+                          userScreenNotifier),
+                    ],
                   ),
                 ),
               ),
-      
+            
               SizedBox(height: 10.dp),
-      
-      
-      
-      
+            
             ],
           ),
         ),
-      
       ),
+    
     );
   }
+
 
   Widget _ordersSection(BuildContext context, List orderList,
       OrderScreenGlobalState userScreenState,
@@ -123,17 +126,17 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(objConstantAssest.noOrder, width: 65.dp),
+              Image.asset(objConstantAssest.noOrder, width: 50.dp),
               SizedBox(height: 1.dp),
-              Text("No Orders" ,
+              Text("No active orders" ,
                 style: TextStyle(
-                  color: objConstantColor.gray,
-                  fontSize: 15.dp,
-                  fontFamily: ConstantAssests.montserratSemiBold,
+                  color: Colors.black.withAlpha(150),
+                  fontSize: 12.dp,
+                  fontFamily: ConstantAssests.montserratMedium,
                 ),
               ),
 
-              SizedBox(height: 10.dp),
+              SizedBox(height: 7.dp),
 
               CupertinoButton(padding: EdgeInsets.zero,
                   child: Container(
@@ -144,8 +147,8 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
                     padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
                     child: objCommonWidgets.customText(context,
                         'Shop Now',
-                        14, objConstantColor.white,
-                        objConstantFonts.montserratBold),
+                        12, objConstantColor.white,
+                        objConstantFonts.montserratSemiBold),
                   ),
                   onPressed: (){
                     userScreenNotifier.callNavigation(ScreenName.home);
@@ -157,31 +160,20 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
     }
 
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 5.dp),
-      child: ListView.builder(
+      padding: EdgeInsets.symmetric(horizontal: 15.dp),
+      child: ListView.separated(
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemCount: orderList.length,
+        separatorBuilder: (context, index) => SizedBox(height: 10.dp),
         itemBuilder: (context, index) {
           return Column(
             children: [
-              if (index != 0)
-                SizedBox(height: 20.dp,),
               orderListWidget(
                   context,
                   orderList[index],
                   userScreenNotifier,
                 index
-              ),
-              SizedBox(height: 25.dp),
-
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.dp),
-                child: const Divider(
-                  color: Colors.black12,
-                  thickness: 1.5,
-                  height: 1.5,
-                ),
               ),
             ],
           );
@@ -192,264 +184,139 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
 
 
   Widget orderListWidget(BuildContext context, OrderDataList order, MainScreenGlobalStateNotifier notifier, int index) {
-    final orderScreenNotifier = ref.read(
-        OrderScreenGlobalStateProvider.notifier);
+    final orderScreenNotifier = ref.read(OrderScreenGlobalStateProvider.notifier);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20.dp),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 5,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      margin: EdgeInsets.symmetric(horizontal: 5.dp,),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-
-          Container(
-            padding: EdgeInsets.only(top: 15.dp, left: 15.dp, right: 15.dp),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                objCommonWidgets.customText(context,
-                    'Order Details', 15,
-                    objConstantColor.navyBlue,
-                    objConstantFonts.montserratSemiBold),
-
-                ListView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: order.orderDetails.length,
-                  itemBuilder: (context, index) {
-                    var productDetails = order.orderDetails[index];
-
-                    return cell(
-                      context,
-                      index,
-                      '${productDetails.productDetails.productName}',
-                      '${productDetails.productDetails.productSellingPrice}',
-                      '${productDetails.productDetails.gram}',
-                      productDetails.productCount,
-                      '${productDetails.productDetails.image}',
-                    );
-                  },
-                ),
-
-              ],
-
+    return CupertinoButton(
+      padding: EdgeInsets.zero,
+      minimumSize: Size.zero,
+      onPressed: () {
+        setState(() {
+          savedOrderData = order;
+          orderScreenNotifier.callNavigateToTrackOrder(notifier);
+        });
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.dp),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(10),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
-          ),
-
-
-          Container(
-            decoration: BoxDecoration(
-                color: const Color(0xFF373737),
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20.dp),
-                    bottomRight: Radius.circular(20.dp),
-                    topLeft: Radius.circular(25.dp),
-                    topRight: Radius.circular(25.dp)
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 5,
-                    offset: const Offset(0, 1),
-                  ),
-                ]
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 10.dp),
-            child: Column(
-              children: [
-                SizedBox(height: 5.dp),
-
-
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.symmetric(
-                      vertical: 10.dp, horizontal: 5.dp),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 1. Order Header: Status & Arrow
+            Padding(
+              padding: EdgeInsets.all(12.dp),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          objCommonWidgets.customText(
-                              context, 'Payment Type', 12,
-                              objConstantColor.white,
-                              objConstantFonts.montserratBold),
-                          objCommonWidgets.customText(
-                              context, 'Cash on delivery', 15,
-                              objConstantColor.white,
-                              objConstantFonts.montserratSemiBold),
-                        ],
-                      ),
-
                       objCommonWidgets.customText(
-                          context, '₹${order.orderTotalAmount}/_', 18,
-                          objConstantColor.white,
-                          objConstantFonts.montserratBold),
-                    ],
-                  ),
-                ),
-
-
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 0.dp),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: objConstantColor.white.withAlpha(15),
-                            borderRadius: BorderRadius.circular(10.dp),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                              vertical: 15.dp, horizontal: 10.dp),
-                          child: Row(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: objConstantColor.white.withAlpha(20),
-                                  borderRadius: BorderRadius.circular(35.dp),
-                                ),
-                                padding: EdgeInsets.all(10.dp),
-                                child: Icon(Icons.delivery_dining_sharp,
-                                    size: 15.dp, color: Colors.white),
-                              ),
-                              SizedBox(width: 8.dp),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  objCommonWidgets.customText(
-                                    context, 'Delivery on', 10,
-                                    objConstantColor.white.withAlpha(200),
-                                    objConstantFonts.montserratSemiBold,
-                                  ),
-                                  objCommonWidgets.customText(
-                                    context, 'Dec 6', 13,
-                                    objConstantColor.white,
-                                    objConstantFonts.montserratBold,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                        context,
+                        steps[order.currentOrderStatus ?? 0],
+                        13,
+                        Colors.green,
+                        objConstantFonts.montserratSemiBold,
                       ),
-
-                      SizedBox(width: 10.dp), // space between both boxes
-
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: objConstantColor.white.withAlpha(15),
-                            borderRadius: BorderRadius.circular(10.dp),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                              vertical: 15.dp, horizontal: 10.dp),
-                          child: Row(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: objConstantColor.white.withAlpha(20),
-                                  borderRadius: BorderRadius.circular(35.dp),
-                                ),
-                                padding: EdgeInsets.all(10.dp),
-                                child: Image.asset(
-                                  objConstantAssest.orderSelectedIcon,
-                                  width: 15.dp,
-                                  color: Colors.white,),
-                              ),
-                              SizedBox(width: 8.dp),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    objCommonWidgets.customText(
-                                      context, 'Order Status', 10,
-                                      objConstantColor.white.withAlpha(200),
-                                      objConstantFonts.montserratSemiBold,
-                                    ),
-
-                                    FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      alignment: Alignment.centerLeft,
-                                      child: objCommonWidgets.customText(
-                                        context,
-                                        steps[order.currentOrderStatus ?? 0],
-                                        13,
-                                        objConstantColor.white,
-                                        objConstantFonts.montserratBold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
+                      SizedBox(height: 2.dp),
+                      objCommonWidgets.customText(
+                        context,
+                        "Order #${order.orderId}",
+                        10,
+                        Colors.black.withAlpha(150),
+                        objConstantFonts.montserratRegular,
                       ),
                     ],
                   ),
-                ),
+                  Icon(Icons.arrow_forward_ios_outlined, size: 14.dp, color: Colors.grey),
+                ],
+              ),
+            ),
 
+            Divider(height: 0.dp, thickness: 0.5),
 
-                SizedBox(height: 15.dp),
-
-                CupertinoButton(onPressed: () {
-                  setState(() {
-                    savedOrderData = order;
-                    orderScreenNotifier.callNavigateToTrackOrder(
-                        notifier);
-                  });
+            // 2. Product List
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.dp, horizontal: 12.dp),
+              child: ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: order.orderDetails.length,
+                itemBuilder: (context, idx) {
+                  var productDetails = order.orderDetails[idx];
+                  return cell(
+                    context,
+                    idx,
+                    productDetails.productDetails.productName,
+                    '${productDetails.productDetails.productSellingPrice}',
+                    '${productDetails.productDetails.gram}',
+                    productDetails.productCount,
+                    productDetails.productDetails.image,
+                  );
                 },
-                  padding: EdgeInsets.zero, child: Container(
-                    width: double.infinity,
+              ),
+            ),
+
+            Divider(height: 0.dp, thickness: 0.5),
+
+            // 3. Order Footer: Expected Delivery Date
+            Padding(
+              padding: EdgeInsets.all(12.dp),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  objCommonWidgets.customText(
+                    context,
+                    "Expected Delivery :",
+                    13,
+                    Colors.black,
+                    objConstantFonts.montserratMedium,
+                  ),
+                  
+
+                  
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 10.dp),
                     decoration: BoxDecoration(
-                      color: objConstantColor.white,
-                      borderRadius: BorderRadius.circular(35.dp),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 5,
-                          offset: const Offset(0, 1),
+                      color: Colors.green.withAlpha(200),
+                      borderRadius: BorderRadius.circular(20.dp)
+                    ),
+                    child: Row(
+                      children: [
+
+                        Icon(Icons.calendar_month_sharp, color: Colors.white, size: 15.dp),
+                        SizedBox(width: 5.dp),
+                        objCommonWidgets.customText(
+                          context,
+                          'Feb 25 2026',
+                          12,
+                          Colors.white,
+                          objConstantFonts.montserratSemiBold,
                         ),
                       ],
                     ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 13.dp, horizontal: 18.dp),
-                      child: Center(
-                        child: objCommonWidgets.customText(
-                            context, 'Track Order', 15,
-                            const Color(0xFF01B502),
-                            objConstantFonts.montserratSemiBold),
-                      ),
-                    ),
-                  ),),
+                  )
 
-                SizedBox(height: 10.dp,),
-              ],
+
+
+                ],
+              ),
             ),
-          )
-
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  /// Cell Widget
+
   Widget cell(
       BuildContext context,
       int index,
@@ -459,120 +326,84 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
       int count,
       String image,
       ) {
-    return Column(
-      children: [
-        Row(
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             /// Image
-            Container(
-              width: 70.dp,
-              height: 70.dp,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5.dp),
-                border: Border.all(
-                  color: objConstantColor.black,
-                  width: 0.5,
-                ),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(5.dp),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(5.dp),
+              child: SizedBox(
+                width: 80.dp,
+                height: 80.dp,
                 child: NetworkImageLoader(
                   imageUrl: '${ConstantURLs.baseUrl}$image',
                   placeHolder: objConstantAssest.placeHolder,
-                  size: 50.dp,
-                  imageSize: 70.dp,
+                  size: 80.dp,
+                  imageSize: 80.dp,
+                  bottomCurve: 5,
+                  topCurve: 5,
                 ),
               ),
             ),
 
-            SizedBox(width: 12.dp),
+            SizedBox(width: 10.dp),
 
             /// Details
             Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 4.dp), // 👈 add slight padding for balance
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    objCommonWidgets.customText(
-                      context,
-                      CodeReusability().cleanProductName(productName),
-                      12,
-                      objConstantColor.navyBlue,
-                      objConstantFonts.montserratSemiBold,
-                    ),
-                    SizedBox(height: 2.dp),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 1.dp),
 
-                    /// Price
-                    Row(
-                      children: [
-                        objCommonWidgets.customText(
-                          context,
-                          'Price:',
-                          12,
-                          objConstantColor.navyBlue,
-                          objConstantFonts.montserratSemiBold,
-                        ),
-                        SizedBox(width: 5.dp,),
-                        objCommonWidgets.customText(
-                          context,
-                          '₹$price/_',
-                          12,
-                          objConstantColor.green,
-                          objConstantFonts.montserratSemiBold,
-                        ),
+                  objCommonWidgets.customText(
+                    context,
+                    CodeReusability().cleanProductName(productName),
+                    13,
+                    Colors.deepOrange,
+                    objConstantFonts.montserratSemiBold,
+                  ),
 
-                      ],
-                    ),
+                  SizedBox(height: 1.dp),
 
-                    SizedBox(height: 2.dp),
+                  /// Quantity
+                  objCommonWidgets.customText(
+                    context,
+                    'item: $count',
+                    11,
+                    Colors.black,
+                    objConstantFonts.montserratMedium,
+                  ),
+                  SizedBox(height: 1.dp),
 
-                    /// Quantity
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: objCommonWidgets.customText(
-                            context,
-                            'Quantity: $count',
-                            12,
-                            objConstantColor.navyBlue,
-                            objConstantFonts.montserratSemiBold,
-                          ),
-                        ),
+                  objCommonWidgets.customText(
+                    context,
+                    '$gram gm',
+                    11,
+                    Colors.black,
+                    objConstantFonts.montserratMedium,
+                  ),
 
-                      ],
-                    ),
-                    SizedBox(height: 2.dp),
+                  SizedBox(height: 1.dp),
+                  objCommonWidgets.customText(
+                    context,
+                    'Ordered on: 17/02/2026',
+                    11,
+                    Colors.black,
+                    objConstantFonts.montserratMedium,
+                  ),
+                  SizedBox(height: 1.dp),
+                  Row(
+                    children: [
+                      objCommonWidgets.customText(context, 'Amount to be paid : ', 11, Colors.black, objConstantFonts.montserratMedium),
+                      objCommonWidgets.customText(context, '₹$price/_', 12, Colors.green, objConstantFonts.montserratSemiBold),
+                    ],
+                  )
 
-                    /// Net Weight
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              objCommonWidgets.customText(
-                                context,
-                                'Net Wt (per item): $gram',
-                                12,
-                                objConstantColor.navyBlue,
-                                objConstantFonts.montserratSemiBold,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                ],
               ),
             ),
           ],
-        ),
-
-        SizedBox(height: 10.dp),
-      ],
-    );
+        );
   }
 
 
@@ -582,7 +413,7 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8.dp, horizontal: 8.dp),
+        padding: EdgeInsets.symmetric(horizontal: 8.dp),
         child: Column(
           children: List.generate(4, (index) {
             return Container(

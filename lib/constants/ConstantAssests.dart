@@ -95,6 +95,9 @@ class ConstantAssests{
    String wishlist = '${commonIconsAssets}wishlist.png';
    String quote = '${commonIconsAssets}quote.png';
    String defaultProfile = '${commonIconsAssets}user.png';
+   String delivered = '${commonIconsAssets}delivered.png';
+   String returned = '${commonIconsAssets}returned.png';
+
 
    ///Adds Assets
    String addImage6 = '${addsAssets}adds6.webp';

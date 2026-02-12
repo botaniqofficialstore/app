@@ -103,7 +103,6 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
 
-
                         orderDetailsWidget(context),
 
 
@@ -619,6 +618,7 @@ class AnimatedOrderTrackStep extends StatefulWidget {
   final Color activeColor;
   final Color inactiveColor;
   final TextStyle? textStyle;
+  final bool isReturn;
 
   const AnimatedOrderTrackStep({
     super.key,
@@ -630,6 +630,7 @@ class AnimatedOrderTrackStep extends StatefulWidget {
     this.activeColor = Colors.green,
     this.inactiveColor = Colors.grey,
     this.textStyle,
+    this.isReturn = false
   });
 
   @override
@@ -702,14 +703,14 @@ class _AnimatedOrderTrackStepState extends State<AnimatedOrderTrackStep>
               child: AnimatedBuilder(
                 animation: _colorAnimation,
                 builder: (context, child) => Container(
-                  width: 16,
-                  height: 16,
+                  width: 13.dp,
+                  height: 13.dp,
                   decoration: BoxDecoration(
                     color: _colorAnimation.value,
                     shape: BoxShape.circle,
                   ),
                   child: widget.isCompleted
-                      ? Icon(Icons.check, size: 10.dp, color: Colors.white)
+                      ? Icon(Icons.check, size: 8.dp, color: Colors.white)
                       : null,
                 ),
               ),
@@ -756,7 +757,7 @@ class _AnimatedOrderTrackStepState extends State<AnimatedOrderTrackStep>
                 duration: widget.animationDuration,
                 style: widget.textStyle ??
                     TextStyle(
-                      fontSize: 11.5.dp,
+                      fontSize: 10.5.dp,
                       fontFamily: objConstantFonts.montserratSemiBold,
                       color: widget.isCompleted
                           ? widget.activeColor
@@ -767,8 +768,8 @@ class _AnimatedOrderTrackStepState extends State<AnimatedOrderTrackStep>
               objCommonWidgets.customText(
                 context,
                 widget.date,
-                10,
-                objConstantColor.gray,
+                8.5,
+                Colors.black.withAlpha(150),
                 objConstantFonts.montserratMedium,
               ),
             ],

@@ -74,7 +74,6 @@ class OrderScreenGlobalStateNotifier
       return;
     }
 
-    if (!loadMore) CommonWidgets().showLoadingBar(true, context);
 
     Timer? fallbackTimer;
     bool callbackInvoked = false;
@@ -90,7 +89,6 @@ class OrderScreenGlobalStateNotifier
         if (!callbackInvoked) {
           Logger().log('OrderListRepository callback TIMEOUT after ${_repoCallbackTimeout.inSeconds}s');
           state = state.copyWith(isLoading: false);
-          CommonWidgets().showLoadingBar(false, context);
         }
       });
 
@@ -122,13 +120,11 @@ class OrderScreenGlobalStateNotifier
           Logger().log('⚠️ Error parsing OrderList response: $e\n$st');
           state = state.copyWith(isLoading: false);
         } finally {
-          CommonWidgets().showLoadingBar(false, context);
         }
       });
     } catch (e, st) {
       Logger().log('Exception in callOrderListGepAPI: $e\n$st');
       state = state.copyWith(isLoading: false);
-      CommonWidgets().showLoadingBar(false, context);
       fallbackTimer?.cancel();
     }
   }
@@ -139,7 +135,6 @@ class OrderScreenGlobalStateNotifier
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
       if (isConnected) {
 
-        CommonWidgets().showLoadingBar(true, context);
         var prefs = await PreferencesManager.getInstance();
         String userID = prefs.getStringValue(PreferenceKeys.userID) ?? '';
 
@@ -151,7 +146,6 @@ class OrderScreenGlobalStateNotifier
         OrderListRepository().callCancelOrderDELETEApi(ConstantURLs.placeOrderUrl, requestBody, (statusCode, responseBody) async {
           final cancelResponse = CancelOrderResponseModel.fromJson(responseBody);
           CodeReusability().showAlert(context, cancelResponse.message ?? "something Went Wrong");
-          CommonWidgets().showLoadingBar(false, context);
           if (statusCode == 200 || statusCode == 201){
             if (index < 0 || index >= state.orderList.length) return;
 

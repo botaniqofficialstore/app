@@ -90,7 +90,8 @@ enum ScreenName {
   refundPolicy,
   shippingPolicy,
   aboutUS,
-  familyAndFriends
+  familyAndFriends,
+  orderHistory
 }
 
 
@@ -183,9 +184,18 @@ final steps = [
   "Packed",
   "Shipped",
   "Out for Delivery",
-  "Delivered",
+  "Delivered"
 ];
 
+final returnSteps = [
+  "Order Placed",
+  "Order Confirmed",
+  "Packed",
+  "Shipped",
+  "Out for Delivery",
+  "Delivered",
+  "Returned"
+];
 
 
 

@@ -5,9 +5,9 @@ import 'package:flutter_sizer/flutter_sizer.dart';
 import '../../Utility/PreferencesManager.dart';
 import '../../constants/ConstantVariables.dart';
 
-class LogoutPopup {
+class DeleteAccountPopup {
   /// Modern animated logout confirmation popup
-  static Future<void> showLogoutPopup({
+  static Future<void> showDeleteAccountPopup({
     required BuildContext context,
     required VoidCallback onConfirm,
   }) async {
@@ -28,7 +28,7 @@ class LogoutPopup {
           transform: Matrix4.translationValues(0.0, curvedValue * -50, 0.0),
           child: Opacity(
             opacity: anim1.value,
-            child: _LogoutPopupContent(
+            child: _DeleteAccountPopupContent(
               onConfirm: onConfirm,
             ),
           ),
@@ -38,9 +38,9 @@ class LogoutPopup {
   }
 }
 
-class _LogoutPopupContent extends StatelessWidget {
+class _DeleteAccountPopupContent extends StatelessWidget {
   final VoidCallback onConfirm;
-  const _LogoutPopupContent({required this.onConfirm});
+  const _DeleteAccountPopupContent({required this.onConfirm});
 
   @override
   Widget build(BuildContext context) {
@@ -55,53 +55,64 @@ class _LogoutPopupContent extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12.withOpacity(0.1),
-                  blurRadius: 15,
-                  offset: const Offset(0, 10),
-                ),
-              ],
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // 🔹 Logout Icon
-                Container(
-                  decoration: BoxDecoration(
-                    color: objConstantColor.redd.withOpacity(0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  padding: EdgeInsets.all(16.dp),
-                  child: Icon(
-                    CupertinoIcons.power,
-                    size: 35.dp,
-                    color: Colors.redAccent,
-                  ),
+                Stack(
+                  children: [
+                    Container(
+                      width: 75.dp,
+                      height: 75.dp,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFF0404).withAlpha(25),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+
+                    Positioned(top: 0, bottom: 5, left: 0, right: 0,
+                        child: Icon(
+                      Icons.warning_rounded,
+                      size: 45.dp,
+                      color: const Color(0xFFFF0404),
+                    ))
+                  ],
                 ),
-                SizedBox(height: 15.dp),
+                SizedBox(height: 20.dp),
 
                 // 🔹 Title
                 objCommonWidgets.customText(
                   context,
-                  'Logout',
-                  20,
+                  'Delete Account',
+                  15,
                   objConstantColor.navyBlue,
-                  objConstantFonts.montserratSemiBold,
+                  objConstantFonts.montserratMedium,
                 ),
 
                 SizedBox(height: 8.dp),
 
                 objCommonWidgets.customText(
-                  context,
-                  'Are you sure you want to logout?',
-                  12,
-                  objConstantColor.black,
-                  objConstantFonts.montserratRegular,
-                  textAlign: TextAlign.center
+                    context,
+                    'Closing your account will delete your profile and personal data permanently. You will no longer be able to access your purchase history or loyalty points.',
+                    10,
+                    objConstantColor.black.withAlpha(140),
+                    objConstantFonts.montserratRegular,
+                  textAlign: TextAlign.justify
                 ),
 
-                SizedBox(height: 40.dp),
+                SizedBox(height: 20.dp),
+
+                objCommonWidgets.customText(
+                    context,
+                    'Are you sure you want to close your account for permanent?',
+                    10,
+                    Colors.redAccent,
+                    objConstantFonts.montserratRegular,
+                    textAlign: TextAlign.center
+                ),
+
+                SizedBox(height: 15.dp),
 
                 // 🔹 Buttons
                 Row(
@@ -128,11 +139,11 @@ class _LogoutPopupContent extends StatelessWidget {
                             14,
                             objConstantColor.black,
                             objConstantFonts.montserratSemiBold,
-                                                  ),
+                          ),
+                        ),
                       ),
                     ),
-                    ),
-                     SizedBox(width: 10.dp),
+                    SizedBox(width: 10.dp),
                     Expanded(
                       child: CupertinoButton(
                         padding: EdgeInsets.zero,
@@ -141,19 +152,19 @@ class _LogoutPopupContent extends StatelessWidget {
                           onConfirm();
                         },
                         child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.redAccent,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
-                          alignment: Alignment.center,
-                          child: objCommonWidgets.customText(
+                            decoration: BoxDecoration(
+                              color: Colors.redAccent,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                            alignment: Alignment.center,
+                            child: objCommonWidgets.customText(
                               context,
-                              'Logout',
+                              'Confirm',
                               14,
                               objConstantColor.white,
                               objConstantFonts.montserratSemiBold,
-                          )
+                            )
                         ),
                       ),
                     ),

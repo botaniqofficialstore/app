@@ -35,7 +35,7 @@ class InformationScreenState extends ConsumerState<InformationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF4F4F4),
       body: SafeArea(child: profileView(context)),
     );
   }
@@ -51,11 +51,7 @@ class InformationScreenState extends ConsumerState<InformationScreen> {
       children: [
 
         Container(
-            padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 5.dp),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2.dp, offset: const Offset(0, 1))],
-            ),
+            padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 10.dp),
             child: Row(
               children: [
                 CupertinoButton(
@@ -63,11 +59,9 @@ class InformationScreenState extends ConsumerState<InformationScreen> {
                     minimumSize: const Size(0, 0),
                     child: Padding(
                       padding: EdgeInsets.only(top: 2.dp),
-                      child: Image.asset(
-                        objConstantAssest.backIcon,
-                        height: 20.dp,
-                        color: objConstantColor.navyBlue,
-                      ),
+                      child: Icon(Icons.arrow_back_rounded,
+                          color: Colors.black,
+                          size: 20.dp),
                     ),
                     onPressed: () {
                       mainScreenNotifier.callNavigation(ScreenName.profile);
@@ -79,9 +73,9 @@ class InformationScreenState extends ConsumerState<InformationScreen> {
                   child: objCommonWidgets.customText(
                     context,
                     screenState.currentPage,
-                    15,
+                    14,
                     objConstantColor.navyBlue,
-                    objConstantFonts.montserratSemiBold,
+                    objConstantFonts.montserratMedium,
                   ),
                 ),
 
@@ -93,7 +87,6 @@ class InformationScreenState extends ConsumerState<InformationScreen> {
 
         Expanded(
           child: Container(
-            color: Colors.black.withAlpha(10),
             padding: EdgeInsets.only(top: 10.dp),
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
@@ -131,7 +124,7 @@ class InformationScreenState extends ConsumerState<InformationScreen> {
           // Headings (end with :)
           if (text.endsWith(':')) {
             return Padding(
-              padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 15.dp),
+              padding: EdgeInsets.only(left: 15.dp, top: 12.dp, bottom: 5.dp),
               child: objCommonWidgets.customText(
                 context,
                 text.toUpperCase(),
@@ -143,11 +136,12 @@ class InformationScreenState extends ConsumerState<InformationScreen> {
           }
 
           // Bullet points
+
           if (text.startsWith('•')) {
             return Container(
               color: Colors.white,
               width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 15.dp, vertical: 0.8.dp),
+              padding: EdgeInsets.symmetric(horizontal: 15.dp, vertical: 2.dp),
               child: objCommonWidgets.customText(
                 context,
                 text,

@@ -9,12 +9,13 @@ import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/HomeScre
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/InformationScreen/InformationScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/LocationScreen/LocationScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/OrderDetailsScreen/OrderDetailsScreen.dart';
+import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/OrderHistoryScreen/OrderHistoryScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/OrderSummaryScreen/OrderSummaryScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/ProductDetail/ProductDetailScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/ProfileScreen/ProfileScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/WishListScreen/WishListScreen.dart';
-import 'package:botaniqmicrogreens/screens/commonViews/MapScreen.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:botaniqmicrogreens/API/CommonAPI.dart';
 import 'package:botaniqmicrogreens/CodeReusable/CodeReusability.dart';
@@ -127,6 +128,8 @@ class MainScreenGlobalStateNotifier
       return const InformationScreen();
     } else if (state.currentModule == ScreenName.familyAndFriends){
       return const FamilyLocationScreen();
+    } else if (state.currentModule == ScreenName.orderHistory){
+      return const OrderHistoryScreen();
     } else {
       return const HomeScreen();
     }
@@ -146,7 +149,8 @@ class MainScreenGlobalStateNotifier
       onScreen = ScreenName.home;
     } else if (module == ScreenName.editProfile ||
         module == ScreenName.information ||
-    module == ScreenName.familyAndFriends) {
+    module == ScreenName.familyAndFriends ||
+    module == ScreenName.orderHistory) {
       onScreen = ScreenName.profile;
     } else if (module == ScreenName.orderSummary) {
       onScreen = ScreenName.cart;
@@ -200,6 +204,41 @@ class MainScreenGlobalStateNotifier
       }
     });
   }
+
+
+  SystemUiOverlayStyle getStatusBarStyleFromColor(ScreenName currentModule) {
+
+    if (currentModule == ScreenName.home ||
+    currentModule == ScreenName.wishList ||
+    currentModule == ScreenName.productDetail ||
+        currentModule == ScreenName.map ||
+        currentModule == ScreenName.orders ||
+        currentModule == ScreenName.orderDetails ||
+        currentModule == ScreenName.cart ||
+        currentModule == ScreenName.orderSummary ||
+        currentModule == ScreenName.profile ||
+        currentModule == ScreenName.privacyPolicy ||
+        currentModule == ScreenName.editProfile ||
+        currentModule == ScreenName.orderHistory ||
+        currentModule == ScreenName.familyAndFriends ||
+        currentModule == ScreenName.information){
+
+      return const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      );
+    } else {
+      return const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      );
+    }
+
+
+  }
+
 
 
   Future <void> callFooterCountGETAPI() async {

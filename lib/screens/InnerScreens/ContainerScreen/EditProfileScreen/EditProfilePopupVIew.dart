@@ -42,103 +42,133 @@ class EditProfilePopupViewState extends ConsumerState<EditProfilePopupView> {
     final notifier = ref.read(editProfileScreenStateProvider.notifier);
 
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF4F4F4),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 15.dp),
-            child: Column(
-              children: [
-                
-                Row(
-                  children: [
-                    CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        minimumSize: Size.zero,
-                        child: Icon(Icons.arrow_back_rounded,
-                            color: Colors.black,
-                            size: 20.dp),
-                        onPressed: () => Navigator.pop(context)
-                    ),
-                    SizedBox(width: 3.dp),
-                    objCommonWidgets.customText(context, 'Edit Profile', 14, Colors.black, objConstantFonts.montserratMedium)
-                    
-                  ],
-                ),
-                
-                SizedBox(height: 15.dp),
-
-                profileImageView(),
-
-                SizedBox(height: 20.dp),
-
-                CodeReusability().customTextField(
-                    context,
-                    "First Name",
-                    "enter your first name",
-                    Icons.person_2_outlined,
-                    state.firstNameController,
-                    onChanged: (_) => notifier.onChanged()
-                ),
-
-                SizedBox(height: 20.dp),
-
-                CodeReusability().customTextField(
-                    context,
-                    "Last Name",
-                    "enter your last name",
-                    Icons.person_2_outlined,
-                    state.lastNameController,
-                    onChanged: (_) => notifier.onChanged()
-                ),
-
-                SizedBox(height: 20.dp),
-
-                CodeReusability().datePickerTextField(
-                  context,
-                  "Date of birth",
-                  "select your date of birth",
-                  Icons.calendar_today,
-                  state.dobController,
-                  minimumAge: 0
-                ),
-
-                SizedBox(height: 20.dp),
-
-                CodeReusability().customSingleDropdownField(
-                  context: context,
-                  placeholder: "Select Your Gender",
-                  items: genderType,
-                  selectedValue: state.gender,
-                  prefixIcon: Icons.wc,
-                  onChanged: (value) {
-                    setState(() {
-                      notifier.updateGender(value!);
-                    });
-                  },
-                ),
-
-                SizedBox(height: 30.dp),
-
-                CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    minimumSize: Size.zero,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 13.dp),
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(25.dp)
+    return GestureDetector(
+      onTap: () => CodeReusability.hideKeyboard(context),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF4F4F4),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 15.dp),
+              child: Column(
+                children: [
+                  
+                  Row(
+                    children: [
+                      CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                          child: Icon(Icons.arrow_back_rounded,
+                              color: Colors.black,
+                              size: 20.dp),
+                          onPressed: () => Navigator.pop(context)
                       ),
-                      child: Center(
-                        child: objCommonWidgets.customText(context, 'Update', 14, Colors.white, objConstantFonts.montserratSemiBold),
+                      SizedBox(width: 3.dp),
+                      objCommonWidgets.customText(context, 'Edit Profile', 14, Colors.black, objConstantFonts.montserratMedium)
+                      
+                    ],
+                  ),
+                  
+                  SizedBox(height: 15.dp),
+      
+                  profileImageView(),
+      
+                  SizedBox(height: 20.dp),
+      
+                  CodeReusability().customTextField(
+                      context,
+                      "First Name",
+                      "enter your first name",
+                      Icons.person_2_outlined,
+                      state.firstNameController,
+                      onChanged: (_) => notifier.onChanged()
+                  ),
+      
+                  SizedBox(height: 20.dp),
+      
+                  CodeReusability().customTextField(
+                      context,
+                      "Last Name",
+                      "enter your last name",
+                      Icons.person_2_outlined,
+                      state.lastNameController,
+                      onChanged: (_) => notifier.onChanged()
+                  ),
+      
+                  SizedBox(height: 15.dp),
+      
+                  CodeReusability().customTextField(
+                      context,
+                      "Email",
+                      "enter your email",
+                      Icons.mail_outline_rounded,
+                      state.emailController,
+                      onChanged: (_) => notifier.onChanged()
+                  ),
+      
+                  SizedBox(height: 15.dp),
+      
+                  CodeReusability().customTextField(
+                    context,
+                    "Mobile Number",
+                    "enter valid mobile number",
+                    Icons.phone,
+                    state.mobileNumberController,
+                    inputType: CustomInputType.mobile,
+                    prefixText: '+91',
+                    onChanged: (_){
+                      notifier.onChanged();
+                    },
+                    suffixWidget: null,
+                  ),
+      
+                  SizedBox(height: 20.dp),
+      
+                  CodeReusability().datePickerTextField(
+                    context,
+                    "Date of birth",
+                    "select your date of birth",
+                    Icons.calendar_today,
+                    state.dobController,
+                    minimumAge: 0
+                  ),
+      
+                  SizedBox(height: 20.dp),
+      
+                  CodeReusability().customSingleDropdownField(
+                    context: context,
+                    placeholder: "Select Your Gender",
+                    items: genderType,
+                    selectedValue: state.gender,
+                    prefixIcon: Icons.wc,
+                    onChanged: (value) {
+                      setState(() {
+                        notifier.updateGender(value!);
+                      });
+                    },
+                  ),
+      
+                  SizedBox(height: 30.dp),
+      
+                  CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 13.dp),
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(25.dp)
+                        ),
+                        child: Center(
+                          child: objCommonWidgets.customText(context, 'Update', 14, Colors.white, objConstantFonts.montserratSemiBold),
+                        ),
                       ),
-                    ),
-                    onPressed: () => notifier.checkEmptyValidation(context,)
-                ),
-
-              ],
+                      onPressed: () => notifier.checkEmptyValidation(context,)
+                  ),
+      
+                ],
+              ),
             ),
           ),
         ),

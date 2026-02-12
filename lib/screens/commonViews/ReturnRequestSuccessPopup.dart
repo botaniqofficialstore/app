@@ -1,18 +1,19 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import '../../constants/ConstantVariables.dart';
 
-class ReviewSuccessPopup extends StatelessWidget {
-  const ReviewSuccessPopup({super.key});
+class ReturnRequestSuccessPopup extends StatelessWidget {
+  const ReturnRequestSuccessPopup({super.key});
 
   /// Static method to show the popup
   static Future<void> show(BuildContext context) async {
     await showGeneralDialog(
       context: context,
       barrierDismissible: false,
-      barrierLabel: 'Review Submitted',
+      barrierLabel: 'Request Submitted',
       barrierColor: Colors.black.withOpacity(0.5),
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, anim1, anim2) {
@@ -20,7 +21,7 @@ class ReviewSuccessPopup extends StatelessWidget {
           filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
           child: const PopScope(
             canPop: false,
-            child: ReviewSuccessPopup(),
+            child: ReturnRequestSuccessPopup(),
           ),
         );
       },
@@ -56,8 +57,8 @@ class ReviewSuccessPopup extends StatelessWidget {
               height: 85.dp,
               width: 85.dp,
               decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.green
+                  shape: BoxShape.circle,
+                  color: Colors.green
               ),
               child: Icon(
                 Icons.check_rounded,
@@ -71,7 +72,7 @@ class ReviewSuccessPopup extends StatelessWidget {
             /// Title
             objCommonWidgets.customText(
               context,
-              "Thanks You for Your Review!",
+              "Return Request Submitted Successfully!",
               15,
               Colors.black,
               objConstantFonts.montserratSemiBold,
@@ -83,7 +84,7 @@ class ReviewSuccessPopup extends StatelessWidget {
             /// Description
             objCommonWidgets.customText(
               context,
-              "We truly appreciate you taking the time to share your feedback on the product and delivery experience.",
+              "Your return request has been received and is currently under review. Our delivery partner will contact you shortly to schedule the pickup from your doorstep.",
               10,
               Colors.black87,
               objConstantFonts.montserratMedium,
@@ -94,9 +95,9 @@ class ReviewSuccessPopup extends StatelessWidget {
 
             objCommonWidgets.customText(
               context,
-              "Your review helps us improve our service and ensures we continue delivering quality organic products to you.",
+              "Please ensure the product is securely packed and that you are available during the pickup. Once the item is received and verified, your refund will be processed within 5–7 business days.",
               10,
-              Colors.black87,
+              Colors.black.withAlpha(150),
               objConstantFonts.montserratMedium,
               textAlign: TextAlign.center,
             ),
@@ -112,8 +113,8 @@ class ReviewSuccessPopup extends StatelessWidget {
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(vertical: 14.dp),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20.dp),
-                  color: Colors.deepOrange
+                    borderRadius: BorderRadius.circular(20.dp),
+                    color: Colors.deepOrange
                 ),
                 child: Center(
                   child: objCommonWidgets.customText(

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import '../../CodeReusable/CodeReusability.dart';
 import '../../constants/ConstantVariables.dart';
-import 'ReviewSuccessPopup.dart';
 
 class ProductRatingScreen extends StatefulWidget {
   const ProductRatingScreen({super.key});
@@ -64,7 +63,7 @@ class ProductRatingScreenState extends State<ProductRatingScreen>
                       padding: EdgeInsets.zero,
                       minimumSize: Size.zero,
                       child: Icon(Icons.arrow_back_outlined,
-                          color: Colors.black87, size: 20.dp),
+                          color: Colors.black, size: 18.dp),
                     ),
                     SizedBox(width: 5.dp,),
                     objCommonWidgets.customText(
@@ -72,7 +71,7 @@ class ProductRatingScreenState extends State<ProductRatingScreen>
                       'Ratings & Reviews',
                       14,
                       Colors.black,
-                      objConstantFonts.montserratSemiBold,
+                      objConstantFonts.montserratMedium,
                     ),
                     SizedBox(width: 25.dp),
                   ],
@@ -125,7 +124,7 @@ class ProductRatingScreenState extends State<ProductRatingScreen>
                               objCommonWidgets.customText(
                                 context,
                                 'How was your product & delivery experience?',
-                                15,
+                                13,
                                 Colors.black,
                                 objConstantFonts.montserratSemiBold,
                                 textAlign: TextAlign.center,
@@ -148,12 +147,12 @@ class ProductRatingScreenState extends State<ProductRatingScreen>
                                             horizontal: 4.dp),
                                         child: Icon(
                                           isSelected
-                                              ? Icons.star_rate_rounded
+                                              ? Icons.star
                                               : Icons.star_border_rounded,
                                           color: isSelected
                                               ? const Color(0xFFFFD700)
-                                              : Colors.black.withAlpha(150),
-                                          size: 35.dp,
+                                              : Colors.black,
+                                          size: 25.dp,
                                         ),
                                       ),
                                     ),
@@ -242,7 +241,7 @@ class ProductRatingScreenState extends State<ProductRatingScreen>
                             opacity: _isButtonEnabled ? 1.0 : 0.6,
                             child: SizedBox(
                               width: double.infinity,
-                              height: 55.dp,
+                              height: 45.dp,
                               child: CupertinoButton(
                                 padding: EdgeInsets.zero,
                                 minimumSize: Size.zero,

@@ -1,8 +1,8 @@
+import 'package:botaniqmicrogreens/screens/commonViews/DeleteAccountPopup.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
-import '../../../../Utility/PreferencesManager.dart';
 import '../../../commonViews/LogoutPopup.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../../../constants/Constants.dart';
@@ -75,43 +75,13 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
                   objCommonWidgets.customText(
                     context,
                     'Account',
-                    15,
+                    14,
                     objConstantColor.navyBlue,
-                    objConstantFonts.montserratSemiBold,
+                    objConstantFonts.montserratMedium,
                   ),
 
                   const Spacer(),
 
-                  CupertinoButton(
-                      minimumSize: const Size(0, 0),
-                      padding: EdgeInsets.zero,
-                      child: Row(
-                        children: [
-                          objCommonWidgets.customText(
-                            context,
-                            'Logout',
-                            12.5,
-                            Colors.red,
-                            objConstantFonts.montserratSemiBold,
-                          ),
-                          SizedBox(width: 2.5.dp),
-                          Icon(Icons.power_settings_new_outlined, color: Colors.red, size: 19.9.dp),
-                        ],
-                      ),
-                      onPressed: (){
-                        PreferencesManager.getInstance().then((pref) {
-                          pref.setBooleanValue(
-                              PreferenceKeys.isDialogOpened, true);
-                          LogoutPopup.showLogoutPopup(
-                            context: context,
-                            onConfirm: () {
-                              pref.setBooleanValue(
-                                  PreferenceKeys.isDialogOpened, false);
-                              screenNotifier.callLogoutAPI(context);
-                            },
-                          );
-                        });
-                      }),
 
                 ],
               ),
@@ -122,59 +92,6 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
-
-                    /// PROFILE + LOCATION
-                   /* Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10.dp),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 15.dp, horizontal: 10.dp),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20.dp),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _bigCard(
-                                    icon: Icons.person,
-                                    title: 'Profile',
-                                    subtitle: 'View & edit details',
-                                    onTap: () {
-                                      mainScreenNotifier.callNavigation(ScreenName.editProfile);
-                                    },
-                                  ),
-                                ),
-                                SizedBox(width: 12.dp),
-                                Expanded(
-                                  child: _bigCard(
-                                    icon: Icons.location_on,
-                                    title: 'Location',
-                                    subtitle: 'Delivery address',
-                                    onTap: () {
-                                      userFrom = ScreenName.profile;
-                                      mainScreenNotifier.callNavigation(ScreenName.map);
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            SizedBox(height: 12.dp),
-
-                            /// SUPPORT
-                            _supportCard(
-                              context,
-                              onTap: () {
-                                screenNotifier.openCustomerSupportEmail();
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),*/
 
                     SizedBox(height: 10.dp),
 
@@ -304,7 +221,7 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
                       padding: EdgeInsets.symmetric(horizontal: 10.dp),
                       child: objCommonWidgets.customText(
                         context,
-                        'DELETE ACCOUNT',
+                        'Customer Support',
                         10,
                         objConstantColor.navyBlue,
                         objConstantFonts.montserratMedium,
@@ -318,20 +235,54 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
                       padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
                       child: objCommonWidgets.customText(
                           context,
-                          'Closing your account will delete your profile and personal data permanently. You will no longer be able to access your purchase history or loyalty points.',
+                          'Customer support is available to assist you with order issues, refunds, delivery concerns, and account queries. Please reach out with accurate details so we can resolve your request quickly and efficiently.',
                           10,
                           objConstantColor.navyBlue,
                           objConstantFonts.montserratMedium
                       ),
                     ),
+                    SizedBox(height: 2.dp),
+                    CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        screenNotifier.openCustomerSupportEmail();
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(horizontal: 15.dp, vertical: 13.dp),
+                        color: Colors.white,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Icon(Icons.headset_mic_rounded, size: 16.dp, color: const Color(0xFF0345DC)),
+                            SizedBox(width: 5.dp),
+                            objCommonWidgets.customText(
+                                context,
+                                'Customer Support', 11.5,
+                                const Color(0xFF0345DC),
+                                objConstantFonts.montserratMedium
+                            ),
+                            const Spacer(),
+                            Icon(Icons.chevron_right, size: 18.dp, color: const Color(0xFF0345DC))
+                          ],
+                        ),
+                      ),
+                    ),
 
-                    SizedBox(height: 20.dp),
+                    SizedBox(height: 30.dp),
 
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 15.dp),
                       child: CupertinoButton(
                         padding: EdgeInsets.zero,
-                        onPressed: (){},
+                        onPressed: (){
+                          LogoutPopup.showLogoutPopup(
+                            context: context,
+                            onConfirm: () {
+                              screenNotifier.callLogoutAPI(context);
+                            },
+                          );
+                        },
                         child: Container(
                           width: double.infinity,
                           padding: EdgeInsets.symmetric(vertical: 14.dp),
@@ -340,19 +291,26 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
                             borderRadius: BorderRadius.circular(20.dp),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withAlpha(45),
-                                blurRadius: 10,
+                                color: Colors.black.withAlpha(15),
+                                blurRadius: 5,
                                 offset: const Offset(2, 5),
                               ),
                             ],
                           ),
-                          child: Center(
-                            child: objCommonWidgets.customText(
-                                context,
-                                'DELETE ACCOUNT',
-                                15,
-                                Colors.white,
-                                objConstantFonts.montserratSemiBold),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Image.asset(objConstantAssest.logout,color: Colors.white, width: 16.dp,),
+                              SizedBox(width: 5.dp),
+                              objCommonWidgets.customText(
+                                  context,
+                                  'Logout',
+                                  15,
+                                  Colors.white,
+                                  objConstantFonts.montserratSemiBold
+                              ),
+                            ],
                           ),
                         ), ),
                     ),
@@ -386,7 +344,9 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
           mainScreenNotifier.callNavigation(ScreenName.map);
         }),
         SizedBox(height: 2.dp),
-        commonBtn('Order History', (){}),
+        commonBtn('Order History', (){
+          mainScreenNotifier.callNavigation(ScreenName.orderHistory);
+        }),
         SizedBox(height: 2.dp),
         commonBtn('My Wishlist', (){
           userFrom = ScreenName.profile;
@@ -397,7 +357,14 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
           mainScreenNotifier.callNavigation(ScreenName.familyAndFriends);
         }),
         SizedBox(height: 2.dp),
-        commonBtn('Delete Account', (){}),
+        commonBtn('Delete Account', (){
+          DeleteAccountPopup.showDeleteAccountPopup(
+            context: context,
+            onConfirm: () {
+
+            },
+          );
+        }),
       ],
     );
   }
@@ -454,56 +421,6 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
 
-
-
-  Widget _bigCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return CupertinoButton(
-      padding: EdgeInsets.zero,
-      onPressed: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.all(18.dp),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20.dp),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(25),
-              blurRadius: 10,
-              offset: const Offset(1, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 40.dp,
-              width: 40.dp,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF2F3F6),
-                borderRadius: BorderRadius.circular(10.5.dp),
-              ),
-              child: Icon(icon, size: 20.dp, color: objConstantColor.orange),
-            ),
-            SizedBox(height: 14.dp),
-            objCommonWidgets.customText(context, title, 13, Colors.black, objConstantFonts.montserratMedium),
-            SizedBox(height: 2.dp),
-            objCommonWidgets.customText(context, subtitle, 10.5, Colors.grey.shade600, objConstantFonts.montserratMedium),
-
-          ],
-        ),
-      ),
-    );
-  }
-
-
-
   Widget _chipCard(
       BuildContext context,
       String title,
@@ -543,63 +460,6 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
       ),
     );
   }
-
-
-  Widget _supportCard(
-      BuildContext context, {
-        required VoidCallback onTap,
-      }) {
-    return CupertinoButton(
-      onPressed: onTap,
-      padding: EdgeInsets.zero,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 22.dp, horizontal: 15.dp),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-
-              Color(0xFF0345DC),
-              Color(0xFF3264D3),
-              Color(0xFF5A8DF6),
-
-            ],
-            stops: [0.0, 0.55, 1.0],
-          ),
-          borderRadius: BorderRadius.circular(20.dp),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(25),
-              blurRadius: 10,
-              offset: const Offset(1, -2),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Icon(Icons.headset_mic, color: Colors.white, size: 30.dp),
-            SizedBox(width: 5.dp),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                objCommonWidgets.customText(context,
-                    'Customer Support',
-                    15, Colors.white, objConstantFonts.montserratSemiBold),
-                objCommonWidgets.customText(context,
-                    'Need any help?',
-                    10, Colors.white, objConstantFonts.montserratMedium),
-              ],
-            ),
-            const Spacer(),
-            Icon(Icons.keyboard_arrow_right, color: Colors.white, size: 20.dp),
-          ],
-        ),
-      ),
-    );
-  }
-
 
 
 

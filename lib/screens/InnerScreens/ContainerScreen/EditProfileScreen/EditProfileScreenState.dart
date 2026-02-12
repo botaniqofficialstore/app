@@ -82,6 +82,7 @@ class EditProfileScreenGlobalStateNotifier
   ));
 
 
+
   void onChanged() {
     state = state.copyWith();
   }

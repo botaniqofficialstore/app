@@ -3,6 +3,7 @@ import 'package:botaniqmicrogreens/constants/ConstantVariables.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import '../../../Utility/PreferencesManager.dart';
@@ -40,39 +41,42 @@ class MainScreenState extends ConsumerState<MainScreen> {
     var userScreenState = ref.watch(MainScreenGlobalStateProvider);
     var userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
 
-    return PopScope(
-      canPop: false, // 🔥 We fully control back navigation
-      onPopInvokedWithResult: (didPop, dynamic) {
-        if (didPop) return;
-        _handleBack(context);
-      },
-      child: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: userScreenNotifier.getStatusBarStyleFromColor(userScreenState.currentModule),
+      child: PopScope(
+        canPop: false, // 🔥 We fully control back navigation
+        onPopInvokedWithResult: (didPop, dynamic) {
+          if (didPop) return;
+          _handleBack(context);
         },
-        child: SafeArea(
-          top: false,
-          bottom: false,
-          child: Scaffold(
-            key: _scaffoldKey,
-            backgroundColor: objConstantColor.white,
+        child: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: SafeArea(
+            top: false,
+            bottom: false,
+            child: Scaffold(
+              key: _scaffoldKey,
+              backgroundColor: objConstantColor.white,
 
-            body: Center(
-              child: userScreenNotifier.getChildContainer(),
+              body: Center(
+                child: userScreenNotifier.getChildContainer(),
+              ),
+
+              // UPDATED: Footer shows live cart & wishlist count
+              bottomNavigationBar: ((userScreenState.currentModule != ScreenName.reels))
+
+                  ? UserFooterView(
+                currentModule: userScreenState.currentModule,
+                cartCount: userScreenState.cartCount,
+                wishlistCount: userScreenState.wishlistCount,
+                selectedFooterIndex: (index) {
+                  userScreenNotifier.setFooterSelection(index);
+                },
+              )
+                  : const SizedBox.shrink(),
             ),
-
-            // UPDATED: Footer shows live cart & wishlist count
-            bottomNavigationBar: ((userScreenState.currentModule != ScreenName.reels))
-
-                ? UserFooterView(
-              currentModule: userScreenState.currentModule,
-              cartCount: userScreenState.cartCount,
-              wishlistCount: userScreenState.wishlistCount,
-              selectedFooterIndex: (index) {
-                userScreenNotifier.setFooterSelection(index);
-              },
-            )
-                : const SizedBox.shrink(),
           ),
         ),
       ),
@@ -198,12 +202,12 @@ class UserFooterViewState extends ConsumerState<UserFooterView> {
                   height: 4.dp,
                   width: indicatorWidth,
                   decoration: BoxDecoration(
-                    color: objConstantColor.navyBlue,
+                    color: objConstantColor.black,
                     borderRadius: BorderRadius.circular(20.dp),
                   ),
                 ),
               ),
-      
+
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -215,7 +219,7 @@ class UserFooterViewState extends ConsumerState<UserFooterView> {
                     return Stack(
                       clipBehavior: Clip.none,
                       children: [
-      
+
                         CupertinoButton(
                           onPressed: () => widget.selectedFooterIndex(index),
                           padding: EdgeInsets.zero,
@@ -226,6 +230,7 @@ class UserFooterViewState extends ConsumerState<UserFooterView> {
                                 isSelected ? activeIcons[index] : inactiveIcons[index],
                                 height: 20.dp,
                                 width: 20.dp,
+                                color: Colors.black,
                               ),
                               SizedBox(height: 2.5.dp),
                               objCommonWidgets.customText(
@@ -239,7 +244,7 @@ class UserFooterViewState extends ConsumerState<UserFooterView> {
                             ],
                           ),
                         ),
-      
+
                         //Badge for Cart
                         if (index == 3 && widget.cartCount > 0)
                           Positioned(
@@ -266,6 +271,7 @@ class UserFooterViewState extends ConsumerState<UserFooterView> {
                     );
                   }),
                 ),
+                SizedBox(height: 5.dp),
               ],
             ),
           ],

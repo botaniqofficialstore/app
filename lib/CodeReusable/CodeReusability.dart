@@ -370,6 +370,144 @@ class CodeReusability {
   }
 
 
+  Widget customTextView(
+      BuildContext context,
+      String hint,
+      String label,
+      IconData icon,
+      TextEditingController controller, {
+        int maxLength = 400,
+        double initialHeight = 120,
+        Widget? suffixWidget,
+        void Function(String)? onChanged,
+        String description = '',
+        bool isEdit = false
+      }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        objCommonWidgets.customText(
+          context,
+          hint,
+          12,
+          Colors.black,
+          objConstantFonts.montserratMedium,
+        ),
+
+        SizedBox(height: 5.dp),
+
+        if (description.isNotEmpty)...{
+          objCommonWidgets.customText(
+            context,
+            description,
+            10,
+            Colors.black,
+            objConstantFonts.montserratRegular,
+          ),
+          SizedBox(height: 10.dp),
+        },
+
+        Stack(
+          children: [
+            Container(
+              constraints: BoxConstraints(
+                minHeight: initialHeight.dp,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15.dp),
+                border: Border.all(color: Colors.black, width: 0.5),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start, // 🔥 icon stays top
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: 12.dp,
+                      top: 14.dp,
+                    ),
+                    child: Icon(
+                      icon,
+                      color: Colors.black,
+                      size: 20.dp,
+                    ),
+                  ),
+
+                  Expanded(
+                    child: AnimatedBuilder(
+                      animation: controller,
+                      builder: (context, _) {
+                        return TextField(
+                          controller: controller,
+                          maxLines: null,
+                          keyboardType: TextInputType.multiline,
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(maxLength),
+                          ],
+                          cursorColor: Colors.black,
+                          onChanged: onChanged,
+                          style: TextStyle(
+                            fontSize: isEdit ? 12.dp : 14.dp,
+                            fontFamily: objConstantFonts.montserratMedium,
+                            color: Colors.black,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: label,
+                            hintStyle: TextStyle(
+                              fontSize: 12.dp,
+                              fontFamily: objConstantFonts.montserratRegular,
+                              color: Colors.black.withAlpha(150),
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.fromLTRB(
+                              10.dp,
+                              12.dp,
+                              15.dp,
+                              30.dp, // space for counter
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  if (suffixWidget != null)
+                    Padding(
+                      padding: EdgeInsets.only(
+                        right: 10.dp,
+                        top: 10.dp,
+                      ),
+                      child: suffixWidget,
+                    ),
+                ],
+              ),
+            ),
+
+            /// 🔢 Counter
+            Positioned(
+              right: 8.dp,
+              bottom: 5.dp,
+              child: AnimatedBuilder(
+                animation: controller,
+                builder: (context, _) {
+                  final length = controller.text.length;
+                  return Text(
+                    '$length / $maxLength',
+                    style: TextStyle(
+                      fontSize: 11.dp,
+                      fontFamily: objConstantFonts.montserratMedium,
+                      color: length >= maxLength ? Colors.red : Colors.black54,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   ///Custom TextField Widget
   Widget customTextField(
       BuildContext context,
@@ -801,7 +939,6 @@ class CodeReusability {
                     value: selectedValue,
                     icon: const SizedBox.shrink(),
                     dropdownColor: Colors.white,
-
                     hint: objCommonWidgets.customText(
                       context,
                       placeholder,
@@ -816,7 +953,7 @@ class CodeReusability {
                         child: Text(
                           value,
                           style: TextStyle(
-                            fontSize: 15.dp,
+                            fontSize: 13.dp,
                             color: (selectedValue == value) ? Colors.black : Colors.black.withAlpha(200),
                             fontFamily: (selectedValue == value) ? objConstantFonts.montserratMedium : objConstantFonts.montserratRegular,
                           ),
