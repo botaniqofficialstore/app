@@ -1,5 +1,3 @@
-import 'package:botaniqmicrogreens/screens/commonViews/ProductRatingScreen.dart';
-import 'package:botaniqmicrogreens/screens/commonViews/ReviewSuccessPopup.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,28 +51,27 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
     var orderDetails = savedOrderData;
     var orderTracking = orderDetails?.orderTracking;
 
-    return SafeArea(
-      child: Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: objConstantColor.white,
-        body: Column(
+
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: const Color(0xFFF4F4F4),
+      body: SafeArea(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             /// Header
             Padding(
-              padding: EdgeInsets.only(left: 10.dp, top: 5.dp,),
+              padding: EdgeInsets.symmetric(horizontal: 15.dp, vertical: 10.dp),
               child: Row(
                 children: [
                   CupertinoButton(
-                      minimumSize: const Size(0, 0),
+                      minimumSize: Size.zero,
                       padding: EdgeInsets.zero,
-                      child: Image.asset(
-                          objConstantAssest.backIcon, width: 20.dp),
+                      child: Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 15.dp,),
                       onPressed: () {
                         userScreenNotifier.callNavigation(ScreenName.orders);
                       }),
-                  SizedBox(width: 5.dp),
+                  SizedBox(width: 3.dp),
                   objCommonWidgets.customText(
                     context,
                     'Order Details',
@@ -82,42 +79,56 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                     objConstantColor.navyBlue,
                     ConstantAssests.montserratSemiBold,
                   ),
+                  const Spacer(),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8.dp, vertical: 5.dp),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(5.dp),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(20),
+                          blurRadius: 2,
+                          spreadRadius: 1,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: objCommonWidgets.customText(
+                        context,
+                        steps[orderDetails?.currentOrderStatus ?? 0],//.toUpperCase(),
+                        10,
+                        Colors.green,
+                        objConstantFonts.montserratBold),
+                  ),
                 ],
               ),
             ),
-
-            SizedBox(height: 5.dp),
-
+            
             /// Scroll content
             Expanded(
               child: Scrollbar(
-                thumbVisibility: true,
                 thickness: 6,
                 radius: Radius.circular(10.dp),
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                        vertical: 5.dp, horizontal: 15.dp),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
 
-                        orderDetailsWidget(context),
+                      titleView('Order Summary'),
 
+                      orderDetailsWidget(context),
 
-                        Divider(
-                            color: objConstantColor.navyBlue, thickness: 0.5.dp),
-                        SizedBox(height: 10.dp),
+                      SizedBox(height: 10.dp),
 
-                        objCommonWidgets.customText(
-                            context, 'Track Order', 15, objConstantColor.navyBlue,
-                            objConstantFonts.montserratSemiBold),
+                      titleView('Track Order'),
 
-                        SizedBox(height: 10.dp),
-
-                        /// Track Order List
-                        ListView.builder(
+                      /// Track Order List
+                      Container(
+                        color: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                        child: ListView.builder(
                           shrinkWrap: true,
                           primary: false,
                           physics: const NeverScrollableScrollPhysics(),
@@ -140,70 +151,16 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                             );
                           },
                         ),
+                      ),
 
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 10.dp),
-                          child: Divider(color: Colors.black, thickness: 0.5.dp),
-                        ),
+                      SizedBox(height: 10.dp),
 
+                      titleView('Purchase Details'),
 
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            /// ⭐ Title
-                            objCommonWidgets.customText(
-                                context, 'Add Your Rating & Review', 15, objConstantColor.black,
-                                objConstantFonts.montserratSemiBold),
-
-                            SizedBox(height: 5.dp),
-
-                            /// 📄 Description
-                            objCommonWidgets.customText(
-                                context, 'Please rate the product and delivery experience. '
-                                'Your honest feedback helps maintain quality and service standards.', 10, objConstantColor.black,
-                                objConstantFonts.montserratMedium),
-
-                            SizedBox(height: 10.dp),
-
-                            /// 🚀 Action Button
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                CupertinoButton(
-                                    padding: EdgeInsets.zero,
-                                    minimumSize: Size.zero,
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black,
-                                        borderRadius: BorderRadius.circular(20.dp)
-                                      ),
-                                  child: Center(
-                                    child: objCommonWidgets.customText(
-                                        context, 'Write a Review', 10, objConstantColor.white,
-                                        objConstantFonts.montserratSemiBold),
-                                  ),
-                                ), onPressed: ()=> openRatingsAndReview(context)),
-                              ],
-                            )
-                          ],
-                        ),
-
-
-
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 10.dp),
-                          child: Divider(color: Colors.black, thickness: 0.5.dp),
-                        ),
-
-                        objCommonWidgets.customText(
-                            context, 'Purchase List', 16,
-                            objConstantColor.navyBlue,
-                            objConstantFonts.montserratSemiBold),
-
-                        SizedBox(height: 2.dp),
-
-                        ListView.builder(
+                      Container(
+                        color: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 13.dp, horizontal: 15.dp),
+                        child: ListView.builder(
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: orderDetails?.orderDetails.length,
@@ -221,13 +178,13 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                             );
                           },
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-
+            
             /// Bottom total bar
             Container(
               width: double.infinity,
@@ -242,7 +199,7 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                 padding: EdgeInsets.fromLTRB(15.dp, 10.dp, 20.dp, 10.dp),
                 child: Row(
                   children: [
-
+            
                     if (orderDetails?.currentOrderStatus == 0)...{
                       CupertinoButton(padding: EdgeInsets.zero,
                           child: Container(
@@ -252,28 +209,28 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                             ),
                             child: Padding(
                               padding: EdgeInsets.symmetric(
-                                  vertical: 12.dp, horizontal: 13.dp),
+                                  vertical: 10.dp, horizontal: 13.dp),
                               child: objCommonWidgets.customText(
-                                  context, 'Cancel Order', 15,
+                                  context, 'Cancel Order', 13,
                                   objConstantColor.white,
                                   objConstantFonts.montserratSemiBold),
                             ),
                           ), onPressed: () {
-
+            
                         setState(() {
                           final orderDetailScreenNotifier = ref.read(OrderDetailsScreenGlobalStateProvider.notifier);
-                          orderDetailScreenNotifier.callCancelOrderAPi(context, orderDetails?.orderId ?? '', userScreenNotifier);
+                          orderDetailScreenNotifier.openCancelRequestView(context, orderDetails?.orderId ?? '', userScreenNotifier);
                         });
                           }),
-
+            
                       const Spacer(),
                     }else...{
                       objCommonWidgets.customText(
                         context,
-                        'Total Amount',
-                        17,
-                        objConstantColor.navyBlue,
-                        objConstantFonts.montserratBold,
+                        'Total Amount :',
+                        15,
+                        Colors.black,
+                        objConstantFonts.montserratSemiBold,
                       ),
                     const Spacer(),
                     },
@@ -306,55 +263,26 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
     );
   }
 
+  Widget titleView(String title){
+    return Padding(
+      padding: EdgeInsets.only(left: 15.dp, top: 10.dp, bottom: 5.dp),
+      child: objCommonWidgets.customText(
+          context, title, 13, objConstantColor.navyBlue,
+          objConstantFonts.montserratSemiBold),
+    );
+  }
+
   Widget orderDetailsWidget(BuildContext context) {
     var orderDetails = savedOrderData;
-
-    // Define status-specific colors for a premium feel
     Color statusColor = Colors.green;
     Color statusBgColor = Colors.green.withAlpha(20);
 
     return Container(
-
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16.dp),
-      ),
+     color: Colors.white,
+      padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Row with Icon
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  objCommonWidgets.customText(
-                      context, 'Order Summary', 15, objConstantColor.navyBlue,
-                      objConstantFonts.montserratSemiBold),
-                ],
-              ),
-              // Premium Status Badge
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.dp, vertical: 4.dp),
-                decoration: BoxDecoration(
-                  color: statusBgColor,
-                  borderRadius: BorderRadius.circular(20.dp),
-                ),
-                child: objCommonWidgets.customText(
-                    context,
-                    steps[orderDetails?.currentOrderStatus ?? 0].toUpperCase(),
-                    10,
-                    statusColor,
-                    objConstantFonts.montserratBold),
-              ),
-            ],
-          ),
-
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.dp),
-            child: Divider(color: Colors.black, thickness: 0.5.dp),
-          ),
-
           // Data Grid
           _modernInfoRow(
             context,
@@ -454,19 +382,19 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
 
   Widget _buildMiniProgressTracker(int statusIndex) {
     return Container(
-      padding: EdgeInsets.all(12.dp),
+      padding: EdgeInsets.all(10.dp),
       decoration: BoxDecoration(
-          color: Colors.deepOrange.shade50,
+          color: Colors.deepOrange.withAlpha(15),
           borderRadius: BorderRadius.circular(12.dp),
           border: Border.all(color: Colors.deepOrange.shade200)
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, size: 16.dp, color: Colors.deepOrange),
+          Icon(Icons.info_outline, size: 20.dp, color: Colors.deepOrange),
           SizedBox(width: 5.dp),
           Flexible(
             child: objCommonWidgets.customText(
-                context, "Your order is currently being processed. You will receive an update once it's shipped.", 8,
+                context, "Your order is currently being processed. You will receive an update once it's shipped.", 9,
                 Colors.deepOrange,
                 objConstantFonts.montserratMedium),
           ),
@@ -486,125 +414,76 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
       int count,
       String image,
       ) {
-    return Column(
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: 80.dp,
-              height: 80.dp,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5.dp),
-                border: Border.all(color: objConstantColor.navyBlue, width: 0.5),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(5.dp),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(5.dp),
-                  child: NetworkImageLoader(
-                    imageUrl: '${ConstantURLs.baseUrl}$image',
-                    placeHolder: objConstantAssest.placeHolder,
-                    size: 60.dp,
-                    imageSize: 80.dp,
-                  ),
-                ),
-              ),
+        /// Image
+        ClipRRect(
+          borderRadius: BorderRadius.circular(5.dp),
+          child: SizedBox(
+            width: 80.dp,
+            height: 80.dp,
+            child: NetworkImageLoader(
+              imageUrl: '${ConstantURLs.baseUrl}$image',
+              placeHolder: objConstantAssest.placeHolder,
+              size: 80.dp,
+              imageSize: 80.dp,
+              bottomCurve: 5,
+              topCurve: 5,
             ),
-            SizedBox(width: 12.dp),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 4.dp),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    objCommonWidgets.customText(
-                      context,
-                      CodeReusability().cleanProductName(productName),
-                      15,
-                      objConstantColor.navyBlue,
-                      objConstantFonts.montserratSemiBold,
-                    ),
-                    SizedBox(height: 2.dp),
-                    Row(
-                      children: [
-                        objCommonWidgets.customText(
-                            context, 'Price:', 12,
-                            objConstantColor.navyBlue,
-                            objConstantFonts.montserratSemiBold),
-                        SizedBox(width: 5.dp),
-                        objCommonWidgets.customText(
-                            context, '₹$price/_', 12,
-                            objConstantColor.green,
-                            objConstantFonts.montserratSemiBold),
-                      ],
-                    ),
-                    SizedBox(height: 2.dp),
-                    objCommonWidgets.customText(
-                      context,
-                      'Quantity: $count',
-                      12,
-                      objConstantColor.navyBlue,
-                      objConstantFonts.montserratSemiBold,
-                    ),
-                    SizedBox(height: 2.dp),
-                    objCommonWidgets.customText(
-                      context,
-                      'Net Wt (per item): $gram',
-                      12,
-                      objConstantColor.navyBlue,
-                      objConstantFonts.montserratSemiBold,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-        SizedBox(height: 10.dp),
+
+        SizedBox(width: 10.dp),
+
+        /// Details
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              objCommonWidgets.customText(
+                context,
+                CodeReusability().cleanProductName(productName),
+                13,
+                Colors.deepOrange,
+                objConstantFonts.montserratSemiBold,
+              ),
+
+
+              /// Quantity
+              objCommonWidgets.customText(
+                context,
+                'item: $count',
+                11,
+                Colors.black,
+                objConstantFonts.montserratMedium,
+              ),
+
+              objCommonWidgets.customText(
+                context,
+                '$gram gm',
+                11,
+                Colors.black,
+                objConstantFonts.montserratMedium,
+              ),
+
+              objCommonWidgets.customText(
+                context,
+                'Ordered on: 17/02/2026',
+                11,
+                Colors.black,
+                objConstantFonts.montserratMedium,
+              ),
+              objCommonWidgets.customText(context, '₹$price/_', 12, Colors.green, objConstantFonts.montserratSemiBold)
+
+            ],
+          ),
+        ),
       ],
     );
   }
 
-
-  void openRatingsAndReview(BuildContext context) async {
-    final Map<String, dynamic>? result =
-    await showGeneralDialog<Map<String, dynamic>>(
-      context: context,
-      barrierDismissible: false,
-      barrierLabel: 'Benefits',
-      transitionDuration: const Duration(milliseconds: 400),
-      pageBuilder: (context, anim1, anim2) =>
-      const ProductRatingScreen(),
-      transitionBuilder: (context, anim1, anim2, child) {
-        return SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0, 1),
-            end: Offset.zero,
-          ).animate(
-            CurvedAnimation(
-              parent: anim1,
-              curve: Curves.easeOutCubic,
-            ),
-          ),
-          child: child,
-        );
-      },
-    );
-
-    /// ✅ User clicked Submit
-    if (result != null) {
-      final int rating = result['rating'];
-      final String review = result['review'];
-
-      debugPrint("User submitted review");
-      debugPrint("Rating: $rating");
-      debugPrint("Review: $review");
-
-      // Call API / show success popup
-      ReviewSuccessPopup.show(context);
-    }
-  }
 
 
 }

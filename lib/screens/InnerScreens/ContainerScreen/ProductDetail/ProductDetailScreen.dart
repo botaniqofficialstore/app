@@ -787,13 +787,13 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                             children: [
                               objCommonWidgets.customText(context,
                                   "₹${product.productSellingPrice}/_",
-                                  14, objConstantColor.green, objConstantFonts.montserratSemiBold),
+                                  13, objConstantColor.darkGreen, objConstantFonts.montserratSemiBold),
                               SizedBox(width: 3.dp),
                               Text(
                                 "₹${product.productPrice}/_",
                                 style: TextStyle(
-                                  color: objConstantColor.gray,
-                                  fontSize: 14.dp,
+                                  color: objConstantColor.black,
+                                  fontSize: 13.dp,
                                   fontFamily: ConstantAssests.montserratMedium,
                                   decoration: TextDecoration.lineThrough,
                                   decorationColor: objConstantColor.gray,
@@ -806,7 +806,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
                         objCommonWidgets.customText(context,
                             "${product.gram}gm",
-                            12, objConstantColor.black, objConstantFonts.montserratSemiBold),
+                            12, objConstantColor.black.withAlpha(150), objConstantFonts.montserratMedium),
 
                         SizedBox(height: 10.dp),
 
@@ -828,7 +828,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                     (product.inCart == 0)
                                         ? "Add to Cart"
                                         : 'View in Cart',
-                                    12, objConstantColor.white, objConstantFonts.montserratSemiBold),
+                                    10, objConstantColor.white, objConstantFonts.montserratSemiBold),
                               )
                           ),
                           onPressed: () {

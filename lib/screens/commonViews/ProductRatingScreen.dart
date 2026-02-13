@@ -163,114 +163,67 @@ class ProductRatingScreenState extends State<ProductRatingScreen>
                           ),
                         ),
 
-                        SizedBox(height: 40.dp),
+                        SizedBox(height: 30.dp),
+                        _buildSectionFadeIn(delay: 300, child: CodeReusability().customTextView(
+                            context,
+                            "Share your thought's",
+                            "Enter here...",
+                            description: 'Write about product quality, freshness, packaging, and delivery experience...',
+                            Icons.description_outlined,
+                            reviewTextController,
+                            onChanged: (_) => setState(() {}),
+                        )),
 
-                        /// 2. Review TextField
-                        _buildSectionFadeIn(
-                          delay: 300,
-                          child: Stack(
-                            children: [
-                              TextField(
-                                controller: reviewTextController,
-                                maxLength: _maxBenefitLength,
-                                cursorColor: Colors.deepOrange,
-                                minLines: 5,
-                                maxLines: null,
-                                onChanged: (_) => setState(() {}),
-                                style: TextStyle(
-                                  fontSize: 12.dp,
-                                  color: Colors.black,
-                                  fontFamily:
-                                  objConstantFonts.montserratMedium,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText:
-                                  "Write about product quality, freshness, packaging, and delivery experience...",
-                                  hintStyle: TextStyle(
-                                    color: Colors.black38,
-                                    fontSize: 11.dp,
-                                    fontFamily:
-                                    objConstantFonts.montserratMedium,
-                                  ),
-                                  counterText: "",
-                                  contentPadding: EdgeInsets.all(16.dp),
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(12.dp),
-                                    borderSide: BorderSide(
-                                        color: Colors.grey.shade300,
-                                        width: 1.dp),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(12.dp),
-                                    borderSide: BorderSide(
-                                        color: Colors.deepOrange,
-                                        width: 1.5.dp),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 10,
-                                right: 15,
-                                child: objCommonWidgets.customText(
-                                  context,
-                                  "${reviewTextController.text.length}/$_maxBenefitLength",
-                                  10,
-                                  reviewTextController.text.length >=
-                                      _maxBenefitLength
-                                      ? Colors.red
-                                      : Colors.black45,
-                                  objConstantFonts.montserratMedium,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
 
                         SizedBox(height: 30.dp),
 
                         /// 3. Submit Button
-                        _buildSectionFadeIn(
-                          delay: 500,
-                          child: AnimatedOpacity(
-                            duration:
-                            const Duration(milliseconds: 300),
-                            opacity: _isButtonEnabled ? 1.0 : 0.6,
-                            child: SizedBox(
-                              width: double.infinity,
-                              height: 45.dp,
-                              child: CupertinoButton(
-                                padding: EdgeInsets.zero,
-                                minimumSize: Size.zero,
-                                color: Colors.deepOrange,
-                                disabledColor:
-                                Colors.grey.shade400,
-                                borderRadius:
-                                BorderRadius.circular(25.dp),
-                                onPressed:
-                                _isButtonEnabled ? _submitData : null,
-                                child: objCommonWidgets.customText(
-                                  context,
-                                  'Submit Review',
-                                  14,
-                                  Colors.white,
-                                  objConstantFonts
-                                      .montserratSemiBold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
 
-                        SizedBox(height: 20.dp),
                       ],
                     ),
                   ),
                 ),
               ),
+
+              if (MediaQuery.of(context).viewInsets.bottom == 0)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 15.dp),
+                  child: _buildSectionFadeIn(
+                    delay: 500,
+                    child: AnimatedOpacity(
+                      duration:
+                      const Duration(milliseconds: 300),
+                      opacity: _isButtonEnabled ? 1.0 : 0.6,
+                      child: CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        color: Colors.deepOrange,
+                        disabledColor:
+                        Colors.grey.shade400,
+                        borderRadius:
+                        BorderRadius.circular(25.dp),
+                        onPressed:
+                        _isButtonEnabled ? _submitData : null,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 10.dp),
+                          width: double.infinity,
+                          child: Center(
+                            child: objCommonWidgets.customText(
+                              context,
+                              'Submit Review',
+                              14,
+                              Colors.white,
+                              objConstantFonts
+                                  .montserratSemiBold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+              SizedBox(height: 20.dp),
             ],
           ),
         ),

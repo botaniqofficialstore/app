@@ -42,45 +42,39 @@ class WishListScreenState extends ConsumerState<WishListScreen> {
     final wishListState = ref.watch(WishListScreenGlobalStateProvider);
     final wishListData = wishListState.wishListItems;
 
-    return SafeArea(
-      child: Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: objConstantColor.white,
-        body: Column(
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: const Color(0xFFF4F4F4),
+      body: SafeArea(
+        child: Column(
           children: [
             /// Header
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: objConstantColor.white,
-              ),
-              child: Padding(
-                padding: EdgeInsets.only(left: 15.dp, top: 5.dp),
-                child: Row(
-                  children: [
-                    CupertinoButton(
-                      minimumSize: const Size(0, 0),
-                      padding: EdgeInsets.zero,
-                      child: Image.asset(
-                        objConstantAssest.backIcon,
-                        width: 15.dp,
-                      ),
-                      onPressed: () {
-                        userScreenNotifier.callNavigation(ScreenName.home);
-                      },
+            Padding(
+              padding: EdgeInsets.only(left: 15.dp, top: 5.dp),
+              child: Row(
+                children: [
+                  CupertinoButton(
+                    minimumSize: const Size(0, 0),
+                    padding: EdgeInsets.zero,
+                    child: Image.asset(
+                      objConstantAssest.backIcon,
+                      width: 15.dp,
                     ),
-                    SizedBox(width: 5.dp),
-                    CommonWidget().customeText(
-                      'My WishList',
-                      13,
-                      objConstantColor.navyBlue,
-                      ConstantAssests.montserratMedium,
-                    ),
-                  ],
-                ),
+                    onPressed: () {
+                      userScreenNotifier.callNavigation(ScreenName.home);
+                    },
+                  ),
+                  SizedBox(width: 5.dp),
+                  CommonWidget().customeText(
+                    'My WishList',
+                    13,
+                    objConstantColor.black,
+                    ConstantAssests.montserratSemiBold,
+                  ),
+                ],
               ),
             ),
-      
+
             SizedBox(height: 10.dp),
 
             if (wishListState.isLoading)...{
@@ -95,24 +89,41 @@ class WishListScreenState extends ConsumerState<WishListScreen> {
                     },
                     color: objConstantColor.navyBlue,
                     backgroundColor: objConstantColor.white,
-                    child: GridView.builder(
+                    child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 0),
-                      gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
-                        childAspectRatio: 0.60,
+                      child: Column(
+                        children: [
+
+                          Container(
+                            color: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                            child: objCommonWidgets.customText(context, "Your wishlist saves the products you love for later. Review your saved items anytime and move them to your cart when you're ready to purchase.",
+                                9, Colors.black, objConstantFonts.montserratMedium,
+                            textAlign: TextAlign.justify),
+                          ),
+                          SizedBox(height: 15.dp),
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 0),
+                            gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
+                              childAspectRatio: 0.60,
+                            ),
+                            itemCount: wishListData.length,
+                            itemBuilder: (context, index) {
+                              final item = wishListData[index];
+                              final product = item.productDetails!;
+                              return _buildProductCard(
+                                  item, product, index, wishListScreenNotifier);
+                            },
+                          ),
+                        ],
                       ),
-                      itemCount: wishListData.length,
-                      itemBuilder: (context, index) {
-                        final item = wishListData[index];
-                        final product = item.productDetails!;
-                        return _buildProductCard(
-                            item, product, index, wishListScreenNotifier);
-                      },
                     )
                 ),
               ),
@@ -163,10 +174,10 @@ class WishListScreenState extends ConsumerState<WishListScreen> {
                 ),
               )
             },
-      
+
             /// Body (with pull to refresh)
 
-      
+
             SizedBox(height: 10.dp),
           ],
         ),
@@ -348,13 +359,13 @@ class WishListScreenState extends ConsumerState<WishListScreen> {
                             children: [
                               objCommonWidgets.customText(context,
                                   "₹${product.productSellingPrice}/_",
-                                  14, objConstantColor.green, objConstantFonts.montserratSemiBold),
+                                  13, objConstantColor.darkGreen, objConstantFonts.montserratSemiBold),
                               SizedBox(width: 3.dp),
                               Text(
                                 "₹${product.productPrice}/_",
                                 style: TextStyle(
-                                  color: objConstantColor.gray,
-                                  fontSize: 14.dp,
+                                  color: objConstantColor.black,
+                                  fontSize: 13.dp,
                                   fontFamily: ConstantAssests.montserratMedium,
                                   decoration: TextDecoration.lineThrough,
                                   decorationColor: objConstantColor.gray,
@@ -367,7 +378,7 @@ class WishListScreenState extends ConsumerState<WishListScreen> {
 
                         objCommonWidgets.customText(context,
                             "${product.gram}gm",
-                            11, objConstantColor.black, objConstantFonts.montserratMedium),
+                            11, objConstantColor.black.withAlpha(150), objConstantFonts.montserratMedium),
 
                         SizedBox(height: 10.dp),
 
@@ -389,7 +400,7 @@ class WishListScreenState extends ConsumerState<WishListScreen> {
                                     (item.inCart == 0)
                                         ? "Add to Cart"
                                         : 'View in Cart',
-                                    12, objConstantColor.white, objConstantFonts.montserratSemiBold),
+                                    10, objConstantColor.white, objConstantFonts.montserratSemiBold),
                               )
                           ),
                           onPressed: () {

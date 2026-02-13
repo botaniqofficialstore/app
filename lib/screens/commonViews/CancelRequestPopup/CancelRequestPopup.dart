@@ -5,22 +5,22 @@ import 'package:flutter_sizer/flutter_sizer.dart';
 
 import '../../../CodeReusable/CodeReusability.dart';
 import '../../../constants/ConstantVariables.dart';
-import 'ReturnRequestPopupState.dart';
+import 'CancelRequestPopupState.dart';
 
 
-class ReturnRequestPopup extends ConsumerStatefulWidget {
-  const ReturnRequestPopup({super.key});
+class CancelRequestPopup extends ConsumerStatefulWidget {
+  const CancelRequestPopup({super.key});
 
   @override
-  ReturnRequestPopupState createState() => ReturnRequestPopupState();
+  CancelRequestPopupState createState() => CancelRequestPopupState();
 }
 
-class ReturnRequestPopupState extends ConsumerState<ReturnRequestPopup> {
+class CancelRequestPopupState extends ConsumerState<CancelRequestPopup> {
 
   @override
   Widget build(BuildContext context) {
-    var state = ref.watch(returnRequestPopupStateProvider);
-    final notifier = ref.read(returnRequestPopupStateProvider.notifier);
+    var state = ref.watch(cancelRequestPopupStateProvider);
+    final notifier = ref.read(cancelRequestPopupStateProvider.notifier);
 
     return GestureDetector(
       onTap: () => CodeReusability.hideKeyboard(context),
@@ -30,7 +30,7 @@ class ReturnRequestPopupState extends ConsumerState<ReturnRequestPopup> {
             child: Column(
               children: [
                 headerView(),
-      
+
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
@@ -42,13 +42,14 @@ class ReturnRequestPopupState extends ConsumerState<ReturnRequestPopup> {
                               horizontal: 15.dp, vertical: 10.dp),
                           child: objCommonWidgets.customText(
                               context,
-                              'Returns can be requested within 24 hours of delivery. Select the reason and submit your request. Once approved, we will arrange pickup, and the refund will be processed to your original payment method after verification. Processing time may vary based on your payment provider.',
+                              'Orders can be cancelled before dispatch. If the order has already been shipped, cancellation may not be possible and you may need to request a return after delivery. Eligible refunds will be processed to the original payment method as per the refund timeline.',
                               10, Colors.black,
-                              objConstantFonts.montserratMedium),
+                              objConstantFonts.montserratMedium,
+                          textAlign: TextAlign.justify),
                         ),
-      
+
                         SizedBox(height: 20.dp),
-      
+
                         Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: 15.dp, vertical: 5.dp),
@@ -57,7 +58,7 @@ class ReturnRequestPopupState extends ConsumerState<ReturnRequestPopup> {
                             placeholder: "Select Reason",
                             items: state.returnReason,
                             selectedValue: state.reason,
-                            prefixIcon: Icons.restart_alt_sharp,
+                            prefixIcon: Icons.highlight_off_rounded,
                             onChanged: (value) {
                               setState(() {
                                 notifier.updateReason(value!);
@@ -65,47 +66,46 @@ class ReturnRequestPopupState extends ConsumerState<ReturnRequestPopup> {
                             },
                           ),
                         ),
-      
+
                         if(state.isOther)
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 15.dp, vertical: 10.dp),
-                          child: CodeReusability().customTextView(
-                              context,
-                              "Explain the return reason",
-                              "Enter your reason in detail here...",
-                              description: 'Brief your exact reason for this return, this will help us to proceed this request quickly',
-                              Icons.description_outlined,
-                              state.reasonController,
-                              onChanged: (_) => notifier.onChanged()
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 15.dp, vertical: 10.dp),
+                            child: CodeReusability().customTextView(
+                                context,
+                                "Explain the cancellation reason",
+                                "Enter your cancellation in detail here...",
+                                description: 'Brief your exact cancel reason, this will help us to proceed this request quickly',
+                                Icons.description_outlined,
+                                state.reasonController,
+                                onChanged: (_) => notifier.onChanged()
+                            ),
                           ),
-                        ),
 
 
 
-      
                       ],
                     ),
                   ),
                 ),
 
                 if (MediaQuery.of(context).viewInsets.bottom == 0)
-                  CupertinoButton(
-                      padding: EdgeInsets.symmetric(horizontal: 15.dp),
-                      onPressed: state.isSubmit ? () => notifier.callSubmit(context)
-                          : null,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 13.dp),
-                        decoration: BoxDecoration(
-                            color: state.isSubmit ? Colors.deepOrange : Colors.grey,
-                            borderRadius: BorderRadius.circular(20.dp)
-                        ),
-                        child: Center(child: objCommonWidgets.customText(context,
-                            'Submit', 13, Colors.white, objConstantFonts.montserratSemiBold)),
-                      )
-                  ),
+                CupertinoButton(
+                    padding: EdgeInsets.symmetric(horizontal: 15.dp),
+                    onPressed: state.isSubmit ? () => notifier.callSubmit(context)
+                        : null,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 13.dp),
+                      decoration: BoxDecoration(
+                          color: state.isSubmit ? Colors.deepOrange : Colors.grey,
+                          borderRadius: BorderRadius.circular(20.dp)
+                      ),
+                      child: Center(child: objCommonWidgets.customText(context,
+                          'Confirm', 13, Colors.white, objConstantFonts.montserratSemiBold)),
+                    )
+                ),
 
-                  SizedBox(height: 20.dp)
+                SizedBox(height: 20.dp)
               ],
             ),
           )
@@ -136,7 +136,7 @@ class ReturnRequestPopupState extends ConsumerState<ReturnRequestPopup> {
 
           objCommonWidgets.customText(
             context,
-            'Request for return',
+            'Cancel Order',
             14,
             objConstantColor.black,
             objConstantFonts.montserratMedium,

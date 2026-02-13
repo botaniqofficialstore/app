@@ -565,13 +565,13 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                           children: [
                             objCommonWidgets.customText(context,
                                 "₹${product.productSellingPrice}/_",
-                                14, objConstantColor.green, objConstantFonts.montserratSemiBold),
+                                12, const Color(0xff00bf01), objConstantFonts.montserratSemiBold),
                             SizedBox(width: 3.dp),
                             Text(
                               "₹${product.productPrice}/_",
                               style: TextStyle(
-                                color: objConstantColor.gray,
-                                fontSize: 14.dp,
+                                color: objConstantColor.black,
+                                fontSize: 12.dp,
                                 fontFamily: ConstantAssests.montserratMedium,
                                 decoration: TextDecoration.lineThrough,
                                 decorationColor: objConstantColor.gray,
@@ -584,7 +584,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
 
                       objCommonWidgets.customText(context,
                           "${product.gram}gm",
-                          11, objConstantColor.black, objConstantFonts.montserratMedium),
+                          11, objConstantColor.black.withAlpha(150), objConstantFonts.montserratMedium),
 
                       SizedBox(height: 5.dp),
 
@@ -606,7 +606,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                                 (product.inCart == 0)
                                     ? "Add to Cart"
                                     : 'View in Cart',
-                                12, objConstantColor.white, objConstantFonts.montserratSemiBold),
+                                10, objConstantColor.white, objConstantFonts.montserratSemiBold),
                           )
                         ),
                         onPressed: () {

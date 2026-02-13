@@ -1,4 +1,3 @@
-// OrderScreen.dart
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -286,20 +285,20 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 10.dp),
                     decoration: BoxDecoration(
-                      color: Colors.green.withAlpha(200),
+                      color: objConstantColor.darkGreen.withAlpha(200),
                       borderRadius: BorderRadius.circular(20.dp)
                     ),
                     child: Row(
                       children: [
 
-                        Icon(Icons.calendar_month_sharp, color: Colors.white, size: 15.dp),
-                        SizedBox(width: 5.dp),
+                        Icon(Icons.calendar_month_sharp, color: Colors.white, size: 12.dp),
+                        SizedBox(width: 3.dp),
                         objCommonWidgets.customText(
                           context,
                           'Feb 25 2026',
-                          12,
+                          10,
                           Colors.white,
-                          objConstantFonts.montserratSemiBold,
+                          objConstantFonts.montserratMedium,
                         ),
                       ],
                     ),
@@ -393,9 +392,10 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
                   ),
                   SizedBox(height: 1.dp),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      objCommonWidgets.customText(context, 'Amount to be paid : ', 11, Colors.black, objConstantFonts.montserratMedium),
-                      objCommonWidgets.customText(context, '₹$price/_', 12, Colors.green, objConstantFonts.montserratSemiBold),
+                      objCommonWidgets.customText(context, 'Amount to be paid : ', 10, Colors.black.withAlpha(150), objConstantFonts.montserratMedium),
+                      objCommonWidgets.customText(context, '₹$price/_', 15, Colors.green, objConstantFonts.montserratSemiBold),
                     ],
                   )
 
