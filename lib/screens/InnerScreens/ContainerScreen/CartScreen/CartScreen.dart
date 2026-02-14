@@ -39,20 +39,20 @@ class CartScreenState extends ConsumerState<CartScreen> {
     final cartScreenNotifier = ref.read(cartScreenGlobalStateProvider.notifier);
     final cartItems = userScreenState.cartItems;
 
-    return SafeArea(
-      child: Scaffold(
-        key: _scaffoldKey,
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: const Color(0xFFF4F4F4),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await cartScreenNotifier.callCartListGepAPI(context);
+        },
+        color: objConstantColor.navyBlue,
         backgroundColor: objConstantColor.white,
-        body: RefreshIndicator(
-          onRefresh: () async {
-            await cartScreenNotifier.callCartListGepAPI(context);
-          },
-          color: objConstantColor.navyBlue,
-          backgroundColor: objConstantColor.white,
+        child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-      
+
               /// Header
               Padding(
                 padding: EdgeInsets.only(left: 10.dp, top: 5.dp, bottom: 5.dp),
@@ -74,130 +74,125 @@ class CartScreenState extends ConsumerState<CartScreen> {
                   ],
                 ),
               ),
-      
+
               /// Scroll content (shimmer while loading, else real content)
               Expanded(
                 child: userScreenState.isLoading
-                    ? _buildShimmerPlaceholder() // show shimmer while loading
-                    : Scrollbar(
-                  thumbVisibility: true,
+                    ?  cartShimmerLoader() : Scrollbar(
                   thickness: 6,
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 18.dp),
-                      child: Builder(
-                        builder: (context) {
-                          if (cartItems.isEmpty) {
-      
-                            return SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.7, // fill height
-                              child: Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Image.asset(objConstantAssest.emptyCartIcon, width: 65.dp),
-                                    SizedBox(height: 1.dp),
-                                    Text(
-                                      "Your cart is empty.",
-                                      style: TextStyle(
-                                        color: objConstantColor.gray,
-                                        fontSize: 13.dp,
-                                        fontFamily: ConstantAssests.montserratSemiBold,
-                                      ),
+                    child: Builder(
+                      builder: (context) {
+                        if (cartItems.isEmpty) {
+
+                          return SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.7, // fill height
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Image.asset(objConstantAssest.emptyCartIcon, width: 65.dp),
+                                  SizedBox(height: 1.dp),
+                                  Text(
+                                    "Your cart is empty.",
+                                    style: TextStyle(
+                                      color: objConstantColor.gray,
+                                      fontSize: 13.dp,
+                                      fontFamily: ConstantAssests.montserratSemiBold,
                                     ),
-      
-                                    SizedBox(height: 20.dp),
-      
-                                    CupertinoButton(padding: EdgeInsets.zero,
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                              color: objConstantColor.orange,
-                                              borderRadius: BorderRadius.circular(5.dp)
-                                          ),
-                                          padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
-                                          child: objCommonWidgets.customText(context,
-                                              'Shop Now',
-                                              14, objConstantColor.white,
-                                              objConstantFonts.montserratBold),
+                                  ),
+
+                                  SizedBox(height: 20.dp),
+
+                                  CupertinoButton(padding: EdgeInsets.zero,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: objConstantColor.orange,
+                                            borderRadius: BorderRadius.circular(5.dp)
                                         ),
-                                        onPressed: (){
-                                          userScreenNotifier.callNavigation(ScreenName.home);
-                                        })
-                                  ],
-                                ),
+                                        padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                                        child: objCommonWidgets.customText(context,
+                                            'Shop Now',
+                                            14, objConstantColor.white,
+                                            objConstantFonts.montserratBold),
+                                      ),
+                                      onPressed: (){
+                                        userScreenNotifier.callNavigation(ScreenName.home);
+                                      })
+                                ],
                               ),
-                            );
-                          }
-      
-                          // ✅ Normal cart content
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-      
-                              customeText(
-                                'Order Summary',
-                                15,
-                                objConstantColor.navyBlue,
-                                ConstantAssests.montserratSemiBold,
-                              ),
-                              SizedBox(height: 15.dp),
-      
-                              /// Cart List
-                              ListView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: cartItems.length,
-                                itemBuilder: (context, index) {
-                                  final item = cartItems[index];
-                                  final details = item.productDetails!;
-      
-                                  return cell(
-                                      index,
-                                      details.productName,
-                                      details.productSellingPrice.toString(),
-                                      details.productPrice.toString(),
-                                      '${details.gram} gm',
-                                      item.productCount,
-                                      details.image,
-                                      cartScreenNotifier,
-                                      details.productId
-                                  );
-                                },
-                              ),
-      
-                              SizedBox(height: 10.dp),
-                              amountText(context, 'Amount', '${userScreenState.totalAmount}', ConstantAssests.montserratMedium, 12, 12),
-                              amountText(context, 'Discount', '${userScreenState.totalDiscount}', ConstantAssests.montserratMedium, 12, 12),
-                              amountText(context, 'Delivery Charge', (userScreenState.isDeliveryAddress) ? '89' : ' __', ConstantAssests.montserratMedium, 12 , 12),
-                              SizedBox(height: 10.dp),
-                              DottedLine(
-                                direction: Axis.horizontal,
-                                alignment: WrapAlignment.center,
-                                lineLength: double.infinity,
-                                lineThickness: 1.5,
-                                dashLength: 8.0,
-                                dashColor: objConstantColor.black.withAlpha(50),
-                                dashRadius: 0.0,
-                                dashGapLength: 4.0,
-                                dashGapColor: Colors.transparent,
-                                dashGapRadius: 0.0,
-                              ),
-                              SizedBox(height: 10.dp),
-                              amountText(context, 'Payable Amount', (userScreenState.isDeliveryAddress) ? '${userScreenState.totalPayableAmount}' : ' __', ConstantAssests.montserratSemiBold, 15, 15,
-                              ),
-                            ],
+                            ),
                           );
-                        },
-                      ),
+                        }
+
+                        // ✅ Normal cart content
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+
+                            /// Cart List
+                            ListView.separated(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: cartItems.length,
+                              separatorBuilder: (context, index) => Divider(color: Colors.black, height: 0.5.dp, thickness: 0.2,),
+                              itemBuilder: (context, index) {
+                                final item = cartItems[index];
+                                final details = item.productDetails!;
+
+                                return cell(
+                                    index,
+                                    details.productName,
+                                    details.productSellingPrice.toString(),
+                                    details.productPrice.toString(),
+                                    '${details.gram} gm',
+                                    item.productCount,
+                                    details.image,
+                                    cartScreenNotifier,
+                                    details.productId,
+                                );
+                              },
+                            ),
+
+                            SizedBox(height: 20.dp),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15.dp),
+                              child: Column(
+                                children: [
+                                  amountText(context, 'Amount', '${userScreenState.totalAmount}', ConstantAssests.montserratMedium, 12, 12),
+                                  amountText(context, 'Discount', '${userScreenState.totalDiscount}', ConstantAssests.montserratMedium, 12, 12),
+                                  amountText(context, 'Delivery Charge', (userScreenState.isDeliveryAddress) ? '89' : ' __', ConstantAssests.montserratMedium, 12 , 12),
+                                  SizedBox(height: 10.dp),
+                                  DottedLine(
+                                    direction: Axis.horizontal,
+                                    alignment: WrapAlignment.center,
+                                    lineLength: double.infinity,
+                                    lineThickness: 1.5,
+                                    dashLength: 8.0,
+                                    dashColor: objConstantColor.black.withAlpha(50),
+                                    dashRadius: 0.0,
+                                    dashGapLength: 4.0,
+                                    dashGapColor: Colors.transparent,
+                                    dashGapRadius: 0.0,
+                                  ),
+                                  SizedBox(height: 10.dp),
+                                  amountText(context, 'Payable Amount', (userScreenState.isDeliveryAddress) ? '${userScreenState.totalPayableAmount}' : ' __', ConstantAssests.montserratSemiBold, 13, 13,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),
               ),
-      
+
               /// Checkout (only when not loading and cart is not empty)
-      
+
               if (!userScreenState.isLoading && cartItems.isNotEmpty)
                if (userScreenState.isProfileCompleted) ...{
                 Container(
@@ -213,7 +208,7 @@ class CartScreenState extends ConsumerState<CartScreen> {
                     padding: EdgeInsets.fromLTRB(20.dp, 10.dp, 20.dp, 10.dp),
                     child: Row(
                       children: [
-      
+
                         Column(
                           children: [
                             customeText(
@@ -230,9 +225,9 @@ class CartScreenState extends ConsumerState<CartScreen> {
                             )
                           ],
                         ),
-      
+
                         const Spacer(),
-      
+
                         CupertinoButton(
                             padding: EdgeInsets.zero,
                             onPressed: () {
@@ -240,21 +235,21 @@ class CartScreenState extends ConsumerState<CartScreen> {
                             },
                             child: Container(
                               padding: EdgeInsets.symmetric(
-                                  vertical: 10.dp, horizontal: 15.dp),
+                                  vertical: 8.dp, horizontal: 15.dp),
                               decoration: BoxDecoration(
-                                color: objConstantColor.orange,
+                                color: Colors.deepOrange,
                                 borderRadius: BorderRadius.circular(5.dp),
                               ),
                               child: customeText(
                                 'Checkout',
-                                15,
+                                13,
                                 objConstantColor.white,
                                 ConstantAssests.montserratSemiBold,
                               ),
                             )
                         ),
-      
-      
+
+
                       ],
                     ),
                   ),
@@ -262,7 +257,7 @@ class CartScreenState extends ConsumerState<CartScreen> {
               }else...{
                  showUpdateProfileView(context)
               }
-      
+
             ],
           ),
         ),
@@ -331,131 +326,161 @@ class CartScreenState extends ConsumerState<CartScreen> {
   }
 
 
-  /// Cell Widget
-  Widget cell(int index, String productName, String price, String actualPrice,
-      String gram, int count, String image, CartScreenGlobalStateNotifier notifier, String productID) {
-    return Column(
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// Image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(5.dp),
-              child: Container(
-                width: 100.dp,
-                height: 100.dp,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5.dp),
-                  border: Border.all(
-                    color: Colors.black,
-                    width: 1,
-                  ),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(5.dp),
-                  child: NetworkImageLoader(
-                    imageUrl: '${ConstantURLs.baseUrl}$image',
-                    placeHolder: objConstantAssest.placeHolder,
-                    size: 60.dp,
-                    imageSize: 100.dp,
-                  ),
+
+  Widget cell(
+      int index,
+      String productName,
+      String price,
+      String actualPrice,
+      String gram,
+      int count,
+      String image,
+      CartScreenGlobalStateNotifier notifier,
+      String productID) {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.symmetric(vertical: 15.dp, horizontal: 15.dp),
+      child: Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// 1. Product Details (Left Side)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    objCommonWidgets.customText(context,
+                        CodeReusability().cleanProductName(productName),
+                        13, Colors.black, objConstantFonts.montserratSemiBold
+                    ),
+                    SizedBox(height: 2.dp),
+
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 4.dp, vertical: 2.dp),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade700,
+                            borderRadius: BorderRadius.circular(4.dp),
+                          ),
+                          child: Row(
+                            children: [
+                              objCommonWidgets.customText(context,
+                                  "4.2",
+                                  9, Colors.white, objConstantFonts.montserratMedium
+                              ),
+                              SizedBox(width: 2.dp),
+                              Icon(Icons.star, color: Colors.white, size: 8.dp),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 6.dp),
+                        objCommonWidgets.customText(context,
+                            "(120+ ratings)",
+                            10, Colors.black, objConstantFonts.montserratMedium
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 6.dp),
+                    objCommonWidgets.customText(context,
+                        gram,
+                        11, Colors.black.withAlpha(180),
+                        objConstantFonts.montserratMedium
+                    ),
+
+                    /// Price Section
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        objCommonWidgets.customText(context,
+                            '₹$price',
+                            16, Colors.black, objConstantFonts.montserratSemiBold
+                        ),
+                        SizedBox(width: 5.dp),
+                        Text(
+                          "₹$actualPrice",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12.dp,
+                            decoration: TextDecoration.lineThrough,
+                            fontFamily: objConstantFonts.montserratMedium
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: 5.dp),
+
+                    CupertinoButton(
+                      onPressed: () {
+                        var mainNotifier = ref.read(MainScreenGlobalStateProvider.notifier);
+                        notifier.callRemoveFromCart(context, productID, index, mainNotifier);
+                      },
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 8.dp),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFE32B2B),
+                          borderRadius: BorderRadius.circular(5.dp)
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.delete_forever_sharp, color: Colors.white, size: 13.dp,),
+                            SizedBox(width: 1.5.dp),
+                            objCommonWidgets.customText(context, 'Remove item', 10, Colors.white, objConstantFonts.montserratSemiBold)
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
 
-            SizedBox(width: 10.dp),
+              SizedBox(width: 15.dp),
 
-            /// Details
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              /// 2. Image & Quantity Toggle (Right Side)
+              Column(
                 children: [
-                  customeText(CodeReusability().cleanProductName(productName),
-                    15,
-                    objConstantColor.navyBlue,
-                    objConstantFonts.montserratSemiBold,
-                  ),
-                  SizedBox(height: 2.dp),
-
-                  /// Price & Offer
-                  Row(
+                  Stack(
+                    alignment: Alignment.bottomCenter,
+                    clipBehavior: Clip.none,
                     children: [
-                      customeText(
-                        '₹$price/_',
-                        14,
-                        objConstantColor.green,
-                        objConstantFonts.montserratSemiBold,
-                      ),
-                      SizedBox(width: 8.dp),
-                      Text(
-                        "₹$actualPrice/_",
-                        style: TextStyle(
-                          color: objConstantColor.gray,
-                          fontSize: 14.dp,
-                          fontFamily: ConstantAssests.montserratMedium,
-                          decoration: TextDecoration.lineThrough,
-                          decorationColor: objConstantColor.gray,
-                          decorationThickness: 1,
+                      /// Product Image
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(5.dp),
+                        child: SizedBox(
+                          width: 85.dp,
+                          height: 85.dp,
+                          child: NetworkImageLoader(
+                            imageUrl: '${ConstantURLs.baseUrl}$image',
+                            placeHolder: objConstantAssest.placeHolder,
+                            size: 85.dp,
+                            imageSize: 85.dp,
+                            bottomCurve: 5,
+                            topCurve: 5,
+                          ),
                         ),
-                      )
+                      ),
+
+
                     ],
                   ),
-
-                  SizedBox(height: 2.dp),
-                  customeText(
-                    gram,
-                    14,
-                    objConstantColor.navyBlue,
-                    objConstantFonts.montserratSemiBold,
-                  ),
-
-                  SizedBox(height: 5.dp),
-
-                  /// Delete Button
-                  CupertinoButton(
-                    onPressed: () {
-                      setState(() {
-                        var mainNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
-                        notifier.callRemoveFromCart(context, productID, index, mainNotifier); // Remove Product
-                      });
-                    },
-                    padding: EdgeInsets.zero,
-                    minSize: 0,
-                    child: Image.asset(
-                      objConstantAssest.deleteIcon,
-                      width: 18.dp,
-                      height: 18.dp,color: Colors.red,
-                    ),
-                  ),
-
                   SizedBox(height: 10.dp),
-
-                  /// Quantity Counter
                   QuantityCounter(
                     count: count,
                     onChanged: (newCount) {
-                      setState(() {
-                        notifier.callUpdateCountAPI(context, productID, index, newCount); //Add Product Count
-                      });
+                      notifier.callUpdateCountAPI(context, productID, index, newCount);
                     },
-                  ),
+                  )
                 ],
               ),
-            ),
-          ],
-        ),
-
-        /// Divider
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: 15.dp),
-          child: Divider(
-            color: objConstantColor.gray.withOpacity(0.4),
-            thickness: 1.5,
-            height: 1.5,
+            ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -468,14 +493,14 @@ class CartScreenState extends ConsumerState<CartScreen> {
           objCommonWidgets.customText(context,
             name,
             textSize,
-            objConstantColor.navyBlue,
+            Colors.black,
             font,
           ),
           const Spacer(),
           objCommonWidgets.customText(context,
             '₹$value/_',
             size,
-            objConstantColor.navyBlue,
+            Colors.black,
             font,
           )
         ],
@@ -497,123 +522,108 @@ class CartScreenState extends ConsumerState<CartScreen> {
   }
 
 
-  /// Shimmer placeholder while cart loads
-  Widget _buildShimmerPlaceholder() {
+  Widget cartShimmerLoader() {
     return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 14.dp, horizontal: 18.dp),
-        child: Column(
-          children: [
-            // title skeleton
-            Shimmer.fromColors(
-              baseColor: Colors.grey.shade300,
-              highlightColor: Colors.grey.shade100,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  width: 140.dp,
-                  height: 26.dp,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            SizedBox(height: 12.dp),
+      physics: const NeverScrollableScrollPhysics(),
+      child: Column(
+        children: [
+          /// Shimmer List (Shows 3 items by default)
+          ListView.separated(
+            shrinkWrap: true,
+            itemCount: 3,
+            separatorBuilder: (context, index) => Divider(height: 1, thickness: 0.5),
+            itemBuilder: (context, index) => shimmerCell(),
+          ),
 
-            // multiple item skeletons
-            Column(
-              children: List.generate(3, (i) {
-                return Container(
-                  margin: EdgeInsets.only(bottom: 12.dp),
-                  padding: EdgeInsets.all(10.dp),
-                  decoration: BoxDecoration(
-                    color: objConstantColor.white,
-                    borderRadius: BorderRadius.circular(6.dp),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 6,
-                        spreadRadius: 1,
-                        offset: const Offset(2, 2),
-                      ),
+          SizedBox(height: 30.dp),
+
+          /// Shimmer Billing Section
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 15.dp),
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Column(
+                children: List.generate(4, (index) => Padding(
+                  padding: EdgeInsets.only(bottom: 15.dp),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(width: 100.dp, height: 12.dp, color: Colors.white),
+                      Container(width: 50.dp, height: 12.dp, color: Colors.white),
                     ],
                   ),
-                  child: Shimmer.fromColors(
-                    baseColor: Colors.grey.shade300,
-                    highlightColor: Colors.grey.shade100,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(width: 100.dp, height: 100.dp, color: Colors.white),
-                        SizedBox(width: 12.dp),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(width: double.infinity, height: 16.dp, color: Colors.white),
-                              SizedBox(height: 8.dp),
-                              Container(width: 120.dp, height: 14.dp, color: Colors.white),
-                              SizedBox(height: 8.dp),
-                              Container(width: 80.dp, height: 14.dp, color: Colors.white),
-                              SizedBox(height: 10.dp),
-                              Row(
-                                children: [
-                                  Container(width: 90.dp, height: 36.dp, color: Colors.white),
-                                  SizedBox(width: 10.dp),
-                                  Container(width: 70.dp, height: 36.dp, color: Colors.white),
-                                ],
-                              )
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                );
-              }),
+                )),
+              ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
 
-            SizedBox(height: 8.dp),
-
-            // totals skeleton
-            Shimmer.fromColors(
-              baseColor: Colors.grey.shade300,
-              highlightColor: Colors.grey.shade100,
+  Widget shimmerCell() {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.symmetric(vertical: 15.dp, horizontal: 15.dp),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// Left side: Details
+            Expanded(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(width: double.infinity, height: 14.dp, color: Colors.white),
+                  // Product Name line
+                  Container(width: 140.dp, height: 14.dp, color: Colors.white),
                   SizedBox(height: 8.dp),
-                  Container(width: double.infinity, height: 14.dp, color: Colors.white),
+                  // Rating line
+                  Container(width: 60.dp, height: 10.dp, color: Colors.white),
                   SizedBox(height: 8.dp),
-                  Container(width: double.infinity, height: 14.dp, color: Colors.white),
+                  // Gram/Weight line
+                  Container(width: 40.dp, height: 10.dp, color: Colors.white),
                   SizedBox(height: 12.dp),
-                  Container(width: 180.dp, height: 18.dp, color: Colors.white),
+                  // Price line
+                  Container(width: 80.dp, height: 16.dp, color: Colors.white),
                 ],
               ),
             ),
 
-            SizedBox(height: 18.dp),
+            SizedBox(width: 15.dp),
 
-            // checkout button skeleton
-            Shimmer.fromColors(
-              baseColor: Colors.grey.shade300,
-              highlightColor: Colors.grey.shade100,
-              child: Container(
-                width: double.infinity,
-                height: 54.dp,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(6.dp),
+            /// Right side: Image & Counter
+            Column(
+              children: [
+                Container(
+                  width: 85.dp,
+                  height: 85.dp,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5.dp),
+                  ),
                 ),
-              ),
+                SizedBox(height: 10.dp),
+                Container(
+                  width: 70.dp,
+                  height: 30.dp,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8.dp),
+                  ),
+                ),
+              ],
             ),
-
-            SizedBox(height: 18.dp),
           ],
         ),
       ),
     );
   }
+
+
+
 }
 
 
@@ -631,67 +641,48 @@ class QuantityCounter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.dp, vertical: 4.dp),
       decoration: BoxDecoration(
-        border: Border.all(color: objConstantColor.navyBlue, width: 1), // border color
-        borderRadius: BorderRadius.circular(5.dp), // curved corners
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.dp),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(15),
+            blurRadius: 2,
+            offset: const Offset(0, 2),
+          ),
+        ],
+        border: Border.all(color: Colors.grey.shade300),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-
-          SizedBox(width: 5.dp,),
-          /// Minus button
-          CupertinoButton(
-            onPressed: () {
-              if (count > 1) {
-                onChanged(count - 1);
-              }
+          _buildBtn(
+            icon: count > 1 ? Icons.remove : Icons.delete_outline,
+            onTap: () {
+              if (count > 1) onChanged(count - 1);
             },
-            padding: EdgeInsets.zero,
-            minSize: 0, // removes default CupertinoButton size
-            child: Image.asset(
-              (count > 1) ? objConstantAssest.minusIcon : objConstantAssest.minusDisableIcon,
-              width: 13.dp,
-              height: 15.dp,
-            ),
+            color: count > 1 ? objConstantColor.navyBlue : Colors.red,
           ),
-
-          SizedBox(width: 15.dp,),
-
-          /// Count in center
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12.dp),
-            child: Text(
-              "$count",
-              style: TextStyle(
-                fontSize: 16.dp,
-                fontFamily: objConstantFonts.montserratMedium,
-                color: objConstantColor.navyBlue,
-              ),
-            ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.dp),
+            child: objCommonWidgets.customText(context, "$count", 14, Colors.black, objConstantFonts.montserratSemiBold)
           ),
-
-          SizedBox(width: 15.dp,),
-
-          /// Plus button
-          CupertinoButton(
-            onPressed: () {
-              onChanged(count + 1);
-            },
-            padding: EdgeInsets.zero,
-            minSize: 0,
-            child: Image.asset(
-              objConstantAssest.addIcon,
-              width: 13.dp,
-              height: 15.dp,
-            ),
+          _buildBtn(
+            icon: Icons.add,
+            onTap: () => onChanged(count + 1),
+            color: objConstantColor.navyBlue,
           ),
-
-          SizedBox(width: 5.dp,),
         ],
       ),
+    );
+  }
+
+  Widget _buildBtn({required IconData icon, required VoidCallback onTap, required Color color}) {
+    return CupertinoButton(
+      onPressed: onTap,
+      padding: EdgeInsets.zero,
+      minSize: 32.dp,
+      child: Icon(icon, size: 16.dp, color: color),
     );
   }
 }

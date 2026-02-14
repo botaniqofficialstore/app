@@ -1,4 +1,6 @@
 import 'package:botaniqmicrogreens/screens/commonViews/ReturnRequestPopup/ReturnRequestPopup.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_sizer/flutter_sizer.dart';
 
 import '../../../constants/Constants.dart';
 import 'package:flutter/cupertino.dart';
@@ -114,6 +116,28 @@ class OrderDetailsPopupViewStateNotifier
       ReturnRequestSuccessPopup.show(context);
 
     }
+  }
+
+  void showDownloadingToast(BuildContext context) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: const Center(
+            child: Text(
+              'Invoice Downloading...',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          backgroundColor: Colors.black,
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.dp),
+          ),
+        ),
+      );
   }
 
 }

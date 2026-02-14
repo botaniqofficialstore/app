@@ -102,6 +102,9 @@ class OrderDetailsPopupViewState extends ConsumerState<OrderDetailsPopupView> {
                           SizedBox(height: 15.dp),
                         },
 
+                        invoiceDownloadView(),
+                        SizedBox(height: 15.dp),
+
 
                         if(state.allProducts['returned'])...{
                           returnReasonView(),
@@ -342,15 +345,79 @@ class OrderDetailsPopupViewState extends ConsumerState<OrderDetailsPopupView> {
     );
   }
 
+  Widget invoiceDownloadView(){
+    final notifier = ref.read(orderDetailsPopupViewStateProvider.notifier);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        titleText('Purchase Invoice'),
+
+        SizedBox(height: 5.dp),
+
+        Container(
+          color: Colors.white,
+          padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+          child: Column(
+            children: [
+              objCommonWidgets.customText(
+                  context, 'Download your purchase invoice for order details, billing information, and payment summary. '
+                  'This document can be used for personal records, returns, or warranty claims.'
+                  , 10, objConstantColor.black,
+                  objConstantFonts.montserratMedium,
+              textAlign: TextAlign.justify),
+
+              SizedBox(height: 10.dp),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 7.dp, horizontal: 13.dp),
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(15.dp)
+                      ),
+                      child: Row(
+                        children: [
+                          objCommonWidgets.customText(
+                            context,
+                            'Download Invoice',
+                            10,
+                            objConstantColor.white,
+                            objConstantFonts.montserratSemiBold,
+                          ),
+                          Icon(Icons.download_rounded, color: Colors.white, size: 18.dp),
+                        ],
+                      ),
+                    ),
+                    onPressed: () {
+                      notifier.showDownloadingToast(context);
+                    },
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+
+      ],
+    );
+  }
+
 
 
   Widget headerView(){
-    var state = ref.watch(orderDetailsPopupViewStateProvider);
+    final notifier = ref.read(orderDetailsPopupViewStateProvider.notifier);
 
     return Container(
       padding: EdgeInsets.only(top: 5.dp, right: 10.dp, left: 10.dp, bottom: 8.dp),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
 
           CupertinoButton(padding: EdgeInsets.zero,
@@ -373,7 +440,6 @@ class OrderDetailsPopupViewState extends ConsumerState<OrderDetailsPopupView> {
             objConstantFonts.montserratMedium,
           ),
 
-          const Spacer(),
 
         ],
       ),

@@ -1,7 +1,7 @@
-import 'package:back_button_interceptor/back_button_interceptor.dart';
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
 import '../../../../CodeReusable/FacebookSignInService.dart';
@@ -11,6 +11,7 @@ import '../../../CodeReusable/CodeReusability.dart';
 import '../../../Utility/PreferencesManager.dart';
 import '../../commonViews/CommonWidgets.dart';
 import '../CreateAccount/CreateAccountScreen.dart';
+import '../OtpScreen/OtpScreen.dart';
 import 'LoginScreenState.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -26,40 +27,374 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    BackButtonInterceptor.add(loginInterceptor);
   }
 
 
   @override
   void dispose() {
-    BackButtonInterceptor.remove(loginInterceptor);
     super.dispose();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    final loginState = ref.watch(loginScreenProvider);
+    final loginNotifier = ref.read(loginScreenProvider.notifier);
 
-  //MARK: - METHODS
-  /// Return true to prevent default behavior (app exit)
-  /// Return false to allow default behavior
-  bool loginInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
-    if (kDebugMode) {
-      print("Back button intercepted!");
-    }
-    PreferencesManager.getInstance().then((prefs) {
-      if (prefs.getBooleanValue(PreferenceKeys.isDialogOpened) == true) {
-        return false;
-      } else if ((prefs.getBooleanValue(PreferenceKeys.isLoadingBarStarted) ==
-          true)) {
-        return true;
-      } else {
-        return false;
-      }
-    });
-    return true;
+    return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, dynamic) {
+          if (didPop) return;
+        },
+        child: AnnotatedRegion<SystemUiOverlayStyle>(
+          value: const SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.light,
+            statusBarBrightness: Brightness.dark,
+          ),
+          child: GestureDetector(
+            onTap: () => CodeReusability.hideKeyboard(context),
+            child: Scaffold(
+              backgroundColor: const Color(0xFFF9FAFB),
+
+              /// ✅ SAFE FOOTER (gesture + button navigation safe)
+
+              body: LayoutBuilder(builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: IntrinsicHeight(
+                      child: SafeArea(
+                        top: false,
+                        child: Column(
+                          children: [
+
+                            /// 🔹 TOP IMAGE SECTION
+                            Stack(
+                              children: [
+                                Image.asset(
+                                  objConstantAssest.sampleTwo,
+                                  width: double.infinity,
+                                  height: 52.h,
+                                  fit: BoxFit.fitHeight,
+                                ),
+                                Positioned.fill(
+                                  child: BackdropFilter(
+                                    filter: ImageFilter.blur(
+                                      sigmaX: 3,
+                                      sigmaY: 3,
+                                    ),
+                                    child: Container(
+                                      color: Colors.black.withAlpha(80),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 45.dp,
+                                  left: 15.dp,
+                                  right: 15.dp,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      objCommonWidgets.customText(
+                                        context,
+                                        'Welcome',
+                                        30,
+                                        Colors.white,
+                                        objConstantFonts
+                                            .montserratSemiBold,
+                                      ),
+                                      SizedBox(height: 1.h),
+                                      objCommonWidgets.customText(
+                                        context,
+                                        'Pure organic goodness, delivered to your door.',
+                                        12,
+                                        Colors.white,
+                                        objConstantFonts
+                                            .montserratSemiBold,
+                                      ),
+                                      SizedBox(height: 3.dp),
+                                      /*objCommonWidgets.customText(
+                                        context,
+                                        'Fresh produce, natural oils, clean \nbody care — all in one place.',
+                                        9,
+                                        Colors.white,
+                                        objConstantFonts
+                                            .montserratMedium,
+                                      ),*/
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            /// 🔹 FORM SECTION
+                            Transform.translate(
+                              offset: const Offset(0, -30),
+                              child: Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 6.w,
+                                  vertical: 2.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF9FAFB),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft:
+                                    Radius.circular(35.dp),
+                                    topRight:
+                                    Radius.circular(35.dp),
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+
+                                    SizedBox(height: 10.dp),
+
+                                    objCommonWidgets.customText(
+                                      context,
+                                      'Login',
+                                      25,
+                                      Colors.black,
+                                      objConstantFonts
+                                          .montserratSemiBold,
+                                    ),
+
+                                    SizedBox(height: 13.dp),
+
+                                    _customTextField(
+                                      "Enter Mobile Number",
+                                      "Enter your reg. mobile number",
+                                      loginState.emailMobileController,
+                                      keyboardType:
+                                      TextInputType.number,
+                                      prefixText: "+91",
+                                      maxLength: 10,
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter
+                                            .digitsOnly,
+                                      ],
+                                      onChanged: (value){
+                                        if (value.length == 10) {
+                                          FocusScope.of(context).unfocus();
+                                        }
+                                      }
+                                    ),
+
+                                    SizedBox(height: 3.h),
+
+                                    CupertinoButton(
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () {
+
+                                        Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                            builder: (_) => OtpScreen(loginWith: '9061197858',
+                                                isEmail: CodeReusability().isEmail('9061197858')),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        width: double.infinity,
+                                        padding:
+                                        EdgeInsets.symmetric(
+                                          vertical: 15.dp,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black,
+                                          borderRadius:
+                                          BorderRadius.circular(
+                                            25.dp,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: objCommonWidgets
+                                              .customText(
+                                            context,
+                                            'Get OTP',
+                                            16,
+                                            Colors.white,
+                                            objConstantFonts
+                                                .montserratSemiBold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    SizedBox(height: 25.dp),
+
+
+                                    Row(
+                                      children: [
+                                        Expanded(child: Divider(thickness: 1.dp)),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: 16.dp),
+                                          child: objCommonWidgets.customText(
+                                            context,
+                                            'OR LOGIN WITH',
+                                            10,
+                                            Colors.grey.shade600,
+                                            objConstantFonts.montserratMedium, // Using Medium for a cleaner look
+                                          ),
+                                        ),
+                                        Expanded(child: Divider(thickness: 1.dp)),
+                                      ],
+                                    ),
+
+                                    SizedBox(height: 25.dp),
+
+                                    // Social Buttons Layout
+                                    Row(
+                                      children: [
+                                        // Google Button
+                                        Expanded(
+                                          child: socialButton(
+                                            asset: objConstantAssest.google,
+                                            label: 'Google',
+                                            onTap: () async {
+                                              final user = await GoogleSignInService.signInWithGoogle();
+                                              if (user != null) {
+                                                var result = CodeReusability().splitFullName('${user.displayName}');
+                                                loginNotifier.callSocialSignInAPI(context, user.email, 'google', '${result["firstName"]}', '${result["lastName"]}');
+                                              }
+                                            },
+                                          ),
+                                        ),
+
+                                        SizedBox(width: 16.dp),
+
+                                        // Facebook Button
+                                        Expanded(
+                                          child: socialButton(
+                                            asset: objConstantAssest.facebook,
+                                            label: 'Facebook',
+                                            onTap: () async {
+                                              final user = await FacebookSignInService.signInWithFacebook();
+                                              if (user != null) {
+                                                var result = CodeReusability().splitFullName('${user.displayName}');
+                                                loginNotifier.callSocialSignInAPI(context, '${user.email}', 'facebook', '${result["firstName"]}', '${result["lastName"]}');
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+                                  ],
+                                ),
+                              ),
+                            ),
+
+
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+        )
+    );
+  }
+
+  Widget _customTextField(
+      String hint,
+      String label,
+      TextEditingController? controller, {
+        int maxLines = 1,
+        TextInputType keyboardType = TextInputType.text,
+        void Function(String)? onChanged,
+        List<TextInputFormatter>? inputFormatters,
+        String? prefixText,
+        int? maxLength,
+      }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        objCommonWidgets.customText(
+          context,
+          hint,
+          12,
+          Colors.black,
+          objConstantFonts.montserratMedium,
+        ),
+        SizedBox(height: 3.dp), // ↓ reduced from 5.dp
+        TextField(
+          controller: controller,
+          onChanged: onChanged,
+          maxLines: maxLines,
+          keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
+          cursorColor: Colors.black,
+          style: TextStyle(
+            fontSize: 14.dp,
+            fontFamily: objConstantFonts.montserratMedium,
+            color: Colors.black87,
+          ),
+          decoration: InputDecoration(
+            counterText: "",
+            prefixIcon: prefixText != null ? Padding(
+              padding: EdgeInsets.only(left: 15.dp, right: 5.dp), // ↓ reduced
+              child: Center(
+                widthFactor: 0.0,
+                child: Text(
+                  prefixText,
+                  style: TextStyle(
+                    fontSize: 15.dp,
+                    fontFamily: objConstantFonts.montserratSemiBold,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            )
+                : null,
+            hintText: label,
+            hintStyle: TextStyle(
+              fontSize: 10.dp,
+              fontFamily: objConstantFonts.montserratRegular,
+              color: Colors.black.withAlpha(150),
+            ),
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.dp),
+              borderSide: BorderSide(color: Colors.black.withAlpha(65)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.dp),
+              borderSide: BorderSide(
+                color: controller!.text.trim().isNotEmpty
+                    ? Colors.black
+                    : Colors.black.withAlpha(65),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.dp),
+              borderSide: const BorderSide(color: Colors.black),
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 10.dp,
+              vertical: 10.dp, // ↓ reduced from 15.dp
+            ),
+          ),
+          maxLength: maxLength,
+        ),
+      ],
+    );
   }
 
 
+
+
   //MARK: - Widget
-  @override
+  /*@override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => CodeReusability.hideKeyboard(context),
@@ -262,26 +597,34 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
         ],
       ),
     );
-  }
+  }*/
 
-  Widget socialIcon(String asset, double size) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(50.dp),
-        border: Border.all(color: Colors.grey.shade400, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            blurRadius: 1,
-            spreadRadius: 1,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(12.dp),
-        child: Image.asset(asset, width: size),
+  Widget socialButton({required String asset, required String label, required VoidCallback onTap}) {
+    return CupertinoButton(
+      onPressed: onTap,
+      padding: EdgeInsets.zero,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12.dp),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.dp),
+          border: Border.all(color: Colors.grey.shade200), // Soft border instead of heavy shadow
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(15),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(asset, width: 18.dp),
+            SizedBox(width: 7.dp),
+            objCommonWidgets.customText(context, label, 12, Colors.black, objConstantFonts.montserratSemiBold)
+          ],
+        ),
       ),
     );
   }

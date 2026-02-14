@@ -285,7 +285,7 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 10.dp),
                     decoration: BoxDecoration(
-                      color: objConstantColor.darkGreen.withAlpha(200),
+                      color: Colors.green,
                       borderRadius: BorderRadius.circular(20.dp)
                     ),
                     child: Row(
@@ -442,7 +442,7 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
                       Row(
                         children: [
                           Container(width: 120.dp, height: 18.dp, color: Colors.white),
-                          Spacer(),
+                          const Spacer(),
                           Container(width: 90.dp, height: 30.dp, color: Colors.white),
                         ],
                       ),

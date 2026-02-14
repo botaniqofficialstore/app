@@ -97,6 +97,7 @@ class ConstantAssests{
    String defaultProfile = '${commonIconsAssets}user.png';
    String delivered = '${commonIconsAssets}delivered.png';
    String returned = '${commonIconsAssets}returned.png';
+   String sampleTwo = '${commonIconsAssets}Gemini_Generated_Image_d8raajd8raajd8ra.png';
 
 
    ///Adds Assets

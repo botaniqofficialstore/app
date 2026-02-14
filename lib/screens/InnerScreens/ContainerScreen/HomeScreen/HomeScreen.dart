@@ -565,17 +565,15 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                           children: [
                             objCommonWidgets.customText(context,
                                 "₹${product.productSellingPrice}/_",
-                                12, const Color(0xff00bf01), objConstantFonts.montserratSemiBold),
+                                13, Colors.black, objConstantFonts.montserratSemiBold),
                             SizedBox(width: 3.dp),
                             Text(
                               "₹${product.productPrice}/_",
                               style: TextStyle(
-                                color: objConstantColor.black,
-                                fontSize: 12.dp,
-                                fontFamily: ConstantAssests.montserratMedium,
-                                decoration: TextDecoration.lineThrough,
-                                decorationColor: objConstantColor.gray,
-                                decorationThickness: 1,
+                                  color: Colors.grey,
+                                  fontSize: 12.dp,
+                                  decoration: TextDecoration.lineThrough,
+                                  fontFamily: objConstantFonts.montserratMedium
                               ),
                             ),
                           ],

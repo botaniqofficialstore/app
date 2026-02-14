@@ -359,17 +359,15 @@ class WishListScreenState extends ConsumerState<WishListScreen> {
                             children: [
                               objCommonWidgets.customText(context,
                                   "₹${product.productSellingPrice}/_",
-                                  13, objConstantColor.darkGreen, objConstantFonts.montserratSemiBold),
+                                  13, Colors.black, objConstantFonts.montserratSemiBold),
                               SizedBox(width: 3.dp),
                               Text(
                                 "₹${product.productPrice}/_",
                                 style: TextStyle(
-                                  color: objConstantColor.black,
-                                  fontSize: 13.dp,
-                                  fontFamily: ConstantAssests.montserratMedium,
-                                  decoration: TextDecoration.lineThrough,
-                                  decorationColor: objConstantColor.gray,
-                                  decorationThickness: 1,
+                                    color: Colors.grey,
+                                    fontSize: 12.dp,
+                                    decoration: TextDecoration.lineThrough,
+                                    fontFamily: objConstantFonts.montserratMedium
                                 ),
                               ),
                             ],

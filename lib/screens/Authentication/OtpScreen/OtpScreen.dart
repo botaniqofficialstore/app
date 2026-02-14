@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +7,6 @@ import 'package:flutter_sizer/flutter_sizer.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../../CodeReusable/CodeReusability.dart';
-import '../../../Utility/PreferencesManager.dart';
 import '../LoginScreen/LoginScreen.dart';
 import 'OtpScreenState.dart';
 
@@ -19,8 +16,8 @@ class OtpScreen extends ConsumerStatefulWidget {
 
   const OtpScreen({
     super.key,
-    required this.loginWith,
-    required this.isEmail,
+    this.loginWith = '',
+    this.isEmail = false,
   });
 
   @override
@@ -39,8 +36,6 @@ class OtpScreenState extends ConsumerState<OtpScreen> {
 
     // Start SMS Listener
     SmsAutoFill().listenForCode();
-
-    BackButtonInterceptor.add(otpInterceptor);
     Future.microtask(() {
       final otpScreenNotifier = ref.read(otpScreenGlobalStateProvider.notifier);
       otpScreenNotifier.updateUserData(widget.loginWith);
@@ -60,8 +55,8 @@ class OtpScreenState extends ConsumerState<OtpScreen> {
   @override
   void dispose() {
     SmsAutoFill().unregisterListener();
-    BackButtonInterceptor.remove(otpInterceptor);
     super.dispose();
+
   }
 
   @override
@@ -74,55 +69,46 @@ class OtpScreenState extends ConsumerState<OtpScreen> {
   }
 
 
-  //MARK: - METHODS
-  /// Return true to prevent default behavior (app exit)
-  /// Return false to allow default behavior
-  bool otpInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
-    if (kDebugMode) {
-      print("Back button intercepted!");
-    }
-    PreferencesManager.getInstance().then((prefs) {
-      if (prefs.getBooleanValue(PreferenceKeys.isDialogOpened) == true) {
-        return false;
-      } else if ((prefs.getBooleanValue(PreferenceKeys.isLoadingBarStarted) ==
-          true)) {
-        return true;
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const LoginScreen()),
-        );
-      }
-    });
-    return true;
-  }
-
 
 
   //MARK: - Widget
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => CodeReusability.hideKeyboard(context),
-      child: Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: objConstantColor.navyBlue,
-        body: SafeArea(
-            bottom: false,
-            child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: constraints.maxHeight, // important
+    return PopScope(
+      canPop: true, // 🔥 We fully control back navigation
+      onPopInvokedWithResult: (didPop, dynamic) {
+        if (didPop) return;
+        if (!context.mounted) return;
+        Navigator.pop(context);
+      },
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent, // optional
+          statusBarIconBrightness: Brightness.dark, // ANDROID → black icons
+          statusBarBrightness: Brightness.light, // iOS → black icons
+        ),
+        child: GestureDetector(
+          onTap: () => CodeReusability.hideKeyboard(context),
+          child: Scaffold(
+            key: _scaffoldKey,
+            backgroundColor: const Color(0xFFF9FAFB),
+            body: SafeArea(
+                bottom: false,
+                child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: constraints.maxHeight, // important
+                            ),
+                            child: IntrinsicHeight(
+                                child: otpView(context))
                         ),
-                        child: IntrinsicHeight(
-                            child: otpView(context))
-                    ),
-                  );
-                })),
+                      );
+                    })),
+          ),
+        ),
       ),
     );
   }
@@ -149,63 +135,65 @@ class OtpScreenState extends ConsumerState<OtpScreen> {
     final otpNotifier = ref.read(otpScreenGlobalStateProvider.notifier);
 
     return Column(
-        children: [
+      children: [
 
-          const Spacer(),
-
-          Padding(
-            padding: EdgeInsets.only(top: 35.dp),
-            child: Center(
-              child: Image.asset(
-                objConstantAssest.loginLogo,
-                width: 150.dp,
-                height: 90.dp,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15.dp, vertical: 5.dp),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                minimumSize: Size.zero,
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Icon(Icons.arrow_back_ios, size: 20.dp, color: Colors.black,),
               ),
-            ),
+            ],
           ),
+        ),
 
-          const Spacer(),
-          const Spacer(),
-    
-    
-          /// Center Content
-          Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(35.dp),
-                    topRight: Radius.circular(35.dp),
+        /// Main Content (takes available height)
+        Expanded(
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.fromLTRB(
+              25.dp,
+              50.dp,
+              25.dp,
+              MediaQuery.of(context).viewInsets.bottom + 5.dp,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20.dp),
+                  child: objCommonWidgets.customText(
+                    context,
+                    'Verify OTP',
+                    25,
+                    objConstantColor.black,
+                    objConstantFonts.montserratSemiBold,
                   ),
                 ),
-                padding: EdgeInsets.fromLTRB(25.dp, 20.dp, 25.dp, MediaQuery.of(context).viewInsets.bottom + 5.dp),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
 
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20.dp),
-                    child: Center(
-                      child: objCommonWidgets.customText(
-                          context, 'Verify OTP', 30,
-                          objConstantColor.navyBlue,
-                          objConstantFonts.montserratBold),
-                    ),
-                  ),
+                SizedBox(height: 10.dp),
 
-                  SizedBox(height: 10.dp),
+                objCommonWidgets.customText(
+                  context,
+                  'Enter the OTP sended to the Mobile Number '
+                      '${CodeReusability().maskEmailOrMobile(widget.loginWith)}',
+                  13,
+                  objConstantColor.black,
+                  objConstantFonts.montserratMedium,
+                  textAlign: TextAlign.center,
+                ),
 
-                  objCommonWidgets.customText(
-                    context,
-                    'Enter the OTP sended to the ${widget.isEmail ? 'Email' : 'Mobile Number'} ${CodeReusability().maskEmailOrMobile(widget.loginWith)}',
-                    15,
-                    objConstantColor.navyBlue,
-                    objConstantFonts.montserratSemiBold,
-                    textAlign: TextAlign.center
-                  ),
-                  SizedBox(height: 35.dp),
+                SizedBox(height: 50.dp),
 
-                  //OTP Field
+                /// OTP Boxes
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10.dp),
                   child: Row(
@@ -213,7 +201,7 @@ class OtpScreenState extends ConsumerState<OtpScreen> {
                     children: List.generate(
                       6,
                           (index) => SizedBox(
-                        width: 11.w, // Adjust width for better spacing
+                        width: 11.w,
                         child: otpBox(
                           context,
                           index,
@@ -226,93 +214,80 @@ class OtpScreenState extends ConsumerState<OtpScreen> {
                   ),
                 ),
 
-
-                  Row(
-                    children: [
-                      const Spacer(),
-                      if (remainingSeconds == 0) ...[
-                        CupertinoButton(
-                          onPressed: () async {
-                            setState(() async {
-                            bool otpSend = await otpNotifier.callReSendOtpAPI(context);
-                            if (otpSend){
-                              otpNotifier.clearOtpFields();
+                /// Resend OTP
+                Row(
+                  children: [
+                    const Spacer(),
+                    if (remainingSeconds == 0)
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () async {
+                          bool otpSend =
+                          await otpNotifier.callReSendOtpAPI(context);
+                          if (otpSend) {
+                            otpNotifier.clearOtpFields();
+                            setState(() {
                               remainingSeconds = 60;
-                              startTimer();
-                              otpState.focusNodes[0].requestFocus();
-                            }
                             });
-
-                          },
-                          padding: EdgeInsets.zero,
-                          child: objCommonWidgets.customText(context, 'Resend OTP', 14, objConstantColor.orange, objConstantFonts.montserratSemiBold),
-                        )
-                      ] else ...[
-                        Padding(
-                          padding: EdgeInsets.all(10.dp),
-                          child: objCommonWidgets.customText(context, 'Get new one after ${otpNotifier.formatTime(remainingSeconds)}', 12, Colors.grey.shade500, objConstantFonts.montserratMedium),
+                            startTimer();
+                            otpState.focusNodes[0].requestFocus();
+                          }
+                        },
+                        child: objCommonWidgets.customText(
+                          context,
+                          'Resend OTP',
+                          12,
+                          Colors.deepOrange,
+                          objConstantFonts.montserratSemiBold,
                         ),
-                      ],
-                    ],
-                  ),
+                      )
+                    else
+                      Padding(
+                        padding: EdgeInsets.all(10.dp),
+                        child: objCommonWidgets.customText(
+                          context,
+                          'Get new one after '
+                              '${otpNotifier.formatTime(remainingSeconds)}',
+                          10,
+                          Colors.black.withAlpha(180),
+                          objConstantFonts.montserratMedium,
+                        ),
+                      ),
+                  ],
+                ),
 
+                SizedBox(height: 25.dp),
 
-                  SizedBox(height: 25.dp),
-                  SizedBox(
+                /// Verify Button
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    otpNotifier.checkEmptyValidation(context);
+                  },
+                  child: Container(
                     width: double.infinity,
-                    child: CupertinoButton(
-                      padding: EdgeInsets.symmetric(vertical: 15.dp),
-                      color: objConstantColor.orange,
-                      borderRadius: BorderRadius.circular(12.dp),
-                      onPressed: () {
-                        setState(() {
-                          otpNotifier.checkEmptyValidation(context);
-                        });
-                      },
+                    padding: EdgeInsets.symmetric(vertical: 15.dp),
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(25.dp),
+                    ),
+                    child: Center(
                       child: objCommonWidgets.customText(
                         context,
-                        'Verify OTP',
-                        18,
-                        objConstantColor.white,
+                        'Verify',
+                        16,
+                        Colors.white,
                         objConstantFonts.montserratSemiBold,
                       ),
                     ),
                   ),
-
-                  SizedBox(height: 60.dp,),
-
-                  Row(
-                    children: [
-                      const Spacer(),
-                      objCommonWidgets.customText(
-                          context, 'Back to', 12, Colors.grey.shade600,
-                          objConstantFonts.montserratMedium),
-                      SizedBox(width: 2.dp,),
-                      CupertinoButton(padding: EdgeInsets.zero,
-                          child: objCommonWidgets.customText(
-                              context, 'Login', 13,
-                              objConstantColor.orange,
-                              objConstantFonts.montserratSemiBold),
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (
-                                      context) => const LoginScreen()),
-                            );
-                          }),
-                      const Spacer(),
-                    ],
-                  ),
-
-                  SizedBox(height: MediaQuery.of(context).padding.bottom)
-
-                ],
-              ),
-
+                ),
+              ],
+            ),
           ),
-        ],
-      );
+        ),
+      ],
+    );
   }
 
 
@@ -331,56 +306,77 @@ class OtpScreenState extends ConsumerState<OtpScreen> {
       OtpScreenGlobalState otpState,
       ) {
     final otpStateWatch = ref.watch(otpScreenGlobalStateProvider);
-    return TextField(
-      controller: controller,
-      focusNode: focusNode,
-      textAlign: TextAlign.center,
-      keyboardType: TextInputType.number,
-      inputFormatters: [
-        FilteringTextInputFormatter.digitsOnly,
-        LengthLimitingTextInputFormatter(1),
-      ],
-      onChanged: (string) {
-        if (string.trim().isNotEmpty) {
-          otpStateWatch.otpValues[index] = string.trim();
+    final bool hasText = otpStateWatch.otpValues[index].isNotEmpty;
+    final bool hasFocus = focusNode.hasFocus;
 
-          controller.selection = TextSelection.fromPosition(
-            TextPosition(offset: controller.text.length),
-          );
+    Color getBorderColor() {
+      if (hasText) {
+        return Colors.black;
+      } else if (hasFocus) {
+        return Colors.deepOrange;
+      } else {
+        return Colors.grey;
+      }
+    }
 
-          if (index < otpStateWatch.focusNodes.length - 1) {
-            FocusScope.of(context)
-                .requestFocus(otpStateWatch.focusNodes[index + 1]);
-          } else {
-            FocusScope.of(context).unfocus();
-          }
-        } else {
-          otpStateWatch.otpValues[index] = "";
+    return RawKeyboardListener(
+      focusNode: FocusNode(), // separate listener node
+      onKey: (event) {
+        if (event is RawKeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.backspace) {
 
-          if (index > 0) {
+          /// If current box is empty → move back
+          if (controller.text.isEmpty && index > 0) {
+            otpStateWatch.otpValues[index - 1] = '';
+            otpStateWatch.controllers[index - 1].clear();
+
             FocusScope.of(context)
                 .requestFocus(otpStateWatch.focusNodes[index - 1]);
           }
         }
       },
-      style: TextStyle(
-        fontFamily: objConstantFonts.montserratSemiBold,
-        color: objConstantColor.navyBlue,
-        fontSize: 20.dp,
-      ),
-      decoration: InputDecoration(
-        isDense: true,
-        contentPadding: EdgeInsets.only(bottom: 8.dp),
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: otpStateWatch.otpValues[index].isNotEmpty
-              ? objConstantColor.orange
-              : objConstantColor.navyBlue, width: 1.5),
+
+      child: TextField(
+        controller: controller,
+        focusNode: focusNode,
+        textAlign: TextAlign.center,
+        keyboardType: TextInputType.number,
+        cursorColor: Colors.black,
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(1),
+        ],
+        onChanged: (value) {
+          if (value.isNotEmpty) {
+            otpStateWatch.otpValues[index] = value;
+
+            if (index < otpStateWatch.focusNodes.length - 1) {
+              FocusScope.of(context)
+                  .requestFocus(otpStateWatch.focusNodes[index + 1]);
+            } else {
+              FocusScope.of(context).unfocus();
+            }
+          } else {
+            otpStateWatch.otpValues[index] = '';
+          }
+        },
+        style: TextStyle(
+          fontFamily: objConstantFonts.montserratSemiBold,
+          color: objConstantColor.navyBlue,
+          fontSize: 20.dp,
         ),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: objConstantColor.orange, width: 2),
-        ),
-        border: UnderlineInputBorder(
-          borderSide: BorderSide(color: objConstantColor.navyBlue, width: 1.5),
+        decoration: InputDecoration(
+          isDense: true,
+          contentPadding: EdgeInsets.only(bottom: 8.dp),
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: getBorderColor(), width: 1.5),
+          ),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: getBorderColor(), width: 2),
+          ),
+          border: UnderlineInputBorder(
+            borderSide: BorderSide(color: getBorderColor(), width: 1.5),
+          ),
         ),
       ),
     );

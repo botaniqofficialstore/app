@@ -1,6 +1,5 @@
 
 import 'package:botaniqmicrogreens/constants/ConstantColors.dart';
-import 'package:botaniqmicrogreens/constants/Constants.dart';
 import 'package:botaniqmicrogreens/screens/Authentication/LoginScreen/LoginScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/Mainscreen/MainScreen.dart';
 import 'package:flutter/material.dart';
@@ -69,13 +68,16 @@ class _SplashScreenState extends State<SplashScreen>
     PreferencesManager.getInstance().then((pref) async {
       bool isLoggedIn = pref.getBooleanValue(PreferenceKeys.isUserLogged);
 
-
-      pref.setStringValue(PreferenceKeys.userID, 'user-1763288528185');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+      /*pref.setStringValue(PreferenceKeys.userID, 'user-1763288528185');
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const MainScreen()),
       );
-
+*/
       /*if (isLoggedIn){
         Navigator.pushReplacement(
           context,|
