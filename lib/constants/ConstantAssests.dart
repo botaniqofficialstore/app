@@ -102,6 +102,10 @@ class ConstantAssests{
    String phonePe = '${commonIconsAssets}phonePe.png';
    String payTm = '${commonIconsAssets}paytm.png';
    String bhmUPI = '${commonIconsAssets}bhim-bharat-interface-for-money-seeklogo.png';
+   String locOne = '${commonIconsAssets}place.png';
+   String locTwo = '${commonIconsAssets}pin.png';
+   String locThree = '${commonIconsAssets}locations.png';
+   String locFour = '${commonIconsAssets}your-location.png';
 
 
    ///Adds Assets

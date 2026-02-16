@@ -877,11 +877,9 @@ class OrderSummaryScreenState extends ConsumerState<OrderSummaryScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: state.paymentTypes.length,
-              separatorBuilder: (context, index) =>
-                  SizedBox(height: 10.dp),
+              separatorBuilder: (context, index) => SizedBox(height: 10.dp),
               itemBuilder: (context, index) {
                 final type = state.paymentTypes[index];
-
                 return paymentCell(type.name, type.icon, type.description, type.isSelected, (){
                   notifier.updateIsOnlinePay(true);
                   notifier.selectPaymentByIndex(index);

@@ -158,12 +158,13 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                       Container(
                         color: Colors.white,
                         padding: EdgeInsets.symmetric(vertical: 13.dp, horizontal: 15.dp),
-                        child: ListView.builder(
+                        child: ListView.separated(
+                          separatorBuilder: (context, index) => SizedBox(height: 10.dp),
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: orderDetails?.orderDetails.length,
+                          itemCount: orderDetails!.orderDetails.length,
                           itemBuilder: (context, index) {
-                            var productDetails = orderDetails?.orderDetails[index];
+                            var productDetails = orderDetails.orderDetails[index];
                             return cell(
                               context,
                               index,
