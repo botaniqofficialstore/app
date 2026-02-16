@@ -130,8 +130,8 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   SizedBox(height: 15.dp),
 
                   objCommonWidgets.customText(
-                    context, 'Microgreens', 14,
-                    objConstantColor.gray, objConstantFonts.montserratSemiBold,
+                    context, 'Microgreens', 12,
+                    Colors.black.withAlpha(130), objConstantFonts.montserratMedium,
                   ),
 
                   SizedBox(height: 5.dp),
@@ -142,8 +142,8 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         context,
                         CodeReusability().cleanProductName(
                             detailsScreenState.productData?.productName),
-                        22,
-                        objConstantColor.navyBlue,
+                        20,
+                        Colors.black,
                         objConstantFonts.montserratBold,
                       ),
                       const Spacer(),
@@ -166,12 +166,12 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     ],
                   ),
 
-                  SizedBox(height: 20.dp),
+                  SizedBox(height: 15.dp),
 
                   customSectionTitle(context, "About"),
                   objCommonWidgets.customText(context,
                       '${detailsScreenState.productData?.description}',
-                      12, objConstantColor.navyBlue,
+                      10, Colors.black,
                       objConstantFonts.montserratMedium,
                       textAlign: TextAlign.justify),
 
@@ -248,7 +248,6 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
                     ],
                   ),
-                  SizedBox(height: 5.dp),
 
                 ],
               ),
@@ -513,7 +512,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     objCommonWidgets.customText(context, 'Delivery Address',
-                        12, objConstantColor.navyBlue,
+                        12, Colors.black,
                         objConstantFonts.montserratSemiBold),
 
                     (exactAddress.isNotEmpty) ? objCommonWidgets.customText(context, exactAddress,
@@ -579,7 +578,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     objCommonWidgets.customText(context, DeliveryUtils.getExpectedDeliveryDate(5),
-                        12, objConstantColor.navyBlue,
+                        12, Colors.black,
                         objConstantFonts.montserratSemiBold),
                     objCommonWidgets.customText(context, 'Order in ${TimerUtils.getRemainingTimeToMidnight()}',
                         11, objConstantColor.orange,
@@ -618,7 +617,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         },
         child: SliverToBoxAdapter(
           child: SizedBox(
-            height: 250.dp, // 👈 required fixed height
+            height: 240.dp, // 👈 required fixed height
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: homeScreenState.productList.length +
@@ -817,7 +816,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                               padding: EdgeInsets.symmetric(vertical: 8.dp),
                               decoration: BoxDecoration(
                                 color: (product.inCart == 0)
-                                    ? objConstantColor.navyBlue
+                                    ? Colors.black
                                     : objConstantColor.orange,
                                 borderRadius: BorderRadius.circular(5.dp),
                               ),
@@ -1111,7 +1110,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     context,
                     'Vitamin',
                     15,
-                    objConstantColor.navyBlue,
+                    Colors.black,
                     objConstantFonts.montserratSemiBold),
               ),
               Padding(
@@ -1120,7 +1119,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     context,
                     'Benefit',
                     15,
-                    objConstantColor.navyBlue,
+                    Colors.black,
                     objConstantFonts.montserratSemiBold),
               ),
             ],
@@ -1133,12 +1132,12 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 10.dp),
                   child: objCommonWidgets.customText(context, n.vitamin, 12,
-                      objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
+                      Colors.black, objConstantFonts.montserratSemiBold),
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 10.dp),
                   child: objCommonWidgets.customText(context, n.benefit, 11,
-                      objConstantColor.navyBlue, objConstantFonts.montserratMedium),
+                      Colors.black, objConstantFonts.montserratMedium),
                 ),
               ],
             ),
@@ -1375,16 +1374,16 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
   Widget _buildReviewCard(ProductReview review) {
     return Container(
-      padding: EdgeInsets.all(15.dp),
+      padding: EdgeInsets.all(10.dp),
       decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18.dp),
-          border: Border.all(color: Colors.black.withOpacity(0.05)),
+          borderRadius: BorderRadius.circular(10.dp),
+          border: Border.all(color: Colors.black.withAlpha(15)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(15),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
+              color: Colors.black.withAlpha(25),
+              blurRadius: 2,
+              offset: const Offset(0, 2),
             )
           ]
       ),

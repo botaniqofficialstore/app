@@ -1,7 +1,5 @@
-import 'package:botaniqmicrogreens/screens/commonViews/MapScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../../commonViews/FamilyLocationEditView/FamilyLocationEditView.dart';
 
 class FamilyLocationScreenState {
@@ -74,10 +72,12 @@ class FamilyMemberLocation {
   final String name;
   final String mobileNumber;
   final String address;
+  final bool? isSelected;
 
   const FamilyMemberLocation({
     required this.name,
     required this.mobileNumber,
     required this.address,
+    this.isSelected = false
   });
 }

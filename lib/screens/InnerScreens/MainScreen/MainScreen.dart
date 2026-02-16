@@ -1,7 +1,5 @@
-import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:botaniqmicrogreens/constants/ConstantVariables.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -102,7 +100,9 @@ class MainScreenState extends ConsumerState<MainScreen> {
           true) {
         return false;
       } else {
-        userScreenNotifier.callBackNavigation(context, state.currentModule);
+        if (state.currentModule != ScreenName.orderSummary) {
+          userScreenNotifier.callBackNavigation(context, state.currentModule);
+        }
       }
     });
     return;

@@ -79,7 +79,8 @@ dependencies:
   image_picker: ^1.2.1
   image_cropper: ^11.0.0
   flutter_image_compress: ^2.4.0
-
+  easy_stepper: ^1.0.1
+  flutter_animate: ^4.5.2
 
 
 dev_dependencies:

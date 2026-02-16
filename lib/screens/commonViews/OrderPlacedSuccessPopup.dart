@@ -33,7 +33,7 @@ class OrderPlacedSuccessPopup extends StatelessWidget {
               objConstantAssest.orderSuccess,
               animate: true,
               repeat: false,
-              height: 120.dp,
+              height: 100.dp,
             ),
             SizedBox(height: 10.dp),
 
@@ -43,9 +43,9 @@ class OrderPlacedSuccessPopup extends StatelessWidget {
           child:
             objCommonWidgets.customText(
               context,
-              'Your Microgreens Are On The Way! 🌱',
-              18,
-              objConstantColor.navyBlue,
+              'Order Purchased Successfully',
+              15,
+              Colors.black,
               objConstantFonts.montserratSemiBold,
               textAlign: TextAlign.center
             ),
@@ -57,9 +57,9 @@ class OrderPlacedSuccessPopup extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 20.dp),
               child: objCommonWidgets.customText(
                   context,
-                  'Thank you for your order! We’ll harvest your greens fresh and notify you once they are ready for delivery.',
-                  13,
-                  objConstantColor.navyBlue,
+                  'Thank you for your order!, and keep going on...',
+                  11,
+                  Colors.black,
                   objConstantFonts.montserratMedium,
                   textAlign: TextAlign.center
               )
@@ -68,27 +68,29 @@ class OrderPlacedSuccessPopup extends StatelessWidget {
             SizedBox(height: 30.dp),
 
             // Full-width CTA button
-            SizedBox(
-              width: double.infinity,
-              child: CupertinoButton(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(25.dp),
-                  bottomRight: Radius.circular(25.dp),
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 50.dp),
+                decoration: BoxDecoration(
+                  color: Colors.deepOrange,
+                  borderRadius: BorderRadius.circular(20.dp)
                 ),
-                color: objConstantColor.navyBlue,
-                padding: EdgeInsets.symmetric(vertical: 18.dp),
                 child: objCommonWidgets.customText(
                   context,
                   'Got It',
-                  18,
+                  15,
                   objConstantColor.white,
-                  objConstantFonts.montserratBold,
+                  objConstantFonts.montserratSemiBold,
                 ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
               ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
             ),
+
+            SizedBox(height: 15.dp),
           ],
         ),
       ),

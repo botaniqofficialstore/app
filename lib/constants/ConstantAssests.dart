@@ -98,6 +98,10 @@ class ConstantAssests{
    String delivered = '${commonIconsAssets}delivered.png';
    String returned = '${commonIconsAssets}returned.png';
    String sampleTwo = '${commonIconsAssets}Gemini_Generated_Image_d8raajd8raajd8ra.png';
+   String gPay = '${commonIconsAssets}gpay.png';
+   String phonePe = '${commonIconsAssets}phonePe.png';
+   String payTm = '${commonIconsAssets}paytm.png';
+   String bhmUPI = '${commonIconsAssets}bhim-bharat-interface-for-money-seeklogo.png';
 
 
    ///Adds Assets

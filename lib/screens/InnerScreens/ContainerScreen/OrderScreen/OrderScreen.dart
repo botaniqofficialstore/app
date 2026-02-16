@@ -90,6 +90,7 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
               /// 🔹 Tabs
               Expanded(
                 child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                   child: Column(
                     children: [
                       _ordersSection(context, orderListData, userScreenState,
@@ -245,7 +246,8 @@ class OrderScreenState extends ConsumerState<OrderScreen> with SingleTickerProvi
             // 2. Product List
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.dp, horizontal: 12.dp),
-              child: ListView.builder(
+              child: ListView.separated(
+                separatorBuilder: (context, index) => SizedBox(height: 10.dp),
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: order.orderDetails.length,

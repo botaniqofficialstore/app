@@ -1,14 +1,16 @@
+import 'package:botaniqmicrogreens/constants/ConstantVariables.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../CodeReusable/CodeReusability.dart';
 import '../../../../CodeReusable/CommonWidgets.dart';
-import '../../../../Utility/Logger.dart';
 import '../../../../Utility/PreferencesManager.dart';
 import '../../../../constants/Constants.dart';
+import '../../../commonViews/FamilyLocationEditView/FamilyLocationEditView.dart';
 import '../../../commonViews/NotificationService.dart';
 import '../../../commonViews/OrderPlacedSuccessPopup.dart';
 import '../../MainScreen/MainScreenState.dart';
 import '../CartScreen/CartModel.dart';
+import '../FamilyLocationScreen/FamilyLocationScreenState.dart';
 import '../OrderDetailsScreen/OrderRepository.dart';
 import 'OrderModel.dart';
 
@@ -19,6 +21,13 @@ class OrderSummaryScreenGlobalState {
   final String mobileNumber;
   final String email;
   final String address;
+  final List<FamilyMemberLocation> familyMembers;
+  final String selectedMember;
+  final int pageIndex;
+  final List<PaymentTypes> paymentTypes;
+  final bool isCod;
+  final bool isOnlinePay;
+  final bool isPriceViewExpanded;
 
   OrderSummaryScreenGlobalState({
     this.currentModule = ScreenName.home,
@@ -26,7 +35,14 @@ class OrderSummaryScreenGlobalState {
     this.userName = '',
     this.mobileNumber = '',
     this.email = '',
-    this.address = ''
+    this.address = '',
+    this.familyMembers = const [],
+    this.selectedMember = '',
+    this.pageIndex = 0,
+    this.paymentTypes = const [],
+    this.isCod = false,
+    this.isOnlinePay = false,
+    this.isPriceViewExpanded = false
   });
 
   OrderSummaryScreenGlobalState copyWith({
@@ -35,7 +51,14 @@ class OrderSummaryScreenGlobalState {
     String? userName,
     String? mobileNumber,
     String? email,
-    String? address
+    String? address,
+    List<FamilyMemberLocation>? familyMembers,
+    String? selectedMember,
+    int? pageIndex,
+    List<PaymentTypes>? paymentTypes,
+    bool? isCod,
+    bool? isOnlinePay,
+    bool? isPriceViewExpanded
   }) {
     return OrderSummaryScreenGlobalState(
         currentModule: currentModule ?? this.currentModule,
@@ -43,7 +66,14 @@ class OrderSummaryScreenGlobalState {
         userName: userName ?? this.userName,
         mobileNumber: mobileNumber ?? this.mobileNumber,
         email: email ?? this.email,
-        address: address ?? this.address
+        address: address ?? this.address,
+      familyMembers: familyMembers ?? this.familyMembers,
+        selectedMember: selectedMember ?? this.selectedMember,
+      pageIndex: pageIndex ?? this.pageIndex,
+      paymentTypes: paymentTypes ?? this.paymentTypes,
+      isCod: isCod ?? this.isCod,
+      isOnlinePay: isOnlinePay ?? this.isOnlinePay,
+      isPriceViewExpanded: isPriceViewExpanded ?? this.isPriceViewExpanded,
     );
   }
 
@@ -71,12 +101,99 @@ class OrderSummaryScreenGlobalState {
 
 class OrderSummaryScreenGlobalStateNotifier
     extends StateNotifier<OrderSummaryScreenGlobalState> {
-  OrderSummaryScreenGlobalStateNotifier() : super(OrderSummaryScreenGlobalState());
+  OrderSummaryScreenGlobalStateNotifier() : super(OrderSummaryScreenGlobalState(
+    familyMembers: const [
+      FamilyMemberLocation(
+        name: 'Ragesh Pillai',
+        mobileNumber: '9447012345',
+        address: 'Skyline Ivy, Panampilly Nagar, Kochi, Kerala, 678451',
+      ),
+      FamilyMemberLocation(
+        name: 'Anjali Menon',
+        mobileNumber: '7012345678',
+        address: 'TC 15/12, Kowdiar, Thiruvananthapuram, Kerala, 678450',
+      ),
+    ],
+    selectedMember: '',
+    pageIndex: 0,
+      paymentTypes: [
+        PaymentTypes(
+          name: 'Gpay',
+          icon: objConstantAssest.gPay,
+          description: 'Pay securely with Google Pay • Save up to ₹50 on your first order',
+          isSelected: false
+        ),
+        PaymentTypes(
+          name: 'PhonePe',
+          icon: objConstantAssest.phonePe,
+          description: 'Fast UPI payments • Get cashback up to ₹75 on eligible orders',
+          isSelected: false
+        ),
+        PaymentTypes(
+          name: 'Paytm',
+          icon: objConstantAssest.payTm,
+          description: 'Quick & trusted payments • Save up to ₹100 with Paytm offers',
+          isSelected: false
+        ),
+      ],
 
-  @override
-  void dispose() {
-    super.dispose();
+      isCod: false,
+      isOnlinePay: false,
+      isPriceViewExpanded: false
+  ));
+
+
+  void updateIsCod(bool isCod) {
+    state = state.copyWith(isCod: isCod, isOnlinePay: !isCod);
   }
+
+  void updateIsOnlinePay(bool isOnlinePay) {
+    state = state.copyWith(isOnlinePay: isOnlinePay, isCod: !isOnlinePay);
+  }
+
+  void updateSelectedDelivery(String contact){
+    state = state.copyWith(selectedMember: contact);
+  }
+
+  void updatePriceView(bool isExpand){
+    state = state.copyWith(isPriceViewExpanded: isExpand);
+  }
+
+  void updatePageIndex(int step){
+    state = state.copyWith(pageIndex: step);
+  }
+
+  void callAddMemberView(BuildContext context, String name, String phone, String address) async {
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) => FamilyLocationScreen(name: name, phone: phone, address: address),
+      ),
+    );
+  }
+
+  void selectPaymentByIndex(int index) {
+    final updatedList = state.paymentTypes.asMap().entries.map((entry) {
+      int i = entry.key;
+      PaymentTypes item = entry.value;
+
+      return item.copyWith(
+        isSelected: i == index,
+      );
+    }).toList();
+
+    state = state.copyWith(paymentTypes: updatedList);
+  }
+
+  void clearAllPaymentSelection() {
+    final updatedList = state.paymentTypes.map((item) {
+      return item.copyWith(isSelected: false);
+    }).toList();
+
+    state = state.copyWith(paymentTypes: updatedList);
+  }
+
+
 
   ///This method is used to update Cart List & User Info
   Future<void> updateCartListAndUserInfo() async {
@@ -169,9 +286,38 @@ class OrderSummaryScreenGlobalStateNotifier
 
 
 
-final OrderSummaryScreenGlobalStateProvider = StateNotifierProvider.autoDispose<
+final orderSummaryScreenStateProvider = StateNotifierProvider.autoDispose<
     OrderSummaryScreenGlobalStateNotifier, OrderSummaryScreenGlobalState>((ref) {
   var notifier = OrderSummaryScreenGlobalStateNotifier();
   return notifier;
 });
+
+
+class PaymentTypes {
+  final String name;
+  final String icon;
+  final String description;
+  final bool isSelected;
+
+  PaymentTypes({
+    required this.name,
+    required this.icon,
+    required this.description,
+    this.isSelected = false,
+  });
+
+  PaymentTypes copyWith({
+    String? name,
+    String? icon,
+    String? description,
+    bool? isSelected,
+  }) {
+    return PaymentTypes(
+      name: name ?? this.name,
+      icon: icon ?? this.icon,
+      description: description ?? this.description,
+      isSelected: isSelected ?? this.isSelected,
+    );
+  }
+}
 

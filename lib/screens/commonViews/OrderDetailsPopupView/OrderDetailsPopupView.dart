@@ -391,6 +391,7 @@ class OrderDetailsPopupViewState extends ConsumerState<OrderDetailsPopupView> {
                             objConstantColor.white,
                             objConstantFonts.montserratSemiBold,
                           ),
+                          SizedBox(width: 5.dp),
                           Icon(Icons.download_rounded, color: Colors.white, size: 18.dp),
                         ],
                       ),

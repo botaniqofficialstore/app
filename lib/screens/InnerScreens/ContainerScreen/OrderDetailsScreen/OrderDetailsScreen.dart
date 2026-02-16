@@ -61,7 +61,7 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
           children: [
             /// Header
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.dp, vertical: 10.dp),
+              padding: EdgeInsets.symmetric(horizontal: 13.dp, vertical: 10.dp),
               child: Row(
                 children: [
                   CupertinoButton(
@@ -115,8 +115,6 @@ class OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
-                      titleView('Order Summary'),
 
                       orderDetailsWidget(context),
 

@@ -81,7 +81,7 @@ class CartScreenState extends ConsumerState<CartScreen> {
                     ?  cartShimmerLoader() : Scrollbar(
                   thickness: 6,
                   child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
+                    physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                     child: Builder(
                       builder: (context) {
                         if (cartItems.isEmpty) {
@@ -213,7 +213,7 @@ class CartScreenState extends ConsumerState<CartScreen> {
                           children: [
                             customeText(
                               '₹${userScreenState.totalPayableAmount}/_',
-                              20,
+                              18,
                               objConstantColor.black,
                               ConstantAssests.montserratSemiBold,
                             ),
@@ -274,9 +274,8 @@ class CartScreenState extends ConsumerState<CartScreen> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: objConstantColor.white,
-        boxShadow: const [
-          BoxShadow(
-              color: Colors.black12, blurRadius: 8, spreadRadius: 1),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withAlpha(55), blurRadius: 5, offset: const Offset(0, 2)),
         ],
       ),
       child: Padding(
@@ -287,10 +286,9 @@ class CartScreenState extends ConsumerState<CartScreen> {
             Expanded(
               child: customeText(
                 userScreenState.profileIncompleteMessage,
-                12,
-                objConstantColor.navyBlue,
-                ConstantAssests.montserratSemiBold,
-
+                10,
+                Colors.black,
+                ConstantAssests.montserratMedium,
               ),
             ),
 
@@ -303,17 +301,17 @@ class CartScreenState extends ConsumerState<CartScreen> {
                 },
                 child: Container(
                   padding: EdgeInsets.symmetric(
-                      vertical: 10.dp, horizontal: 22.dp),
+                      vertical: 8.dp, horizontal: 15.dp),
                   decoration: BoxDecoration(
-                    color: objConstantColor.orange,
+                    color: Colors.deepOrange,
                     borderRadius: BorderRadius.circular(4.dp),
 
                   ),
                   child: customeText(
                     'Update',
-                    18,
+                    13,
                     objConstantColor.white,
-                    ConstantAssests.montserratBold,
+                    ConstantAssests.montserratSemiBold,
                   ),
                 )
             ),
@@ -339,7 +337,7 @@ class CartScreenState extends ConsumerState<CartScreen> {
       String productID) {
     return Container(
       color: Colors.white,
-      padding: EdgeInsets.symmetric(vertical: 15.dp, horizontal: 15.dp),
+      padding: EdgeInsets.only(left: 15.dp, right: 15.dp, top: 10.dp, bottom: 15.dp),
       child: Column(
         children: [
           Row(
@@ -368,10 +366,10 @@ class CartScreenState extends ConsumerState<CartScreen> {
                             children: [
                               objCommonWidgets.customText(context,
                                   "4.2",
-                                  9, Colors.white, objConstantFonts.montserratMedium
+                                  9, Colors.white, objConstantFonts.montserratSemiBold
                               ),
                               SizedBox(width: 2.dp),
-                              Icon(Icons.star, color: Colors.white, size: 8.dp),
+                              Icon(Icons.star, color: Colors.white, size: 10.dp),
                             ],
                           ),
                         ),
@@ -422,7 +420,7 @@ class CartScreenState extends ConsumerState<CartScreen> {
                       child: Container(
                         padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 8.dp),
                         decoration: BoxDecoration(
-                          color: Color(0xFFE32B2B),
+                          color: const Color(0xFFE32B2B),
                           borderRadius: BorderRadius.circular(5.dp)
                         ),
                         child: Row(
@@ -452,13 +450,13 @@ class CartScreenState extends ConsumerState<CartScreen> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(5.dp),
                         child: SizedBox(
-                          width: 85.dp,
-                          height: 85.dp,
+                          width: 100.dp,
+                          height: 100.dp,
                           child: NetworkImageLoader(
                             imageUrl: '${ConstantURLs.baseUrl}$image',
                             placeHolder: objConstantAssest.placeHolder,
-                            size: 85.dp,
-                            imageSize: 85.dp,
+                            size: 100.dp,
+                            imageSize: 100.dp,
                             bottomCurve: 5,
                             topCurve: 5,
                           ),
@@ -466,15 +464,18 @@ class CartScreenState extends ConsumerState<CartScreen> {
                       ),
 
 
+                      Positioned(bottom: -11.dp,
+                          child: QuantityCounter(
+                        count: count,
+                        onChanged: (newCount) {
+                          notifier.callUpdateCountAPI(context, productID, index, newCount);
+                        },
+                      ))
+
+
                     ],
                   ),
-                  SizedBox(height: 10.dp),
-                  QuantityCounter(
-                    count: count,
-                    onChanged: (newCount) {
-                      notifier.callUpdateCountAPI(context, productID, index, newCount);
-                    },
-                  )
+
                 ],
               ),
             ],
@@ -641,36 +642,33 @@ class QuantityCounter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.symmetric(vertical: 3.dp, horizontal: 10.dp),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8.dp),
+        borderRadius: BorderRadius.circular(5.dp),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(15),
-            blurRadius: 2,
-            offset: const Offset(0, 2),
-          ),
-        ],
-        border: Border.all(color: Colors.grey.shade300),
+          BoxShadow(color: Colors.black.withAlpha(55), blurRadius: 5, offset: const Offset(0, 2)),
+      ],
+          border: BoxBorder.all(color: Colors.black, width: 0.5, style: BorderStyle.solid)
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildBtn(
-            icon: count > 1 ? Icons.remove : Icons.delete_outline,
+            icon: Icons.remove,
             onTap: () {
               if (count > 1) onChanged(count - 1);
             },
-            color: count > 1 ? objConstantColor.navyBlue : Colors.red,
+            color: count > 1 ? Colors.black : Colors.black.withAlpha(100),
           ),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.dp),
+            padding: EdgeInsets.symmetric(horizontal: 13.dp),
             child: objCommonWidgets.customText(context, "$count", 14, Colors.black, objConstantFonts.montserratSemiBold)
           ),
           _buildBtn(
             icon: Icons.add,
             onTap: () => onChanged(count + 1),
-            color: objConstantColor.navyBlue,
+            color: Colors.black,
           ),
         ],
       ),
@@ -681,7 +679,7 @@ class QuantityCounter extends StatelessWidget {
     return CupertinoButton(
       onPressed: onTap,
       padding: EdgeInsets.zero,
-      minSize: 32.dp,
+      minimumSize: Size.zero,
       child: Icon(icon, size: 16.dp, color: color),
     );
   }
