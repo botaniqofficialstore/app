@@ -8,7 +8,7 @@ plugins {
 }
 
 // 🔹 Load key.properties if present
-def keystorePropertiesFile = file('key.properties')
+def keystorePropertiesFile = rootProject.file("key.properties")
 def keystoreProperties = new Properties()
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
@@ -39,6 +39,13 @@ android {
         multiDexEnabled true
     }
 
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging true
+        }
+    }
+
     signingConfigs {
         debug {
             storeFile file("C:/Users/VIKAS/.android/debug.keystore")
@@ -49,12 +56,10 @@ android {
 
         // 🔹 release config reads from key.properties
         release {
-            if (keystorePropertiesFile.exists()) {
-                storeFile file(keystoreProperties['storeFile'])
-                storePassword keystoreProperties['storePassword']
-                keyAlias keystoreProperties['keyAlias']
-                keyPassword keystoreProperties['keyPassword']
-            }
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
         }
     }
 
@@ -64,8 +69,12 @@ android {
             signingConfig signingConfigs.release
             minifyEnabled false
             shrinkResources false
+            ndk {
+                debugSymbolLevel 'none'
+            }
         }
     }
+
 }
 
 dependencies {

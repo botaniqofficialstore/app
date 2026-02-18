@@ -14,6 +14,7 @@ import 'package:shimmer/shimmer.dart';
 import '../../CodeReusable/CodeReusability.dart';
 import '../../CodeReusable/CommonWidgets.dart';
 import '../../../../constants/ConstantVariables.dart';
+import '../../Utility/CyclingText.dart';
 import '../../Utility/Logger.dart';
 import '../../Utility/PreferencesManager.dart';
 import '../../constants/Constants.dart';
@@ -35,7 +36,7 @@ class _MapScreenState extends ConsumerState<MapScreen> with SingleTickerProvider
 
   final LatLng _adminLocation = const LatLng(10.700282608343603, 76.73939956587711);
   static const double _radiusKm = 60.0;
-  static const double _minZoomLevel = 18.0;
+  static const double _minZoomLevel = 17.7;
   StreamSubscription<ServiceStatus>? _serviceStatusStream;
   Timer? _locationPollingTimer;
 
@@ -43,6 +44,7 @@ class _MapScreenState extends ConsumerState<MapScreen> with SingleTickerProvider
   final TextEditingController _searchController = TextEditingController();
 
   String _selectedAddress = "";
+  String _selectedTownAddress = "";
   double _currentZoom = 15.0;
   bool _isLocationServiceEnabled = true;
   bool _isMoving = false;
@@ -167,21 +169,12 @@ class _MapScreenState extends ConsumerState<MapScreen> with SingleTickerProvider
               onCameraIdle: () {
                 setState(() => _isMoving = false);
                 if (_selectedLocation != null) {
-                  if (!_isWithinAllowed(_selectedLocation!)) {
+                  /*if (!_isWithinAllowed(_selectedLocation!)) {
                     _showOutOfRangeAlert(context);
-                  } else {
+                  } else {*/
                     _getAddressFromLatLng(_selectedLocation!);
-                  }
+                  //}
                 }
-              },
-              circles: {
-                Circle(
-                  circleId: const CircleId("radius"),
-                  center: _adminLocation,
-                  radius: _radiusKm * 1000,
-                  strokeWidth: 0,
-                  strokeColor: Colors.transparent,
-                ),
               },
             ),
 
@@ -269,10 +262,10 @@ class _MapScreenState extends ConsumerState<MapScreen> with SingleTickerProvider
                               final lng = double.parse(prediction.lng!);
                               final selected = LatLng(lat, lng);
 
-                              if (!_isWithinAllowed(selected)) {
+                              /*if (!_isWithinAllowed(selected)) {
                                 _showOutOfRangeAlert(context);
                                 return;
-                              }
+                              }*/
 
                               final controller = await _controller.future;
                               controller.animateCamera(CameraUpdate.newLatLngZoom(selected, 19));
@@ -350,8 +343,14 @@ class _MapScreenState extends ConsumerState<MapScreen> with SingleTickerProvider
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5.dp),
             gradient: SweepGradient(
-              colors: const [Colors.deepOrange, Colors.white],
-              transform: GradientRotation(_borderAnimationController.value * 2 * pi),
+              // Adding multiple stops prevents the "flicker" at the start/end point
+              colors: [
+                Colors.white,
+                Colors.deepOrange,
+                Colors.deepOrange.withAlpha(80),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+              transform: GradientRotation(_borderAnimationController.value * 2 * 3.141592653589793),
             ),
           ),
           child: Container(
@@ -370,9 +369,7 @@ class _MapScreenState extends ConsumerState<MapScreen> with SingleTickerProvider
                   Colors.black,
                   objConstantFonts.montserratSemiBold,
                 ),
-
                 SizedBox(width: 5.dp),
-
                 SizedBox(
                   width: 35.dp,
                   height: 23.dp,
@@ -390,8 +387,6 @@ class _MapScreenState extends ConsumerState<MapScreen> with SingleTickerProvider
                 ),
               ],
             ),
-
-
           ),
         );
       },
@@ -399,46 +394,161 @@ class _MapScreenState extends ConsumerState<MapScreen> with SingleTickerProvider
   }
 
 
+
   Widget _buildBottomActionArea(dynamic userScreenNotifier) {
     // If zoom is too low or moving, show shimmer for precision requirement
-    if (_currentZoom <= _minZoomLevel || _isMoving || _selectedAddress.isEmpty) {
-      return Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
-        child: Container(
-          height: 60.dp,
-          width: double.infinity,
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10.dp)),
-          child: Center(
-            child: objCommonWidgets.customText(context, "Zoom in more for precise location", 12, Colors.grey, objConstantFonts.montserratMedium),
-          ),
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      child: Container(
+        decoration: BoxDecoration(
+            color: objConstantColor.white,
+            borderRadius: BorderRadius.circular(10.dp),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(15),
+              blurRadius: 2,
+              offset: const Offset(2, 5),
+            ),
+          ],
         ),
-      );
-    }
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: 4.dp, top: 4.dp, right: 4.dp),
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 10.dp),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF3F1F1),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(8.dp),
+                    topRight: Radius.circular(8.dp),
+                  ),
 
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(color: objConstantColor.white, borderRadius: BorderRadius.circular(5.dp)),
-            padding: EdgeInsets.symmetric(vertical: 8.dp, horizontal: 10.dp),
-            child: objCommonWidgets.customText(context, _selectedAddress, 12, Colors.black, objConstantFonts.montserratMedium, textAlign: TextAlign.start),
+                ),
+                child: const CyclingText(),
+              ),
+            ),
+
+            if (_isMoving)...{
+              _buildShimmerArea()
+            } else...{
+              SizedBox(
+                width: double.infinity,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: 10.dp, horizontal: 15.dp),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Image.asset(objConstantAssest.locFour, width: 18.dp),
+                          SizedBox(width: 5.dp),
+                          Flexible(
+                            child: objCommonWidgets.customText(context, _selectedTownAddress, 17,
+                                Colors.black, objConstantFonts.montserratBold),
+                          )
+                        ],
+                      ),
+                      objCommonWidgets.customText(context, _selectedAddress, 12,
+                          Colors.black, objConstantFonts.montserratRegular)
+                    ],
+                  ),
+                ),
+              )
+            },
+
+            if (_currentZoom >= _minZoomLevel && !_isMoving && _selectedAddress.isNotEmpty)...{
+              CupertinoButton(
+                padding: EdgeInsets.only(
+                    bottom: 10.dp, left: 15.dp, right: 15.dp),
+                onPressed: () {
+                  final screenNotifier = ref.read(
+                      MapScreenGlobalStateProvider.notifier);
+                  screenNotifier.callEditProfileAPI(
+                      context, userScreenNotifier, _selectedAddress,
+                      '${_selectedLocation?.latitude},${_selectedLocation
+                          ?.longitude}');
+                },
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(color: Colors.deepOrange,
+                      borderRadius: BorderRadius.circular(10.dp)),
+                  padding: EdgeInsets.symmetric(
+                      vertical: 13.dp, horizontal: 15.dp),
+                  child: Center(child: objCommonWidgets.customText(
+                      context, 'Confirm Location', 14, Colors.white,
+                      objConstantFonts.montserratSemiBold)),
+                ),
+              ),
+            }else...{
+              if(!_isMoving)
+              Padding(
+                padding: EdgeInsets.only(left: 15.dp, right: 15.dp, bottom: 10.dp),
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                  decoration: BoxDecoration(
+                      color: Colors.red.withAlpha(15),
+                      borderRadius: BorderRadius.circular(10.dp),
+                    border: Border.all(color: Colors.red)
+                  ),
+                  child: objCommonWidgets.customText(context,
+                      'Zoom in to place the pin at exact delivery location',
+                      10, Colors.red, objConstantFonts.montserratMedium),
+                ),
+              )
+            }
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildShimmerArea() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  // Shimmer for the Icon
+                  Container(
+                    width: 18.dp,
+                    height: 18.dp,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4.dp),
+                    ),
+                  ),
+                  SizedBox(width: 5.dp),
+                  // Shimmer for 'Chittur' text
+                  Container(
+                    width: 80.dp,
+                    height: 17.dp,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+              SizedBox(height: 8.dp),
+              // Shimmer for the address line
+              Container(
+                width: 200.dp,
+                height: 12.dp,
+                color: Colors.white,
+              ),
+            ],
           ),
         ),
-        SizedBox(width: 10.dp),
-        CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () {
-            final screenNotifier = ref.read(MapScreenGlobalStateProvider.notifier);
-            screenNotifier.callEditProfileAPI(context, userScreenNotifier, _selectedAddress, '${_selectedLocation?.latitude},${_selectedLocation?.longitude}');
-          },
-          child: Container(
-            decoration: BoxDecoration(color: Colors.deepOrange, borderRadius: BorderRadius.circular(5.dp)),
-            padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
-            child: objCommonWidgets.customText(context, 'Confirm', 13, Colors.white, objConstantFonts.montserratSemiBold),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -462,19 +572,39 @@ class _MapScreenState extends ConsumerState<MapScreen> with SingleTickerProvider
 
   Future<void> _getAddressFromLatLng(LatLng position) async {
     try {
-      List<Placemark> placeMarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      List<Placemark> placeMarks =
+      await placemarkFromCoordinates(position.latitude, position.longitude);
+
       if (placeMarks.isNotEmpty) {
         final place = placeMarks.first;
+
         setState(() {
-          final parts = [place.subLocality, place.locality, place.administrativeArea, place.postalCode];
-          final filtered = parts.where((e) => e != null && e.toString().trim().isNotEmpty).toList();
+          final parts = [
+            place.subLocality,
+            place.locality,
+            place.administrativeArea,
+            place.postalCode
+          ];
+
+          final filtered = parts
+              .where((e) => e != null && e.toString().trim().isNotEmpty)
+              .toList();
+
           _selectedAddress = filtered.join(", ");
+
+          // ✅ Proper fallback logic
+          _selectedTownAddress =
+          (place.subLocality != null && place.subLocality!.isNotEmpty)
+              ? place.subLocality!
+              : (place.locality ?? "");
         });
       }
     } catch (e) {
       print("Reverse geocoding error: $e");
     }
   }
+
+
 
   Future<void> _goToCurrentLocation(BuildContext context) async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -488,10 +618,10 @@ class _MapScreenState extends ConsumerState<MapScreen> with SingleTickerProvider
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     LatLng current = LatLng(position.latitude, position.longitude);
 
-    if (!_isWithinAllowed(current)) {
+    /*if (!_isWithinAllowed(current)) {
       _showOutOfRangeAlert(context);
       return;
-    }
+    }*/
 
     final controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newLatLngZoom(current, 19));
@@ -579,3 +709,6 @@ final MapScreenGlobalStateProvider = StateNotifierProvider.autoDispose<
   var notifier = MapScreenGlobalStateNotifier();
   return notifier;
 });
+
+
+

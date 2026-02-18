@@ -8,9 +8,7 @@ import '../../../../CodeReusable/FacebookSignInService.dart';
 import '../../../../CodeReusable/GoogleSignInService.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../../CodeReusable/CodeReusability.dart';
-import '../../../Utility/PreferencesManager.dart';
-import '../../commonViews/CommonWidgets.dart';
-import '../CreateAccount/CreateAccountScreen.dart';
+import '../../../Utility/ScrollingImageBackground.dart';
 import '../OtpScreen/OtpScreen.dart';
 import 'LoginScreenState.dart';
 
@@ -22,7 +20,12 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class LoginScreenState extends ConsumerState<LoginScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  static  List<String> backgroundImages = [
+    objConstantAssest.sampleThree,
+    objConstantAssest.sampleFour,
+    objConstantAssest.sampleFive,
+    objConstantAssest.sampleTwo,
+  ];
 
   @override
   void initState() {
@@ -73,20 +76,32 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                             /// 🔹 TOP IMAGE SECTION
                             Stack(
                               children: [
-                                Image.asset(
-                                  objConstantAssest.sampleTwo,
-                                  width: double.infinity,
-                                  height: 52.h,
-                                  fit: BoxFit.fitHeight,
+                                SizedBox(
+                                  height: 57.h,
+                                  child: ScrollingImageBackground(
+                                    imageList: backgroundImages,
+                                    duration: const Duration(seconds: 5),
+                                  ),
                                 ),
                                 Positioned.fill(
                                   child: BackdropFilter(
                                     filter: ImageFilter.blur(
-                                      sigmaX: 3,
-                                      sigmaY: 3,
+                                      sigmaX: 2,
+                                      sigmaY: 2,
                                     ),
                                     child: Container(
-                                      color: Colors.black.withAlpha(80),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            Colors.transparent,             // Clear at the top
+                                            Colors.black.withAlpha(50),  // Slight tint in the middle
+                                            Colors.black.withAlpha(200),  // Darker at the bottom for text readability
+                                          ],
+                                          stops: const [0.0, 0.5, 1.0],     // Controls where the transitions happen
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -106,24 +121,16 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                                         objConstantFonts
                                             .montserratSemiBold,
                                       ),
-                                      SizedBox(height: 1.h),
+                                      SizedBox(height: 5.dp),
                                       objCommonWidgets.customText(
                                         context,
-                                        'Pure organic goodness, delivered to your door.',
-                                        12,
+                                        'Purely organic. Perfectly delivered your daily\nessentials right to your door.',
+                                        //'Pure organic goodness,\ndelivered to your door.',
+                                        10,
                                         Colors.white,
-                                        objConstantFonts
-                                            .montserratSemiBold,
+                                        objConstantFonts.montserratMedium,
                                       ),
-                                      SizedBox(height: 3.dp),
-                                      /*objCommonWidgets.customText(
-                                        context,
-                                        'Fresh produce, natural oils, clean \nbody care — all in one place.',
-                                        9,
-                                        Colors.white,
-                                        objConstantFonts
-                                            .montserratMedium,
-                                      ),*/
+                                      SizedBox(height: 10.dp),
                                     ],
                                   ),
                                 ),
@@ -132,7 +139,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
 
                             /// 🔹 FORM SECTION
                             Transform.translate(
-                              offset: const Offset(0, -30),
+                              offset: const Offset(0, -40),
                               child: Container(
                                 width: double.infinity,
                                 padding: EdgeInsets.symmetric(
@@ -153,7 +160,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                                   CrossAxisAlignment.start,
                                   children: [
 
-                                    SizedBox(height: 10.dp),
+                                    SizedBox(height: 5.dp),
 
                                     objCommonWidgets.customText(
                                       context,
@@ -226,7 +233,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                                       ),
                                     ),
 
-                                    SizedBox(height: 25.dp),
+                                    SizedBox(height: 20.dp),
 
 
                                     Row(
@@ -246,7 +253,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                                       ],
                                     ),
 
-                                    SizedBox(height: 25.dp),
+                                    SizedBox(height: 20.dp),
 
                                     // Social Buttons Layout
                                     Row(
@@ -266,7 +273,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                                           ),
                                         ),
 
-                                        SizedBox(width: 16.dp),
+                                        SizedBox(width: 5.w),
 
                                         // Facebook Button
                                         Expanded(
@@ -603,6 +610,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
     return CupertinoButton(
       onPressed: onTap,
       padding: EdgeInsets.zero,
+      minimumSize: Size.zero,
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 12.dp),
         decoration: BoxDecoration(

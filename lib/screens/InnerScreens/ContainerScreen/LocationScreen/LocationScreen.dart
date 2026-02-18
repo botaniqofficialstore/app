@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sizer/flutter_sizer.dart';
-import '../../../../Constants/Constants.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../MainScreen/MainScreenState.dart';
 import 'LocationScreenState.dart';
@@ -32,7 +31,7 @@ class LocationScreenState extends ConsumerState<LocationScreen> {
     String btnText = state.selectedLocation == null ? 'Pick Location' : 'Change Location';
 
     return Scaffold(
-      backgroundColor: Colors.transparent, // Clean organic off-white
+      backgroundColor: const Color(0xFFF4F4F4), // Clean organic off-white
       body: SafeArea(
         child: Column(
           children: [
@@ -55,9 +54,9 @@ class LocationScreenState extends ConsumerState<LocationScreen> {
 
             if (state.selectedLocation != null)
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15.dp, vertical: 10.dp),
+                padding: EdgeInsets.only(left: 15.dp, right: 15.dp, top: 25.dp),
                 child: Container(
-                  padding: EdgeInsets.all(14.dp),
+                  padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 10.dp),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(14.dp),
@@ -69,30 +68,32 @@ class LocationScreenState extends ConsumerState<LocationScreen> {
                       ),
                     ],
                   ),
-                  child: Row(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: EdgeInsets.all(5.dp),
-                        decoration: BoxDecoration(
-                          color: Colors.deepOrange.withAlpha(20),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.location_on,
-                          color: Colors.deepOrange,
-                          size: 20.dp,
-                        ),
-                      ),
-                      SizedBox(width: 10.dp),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            objCommonWidgets.customText(context, 'Selected location', 10, Colors.black, objConstantFonts.montserratRegular),
-                            objCommonWidgets.customText(context, state.selectPickupAddress, 12, Colors.black, objConstantFonts.montserratMedium),
-                          ],
-                        ),
+                      objCommonWidgets.customText(context, 'Selected Location', 12,
+                          Colors.black.withAlpha(150), objConstantFonts.montserratMedium),
+
+                      SizedBox(height: 5.dp),
+
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(top: 3.dp),
+                            child: Image.asset(objConstantAssest.locFour, width: 18.dp),
+                          ),
+                          SizedBox(width: 5.dp),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              objCommonWidgets.customText(context, state.selectPickupAddress.split(',').first, 15,
+                                  Colors.black, objConstantFonts.montserratBold),
+                              objCommonWidgets.customText(context, state.selectPickupAddress, 12,
+                                  Colors.black, objConstantFonts.montserratRegular),
+                            ],
+                          )
+                        ],
                       ),
                     ],
                   ),
@@ -134,7 +135,6 @@ class LocationScreenState extends ConsumerState<LocationScreen> {
   // Modern Header
   Widget _buildHeader(BuildContext context) {
     final userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
-    final notifier = ref.read(locationScreenStateProvider.notifier);
 
     return Container(
       padding: EdgeInsets.only(left: 10.dp, top: 10.dp, bottom: 5.dp),

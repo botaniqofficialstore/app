@@ -1,7 +1,4 @@
 import 'package:botaniqmicrogreens/screens/Authentication/CreateAccount/CreateAccountScreen.dart';
-import 'package:botaniqmicrogreens/screens/Authentication/ForgotPasswordScreen/ForgotPasswordScreen.dart';
-import 'package:botaniqmicrogreens/screens/Authentication/LoginScreen/LoginScreen.dart';
-import 'package:botaniqmicrogreens/screens/Authentication/OtpScreen/OtpScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/CartScreen/CartScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/EditProfileScreen/EditProfileScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/FamilyLocationScreen/FamilyLocationScreen.dart';

@@ -258,9 +258,6 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
-
-
                     SizedBox(height: 15.dp),
 
                     /// Categories title
