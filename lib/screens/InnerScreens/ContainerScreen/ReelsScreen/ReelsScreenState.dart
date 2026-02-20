@@ -40,14 +40,7 @@ class ReelsGlobalStateNotifier extends StateNotifier<ReelsScreenState> {
 
   Future<void> shareReel(BuildContext context, ReelData reel) async {
     try {
-      final text = '''
-Check out this amazing reel from BotaniQ Microgreens!
-
-"${reel.caption}"
-
-Watch now: ${reel.reelUrl}
-''';
-
+      final text = '''Check out this amazing reel from BotaniQ Microgreens!"${reel.caption}"Watch now: ${reel.reelUrl}''';
       await Share.share(
         text,
         subject: 'BotaniQ Microgreens Reels',
@@ -165,6 +158,6 @@ Watch now: ${reel.reelUrl}
   }
 }
 
-final ReelsGlobalStateProvider =
+final reelsGlobalStateProvider =
 StateNotifierProvider.autoDispose<ReelsGlobalStateNotifier, ReelsScreenState>(
         (ref) => ReelsGlobalStateNotifier());

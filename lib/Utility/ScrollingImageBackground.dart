@@ -55,7 +55,6 @@ class _ScrollingImageBackgroundState extends State<ScrollingImageBackground> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 52.h,
       child: Stack(
         children: widget.imageList.asMap().entries.map((entry) {
           int index = entry.key;
@@ -69,7 +68,7 @@ class _ScrollingImageBackgroundState extends State<ScrollingImageBackground> {
             child: Image.asset(
               path,
               width: double.infinity,
-              height: 52.h,
+              height: 55.h,
               fit: BoxFit.cover, // Cover is usually smoother for backgrounds than fitHeight
             ),
           );

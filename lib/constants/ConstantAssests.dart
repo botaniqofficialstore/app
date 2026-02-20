@@ -101,6 +101,10 @@ class ConstantAssests{
    String sampleThree = '${commonIconsAssets}pic1.png';
    String sampleFour = '${commonIconsAssets}pic2.png';
    String sampleFive = '${commonIconsAssets}pic3.png';
+   String sampleSix = '${commonIconsAssets}pic5.png';
+   String sampleSeven = '${commonIconsAssets}pic6.png';
+   String sampleEight = '${commonIconsAssets}pic7.png';
+   String sampleNine = '${commonIconsAssets}pic4.png';
    String gPay = '${commonIconsAssets}gpay.png';
    String phonePe = '${commonIconsAssets}phonePe.png';
    String payTm = '${commonIconsAssets}paytm.png';

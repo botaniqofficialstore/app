@@ -79,351 +79,277 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final homeScreenState = ref.watch(HomeScreenGlobalStateProvider);
-    final homeScreenNotifier =
-    ref.watch(HomeScreenGlobalStateProvider.notifier);
-    final userScreenNotifier =
-    ref.watch(MainScreenGlobalStateProvider.notifier);
+    final homeScreenNotifier = ref.watch(HomeScreenGlobalStateProvider.notifier);
+    final userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
+
+    final double statusBarHeight = MediaQuery.of(context).padding.top;
+    final double headerHeight = 150.dp + statusBarHeight;
 
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white, // Set a base color for the body background
       body: RefreshIndicator(
         onRefresh: () async {
           await homeScreenNotifier.callProductListGepAPI(context);
         },
-        color: objConstantColor.navyBlue,
+        color: objConstantColor.black,
         backgroundColor: objConstantColor.white,
-        child: SingleChildScrollView(
+        child: CustomScrollView(
           controller: _scrollController,
-          child: Column(
-            children: [
-
-              /// 🔥 HEADER
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 15.dp),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFFFFA600),
-                      Color(0xFFFF6A00),
-                      Color(0xFFFF3D00),
-                      Color(0xFFFF3D00),
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+          slivers: [
+            /// 🔥 HEADER (Vanish Effect implementation)
+            SliverAppBar(
+              expandedHeight: headerHeight,
+              collapsedHeight: statusBarHeight, // Keeps space for the notch when collapsed
+              toolbarHeight: statusBarHeight,   // Ensures the "vanish" stops at the notch
+              pinned: true,                     // Keeps the "safe area" space fixed at the top
+              floating: false,
+              elevation: 0,
+              primary: false, // We handle the padding manually
+              automaticallyImplyLeading: false,
+              backgroundColor: Colors.white,    // Color when fully collapsed
+              surfaceTintColor: Colors.white,
+              flexibleSpace: FlexibleSpaceBar(
+                collapseMode: CollapseMode.pin,
+                background: Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xFFFFA600),
+                        Color(0xFFFF6A00),
+                        Color(0xFFFF3D00),
+                        Color(0xFFFF3D00),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(30.dp),
+                      bottomRight: Radius.circular(30.dp),
+                    ),
                   ),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30.dp),
-                    bottomRight: Radius.circular(30.dp),
-                  ),
-                ),
-                child: SafeArea(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                      /// Top Row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              objCommonWidgets.customText(
-                                context,
-                                'Good to see you again',
-                                15,
-                                objConstantColor.white,
-                                objConstantFonts.montserratBold,
-                              ),
-                              objCommonWidgets.customText(
-                                context,
-                                'Let’s find something natural today.',
-                                8,
-                                objConstantColor.white,
-                                objConstantFonts.montserratSemiBold,
-                              ),
-                            ],
-                          ),
-
-                          CupertinoButton(
-                            key: wishButtonKey,
-                            padding: EdgeInsets.zero,
-                            minimumSize: Size.zero,
-                            child: Image.asset(
-                              objConstantAssest.wishlist,
-                              width: 25.dp,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              userFrom = ScreenName.home;
-                              userScreenNotifier.callNavigation(ScreenName.wishList);
-                            },
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(height: 10.dp),
-
-                      /// Location
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          objCommonWidgets.customText(
-                            context,
-                            'Delivery Location',
-                            12,
-                            Colors.white,
-                            objConstantFonts.montserratBold,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              userFrom = ScreenName.home;
-                              userScreenNotifier
-                                  .callNavigation(ScreenName.map);
-                            },
-                            child: exactAddress.isNotEmpty
-                                ? Row(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: statusBarHeight, left: 15.dp, right: 15.dp),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        /// Top Row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(Icons.location_on,
-                                    color: Colors.white, size: 15.dp),
-                                SizedBox(
-                                  width: 120.dp,
-                                  child: Text(
-                                    exactAddress,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 9.5.dp,
-                                      fontFamily: objConstantFonts
-                                          .montserratSemiBold,
-                                    ),
-                                  ),
-                                ),
-                                Icon(Icons.keyboard_arrow_down_rounded,
-                                    color: Colors.white, size: 20.dp),
+                                objCommonWidgets.customText(context, 'Good to see you again', 15, Colors.white, objConstantFonts.montserratBold),
+                                objCommonWidgets.customText(context, 'Let’s find something natural today.', 8, Colors.white, objConstantFonts.montserratSemiBold),
                               ],
-                            )
-                                : Padding(
-                                  padding: EdgeInsets.only(top: 5.dp),
-                                  child: Container(
-                                                              padding: EdgeInsets.symmetric(
-                                    vertical: 6.dp, horizontal: 7.dp),
-                                                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius:
-                                  BorderRadius.circular(10.dp),
-                                                              ),
-                                                              child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.my_location_outlined,
-                                        color: objConstantColor.orange,
-                                        size: 15.dp),
-                                    SizedBox(width: 4.dp),
-                                    objCommonWidgets.customText(
-                                      context,
-                                      'Update Location',
-                                      10,
-                                      objConstantColor.orange,
-                                      objConstantFonts.montserratBold,
-                                    ),
-                                  ],
-                                                              ),
-                                                            ),
-                                ),
+                            ),
+                            CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              child: Image.asset(objConstantAssest.wishlist, width: 25.dp, color: Colors.white),
+                              onPressed: () {
+                                userFrom = ScreenName.home;
+                                userScreenNotifier.callNavigation(ScreenName.wishList);
+                              },
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10.dp),
+                        /// Location
+                        GestureDetector(
+                          onTap: () {
+                            userFrom = ScreenName.home;
+                            userScreenNotifier.callNavigation(ScreenName.map);
+                          },
+                          child: exactAddress.isNotEmpty
+                              ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(Icons.location_on, color: Colors.white, size: 18.dp),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      objCommonWidgets.customText(context, exactAddress.split(',').first, 12, Colors.white, objConstantFonts.montserratBold),
+
+                                      Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 100.dp,
+                                            child: Text(exactAddress.split(' ').sublist(1).join(' '), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(color: Colors.white, fontSize: 9.dp, fontFamily: objConstantFonts.montserratMedium)),
+                                          ),
+                                          Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 20.dp),
+                                        ],
+                                      ),
+
+                                    ],
+                                  ),
+
+
+                                ],
+                              )
+                              : Container(
+                            padding: EdgeInsets.symmetric(vertical: 6.dp, horizontal: 7.dp),
+                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10.dp)),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.my_location_outlined, color: objConstantColor.orange, size: 15.dp),
+                                SizedBox(width: 4.dp),
+                                objCommonWidgets.customText(context, 'Update Location', 10, objConstantColor.orange, objConstantFonts.montserratBold),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
-
-                      SizedBox(height: 10.dp),
-
-                      /// Search
-                      CommonSearchField(
-                        controller: TextEditingController(),
-                        hintText: 'Search',
-                        onChanged: (value) {},
-                      ),
-
-                      SizedBox(height: 10.dp),
-                    ],
+                        ),
+                        SizedBox(height: 10.dp),
+                        CommonSearchField(controller: TextEditingController(), hintText: 'Search', onChanged: (value) {}),
+                      ],
+                    ),
                   ),
                 ),
               ),
+            ),
 
-              SizedBox(height: 5.dp),
-
-               Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 15.dp),
-
-                    /// Categories title
-                    Padding(
-                      padding: EdgeInsets.only(left: 15.dp),
-                      child: objCommonWidgets.customText(
-                        context,
-                        'Categories',
-                        13,
-                        objConstantColor.navyBlue,
-                        objConstantFonts.montserratSemiBold,
-                      ),
+            /// 🔥 BODY CONTENT
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 15.dp),
+                  /// Categories title
+                  Padding(
+                    padding: EdgeInsets.only(left: 15.dp),
+                    child: objCommonWidgets.customText(
+                      context,
+                      'Categories',
+                      13,
+                      objConstantColor.navyBlue,
+                      objConstantFonts.montserratSemiBold,
                     ),
-
-                    /// Categories list
-                    Padding(
-                      padding: EdgeInsets.only(left: 15.dp, top: 5.dp),
-                      child: SizedBox(
-                        height: 45.dp,
-                        child: ListView.separated(
-                          padding: EdgeInsets.only(right: 10.dp),
-                          controller: categoryScrollController,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: productCategories.length,
-                          separatorBuilder: (_, __) =>
-                              SizedBox(width: 10.dp),
-                          itemBuilder: (context, index) {
-                            final isSelected =
-                                homeScreenState.selectedIndex == index;
-
-                            return CupertinoButton(
-                              padding: EdgeInsets.zero,
-                              onPressed: () {
-                                homeScreenNotifier.updateSelectedIndex(index);
-                                categoryScrollController.animateTo(
-                                  index * 60,
-                                  duration:
-                                  const Duration(milliseconds: 300),
-                                  curve: Curves.easeOut,
-                                );
-                              },
-                              child: Container(
-                                width: 40.dp,
-                                decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? objConstantColor.yellow
-                                      : objConstantColor.navyBlue,
-                                  borderRadius:
-                                  BorderRadius.circular(8.dp),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      productCategories[index]['image']!,
-                                      width: 20.dp,
-                                      height: 20.dp,
-                                      color: isSelected
-                                          ? Colors.black
-                                          : Colors.white,
-                                    ),
-                                    SizedBox(height: 2.dp),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 5.dp),
-                                      child: Text(
-                                        productCategories[index]['title']!,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 10.dp,
-                                          color: isSelected
-                                              ? Colors.black
-                                              : Colors.white,
-                                          fontFamily: objConstantFonts
-                                              .montserratMedium,
-                                        ),
+                  ),
+                  /// Categories list
+                  Padding(
+                    padding: EdgeInsets.only(left: 15.dp, top: 5.dp),
+                    child: SizedBox(
+                      height: 45.dp,
+                      child: ListView.separated(
+                        padding: EdgeInsets.only(right: 10.dp),
+                        controller: categoryScrollController,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: productCategories.length,
+                        separatorBuilder: (_, __) => SizedBox(width: 10.dp),
+                        itemBuilder: (context, index) {
+                          final isSelected = homeScreenState.selectedIndex == index;
+                          return CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              homeScreenNotifier.updateSelectedIndex(index);
+                              categoryScrollController.animateTo(
+                                index * 60,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeOut,
+                              );
+                            },
+                            child: Container(
+                              width: 40.dp,
+                              decoration: BoxDecoration(
+                                color: isSelected ? objConstantColor.yellow : objConstantColor.black.withAlpha(200),
+                                borderRadius: BorderRadius.circular(8.dp),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    productCategories[index]['image']!,
+                                    width: 20.dp,
+                                    height: 20.dp,
+                                    color: isSelected ? Colors.black : Colors.white,
+                                  ),
+                                  SizedBox(height: 2.dp),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 5.dp),
+                                    child: Text(
+                                      productCategories[index]['title']!,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 10.dp,
+                                        color: isSelected ? Colors.black : Colors.white,
+                                        fontFamily: objConstantFonts.montserratSemiBold,
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-
-                    SizedBox(height: 20.dp),
-
-                    /// Banner
-                    SizedBox(
-                      height: 150.dp,
-                      child: AnimatedCarouselSlider(
-                        imageList: [
-                          objConstantAssest.add2,
-                          objConstantAssest.add3,
-                          objConstantAssest.add1,
-                          objConstantAssest.add4,
-                          objConstantAssest.add5,
-                        ],
-                        fallbackImage:
-                        "assets/images/placeholder.png",
-                      ),
+                  ),
+                  SizedBox(height: 20.dp),
+                  /// Banner
+                  SizedBox(
+                    height: 150.dp,
+                    child: AnimatedCarouselSlider(
+                      imageList: [
+                        objConstantAssest.add2,
+                        objConstantAssest.add3,
+                        objConstantAssest.add1,
+                        objConstantAssest.add4,
+                        objConstantAssest.add5,
+                      ],
+                      fallbackImage: "assets/images/placeholder.png",
                     ),
+                  ),
+                  SizedBox(height: 20.dp),
+                  Padding(
+                    padding: EdgeInsets.only(left: 15.dp),
+                    child: objCommonWidgets.customText(
+                      context,
+                      'Products',
+                      13,
+                      objConstantColor.navyBlue,
+                      objConstantFonts.montserratSemiBold,
+                    ),
+                  ),
 
-                    SizedBox(height: 20.dp),
-
+                  /// Product Grid
+                  if (homeScreenState.isLoading && homeScreenState.productList.isEmpty) ...{
                     Padding(
-                      padding: EdgeInsets.only(left: 15.dp),
-                      child: objCommonWidgets.customText(
-                        context,
-                        'Products',
-                        13,
-                        objConstantColor.navyBlue,
-                        objConstantFonts.montserratSemiBold,
+                      padding: EdgeInsets.symmetric(horizontal: 14.dp, vertical: 5.dp),
+                      child: buildProductShimmer(),
+                    )
+                  } else ...{
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 14.dp),
+                      child: GridView.builder(
+                        padding: EdgeInsets.zero,
+                        primary: false,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: homeScreenState.productList.length + (homeScreenState.isLoading ? 1 : 0),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: 0.60,
+                        ),
+                        itemBuilder: (context, index) {
+                          if (index == homeScreenState.productList.length) {
+                            return const Center(child: CupertinoActivityIndicator());
+                          }
+                          final product = homeScreenState.productList[index];
+                          return _buildProductCard(product, index, homeScreenNotifier);
+                        },
                       ),
                     ),
-
-                    /// Product Grid
-                    if (homeScreenState.isLoading && homeScreenState.productList.isEmpty)...{
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 14.dp, vertical: 5.dp),
-                        child: buildProductShimmer(),
-                      )
-                    } else...{
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 14.dp),
-                        child: GridView.builder(
-                          padding: EdgeInsets.zero,
-                          primary: false,
-                          shrinkWrap: true,
-                          physics:
-                          const NeverScrollableScrollPhysics(),
-                          itemCount:
-                          homeScreenState.productList.length +
-                              (homeScreenState.isLoading ? 1 : 0),
-                          gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 12,
-                            childAspectRatio: 0.60,
-                          ),
-                          itemBuilder: (context, index) {
-                            if (index ==
-                                homeScreenState.productList.length) {
-                              return const Center(
-                                child: CupertinoActivityIndicator(),
-                              );
-                            }
-                            final product =
-                            homeScreenState.productList[index];
-                            return _buildProductCard(
-                                product, index, homeScreenNotifier);
-                          },
-                        ),
-                      ),
-                    },
-
-                    SizedBox(height: 10.dp),
-                  ],
-                ),
-
-            ],
-          ),
+                  },
+                  SizedBox(height: 10.dp),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

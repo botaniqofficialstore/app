@@ -24,7 +24,9 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
     objConstantAssest.sampleThree,
     objConstantAssest.sampleFour,
     objConstantAssest.sampleFive,
-    objConstantAssest.sampleTwo,
+    objConstantAssest.sampleNine,
+    objConstantAssest.sampleSix,
+    objConstantAssest.sampleEight,
   ];
 
   @override
@@ -77,10 +79,10 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                             Stack(
                               children: [
                                 SizedBox(
-                                  height: 57.h,
+                                  height: 56.h,
                                   child: ScrollingImageBackground(
                                     imageList: backgroundImages,
-                                    duration: const Duration(seconds: 5),
+                                    duration: const Duration(seconds: 3),
                                   ),
                                 ),
                                 Positioned.fill(
@@ -192,7 +194,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                                       }
                                     ),
 
-                                    SizedBox(height: 3.h),
+                                    SizedBox(height: 20.dp),
 
                                     CupertinoButton(
                                       padding: EdgeInsets.zero,

@@ -56,24 +56,25 @@ class MainScreenState extends ConsumerState<MainScreen> {
             bottom: false,
             child: Scaffold(
               key: _scaffoldKey,
-              backgroundColor: objConstantColor.white,
+              backgroundColor: userScreenState.currentModule != ScreenName.reels ? Colors.white : Colors.black,
 
               body: Center(
                 child: userScreenNotifier.getChildContainer(),
               ),
 
               // UPDATED: Footer shows live cart & wishlist count
-              bottomNavigationBar: ((userScreenState.currentModule != ScreenName.reels))
+              bottomNavigationBar:
 
-                  ? UserFooterView(
+              UserFooterView(
                 currentModule: userScreenState.currentModule,
                 cartCount: userScreenState.cartCount,
                 wishlistCount: userScreenState.wishlistCount,
+                isWhite: userScreenState.currentModule != ScreenName.reels,
                 selectedFooterIndex: (index) {
                   userScreenNotifier.setFooterSelection(index);
                 },
               )
-                  : const SizedBox.shrink(),
+                 ,
             ),
           ),
         ),
@@ -114,6 +115,7 @@ class UserFooterView extends ConsumerStatefulWidget {
   final ScreenName currentModule;
   final int cartCount;
   final int wishlistCount;
+  final bool isWhite;
   final Function(int) selectedFooterIndex;
 
   const UserFooterView({
@@ -121,6 +123,7 @@ class UserFooterView extends ConsumerStatefulWidget {
     required this.selectedFooterIndex,
     this.cartCount = 0,
     this.wishlistCount = 0,
+    this.isWhite = true,
     super.key,
   });
 
@@ -175,7 +178,7 @@ class UserFooterViewState extends ConsumerState<UserFooterView> {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 10.dp),
         decoration: BoxDecoration(
-          color: objConstantColor.white,
+          color: widget.isWhite ? Colors.white : Colors.black,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha(10),
@@ -202,7 +205,7 @@ class UserFooterViewState extends ConsumerState<UserFooterView> {
                   height: 4.dp,
                   width: indicatorWidth,
                   decoration: BoxDecoration(
-                    color: objConstantColor.black,
+                    color: widget.isWhite ? Colors.black : Colors.white,
                     borderRadius: BorderRadius.circular(20.dp),
                   ),
                 ),
@@ -230,14 +233,14 @@ class UserFooterViewState extends ConsumerState<UserFooterView> {
                                 isSelected ? activeIcons[index] : inactiveIcons[index],
                                 height: 20.dp,
                                 width: 20.dp,
-                                color: Colors.black,
+                                color: widget.isWhite ? Colors.black : Colors.white,
                               ),
                               SizedBox(height: 2.5.dp),
                               objCommonWidgets.customText(
                                   context,
                                   modules[index],
                                   10,
-                                  objConstantColor.navyBlue,
+                                  widget.isWhite ? Colors.black : Colors.white,
                                   objConstantFonts.montserratSemiBold
                               ),
                               SizedBox(height: 2.5.dp),
