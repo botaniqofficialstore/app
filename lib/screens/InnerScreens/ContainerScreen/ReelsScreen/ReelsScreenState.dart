@@ -117,13 +117,43 @@ class ReelsGlobalStateNotifier extends StateNotifier<ReelsScreenState> {
   }
 
   /// Like / Dislike reel
-  Future<void> callReelLikeAPI(BuildContext context, String reelId,
-      bool isLiked, int index) async {
+  Future<void> callReelLikeAPI(
+      BuildContext context,
+      String reelId,
+      bool isLiked,
+      int index,
+      ) async {
+
+    // ---------- OPTIMISTIC UPDATE ----------
+    final updatedList = [...state.reelsList];
+
+    if (index >= 0 && index < updatedList.length) {
+      final oldReel = updatedList[index];
+
+      final updatedReel = ReelData(
+        reelId: oldReel.reelId,
+        reelUrl: oldReel.reelUrl,
+        caption: oldReel.caption,
+        totalLikes: isLiked
+            ? oldReel.totalLikes + 1
+            : (oldReel.totalLikes > 0 ? oldReel.totalLikes - 1 : 0),
+        isLikedByUser: isLiked,
+      );
+
+      updatedList[index] = updatedReel;
+      state = state.copyWith(reelsList: updatedList);
+    }
+
+    // ---------- BACKGROUND API CALL ----------
     bool connected = await CodeReusability().isConnectedToNetwork();
-    if (!connected) return;
+    if (!connected) {
+      _rollbackLike(index, !isLiked);
+      return;
+    }
 
     final prefs = await PreferencesManager.getInstance();
-    String userId = prefs.getStringValue(PreferenceKeys.userID) ?? '';
+    String userId =
+        prefs.getStringValue(PreferenceKeys.userID) ?? '';
 
     Map<String, dynamic> body = {
       "reelId": reelId,
@@ -132,29 +162,34 @@ class ReelsGlobalStateNotifier extends StateNotifier<ReelsScreenState> {
     };
 
     ReelsRepository().callReelsLikeDisLikeApi(
-        body, (statusCode, responseBody) async {
-      if (statusCode == 200) {
-        final res = LikeReelResponse.fromJson(responseBody);
-        Logger().log("### Like Response: ${res.message}");
-
-        final updatedList = [...state.reelsList];
-        if (index >= 0 && index < updatedList.length) {
-          final oldReel = updatedList[index];
-          final updatedReel = ReelData(
-            reelId: oldReel.reelId,
-            reelUrl: oldReel.reelUrl,
-            caption: oldReel.caption,
-            totalLikes: isLiked
-                ? oldReel.totalLikes + 1
-                : (oldReel.totalLikes > 0 ? oldReel.totalLikes - 1 : 0),
-            isLikedByUser: isLiked,
-          );
-
-          updatedList[index] = updatedReel;
-          state = state.copyWith(reelsList: updatedList);
+      body,
+          (statusCode, responseBody) async {
+        if (statusCode != 200) {
+          _rollbackLike(index, !isLiked);
         }
-      }
-    });
+      },
+    );
+  }
+
+  void _rollbackLike(int index, bool revertToLiked) {
+    final updatedList = [...state.reelsList];
+
+    if (index >= 0 && index < updatedList.length) {
+      final oldReel = updatedList[index];
+
+      final revertedReel = ReelData(
+        reelId: oldReel.reelId,
+        reelUrl: oldReel.reelUrl,
+        caption: oldReel.caption,
+        totalLikes: revertToLiked
+            ? oldReel.totalLikes + 1
+            : (oldReel.totalLikes > 0 ? oldReel.totalLikes - 1 : 0),
+        isLikedByUser: revertToLiked,
+      );
+
+      updatedList[index] = revertedReel;
+      state = state.copyWith(reelsList: updatedList);
+    }
   }
 }
 
