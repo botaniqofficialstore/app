@@ -10,7 +10,9 @@ import 'package:botaniqmicrogreens/screens/InnerScreens/MainScreen/MainScreenSta
 
 
 class MainScreen extends ConsumerStatefulWidget {
-  const MainScreen({super.key});
+  final ScreenName module;
+
+  const MainScreen({super.key, this.module = ScreenName.home});
 
   @override
   MainScreenState createState() => MainScreenState();
@@ -23,10 +25,16 @@ class MainScreenState extends ConsumerState<MainScreen> {
   void initState() {
     super.initState();
 
+    Future.microtask((){
+      ref.read(MainScreenGlobalStateProvider.notifier).updateCurrentController(widget.module);
+    });
+
     //Fetch count data when app starts
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(MainScreenGlobalStateProvider.notifier).backgroundRefreshForAPI(context);
     });
+
+
   }
 
   @override

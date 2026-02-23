@@ -1,4 +1,3 @@
-// ProductDetailScreen.dart
 import 'dart:async';
 import 'package:botaniqmicrogreens/Utility/Logger.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -15,12 +14,15 @@ import '../../../../Utility/NetworkImageLoader.dart';
 import '../../../../Utility/TimerUtils.dart';
 import '../../../../constants/ConstantAssests.dart';
 import '../../../../constants/ConstantVariables.dart';
+import '../../MainScreen/MainScreen.dart';
 import '../../MainScreen/MainScreenState.dart';
 import '../HomeScreen/HomeScreenModel.dart';
 import '../HomeScreen/HomeScreenState.dart';
 import 'ProductDetailScreenState.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
+  const ProductDetailScreen({super.key});
+
   @override
   ProductDetailScreenState createState() => ProductDetailScreenState();
 }
@@ -75,190 +77,209 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     var detailsScreenState = ref.watch(productDetailScreenGlobalStateProvider);
     var homeScreenState = ref.watch(HomeScreenGlobalStateProvider);
     var homeScreenNotifier = ref.watch(HomeScreenGlobalStateProvider.notifier);
-    final userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
+
 
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: objConstantColor.white,
-      body: detailsScreenState.isLoading
-          ? buildProductDetailShimmer(context)
-          : CustomScrollView(
-        slivers: [
+      body: SafeArea(
+        top: false,
+        child: detailsScreenState.isLoading
+            ? buildProductDetailShimmer(context)
+            : CustomScrollView(
+          slivers: [
 
-          /// 🔰 1. CAROUSEL + TOP PART
-          SliverToBoxAdapter(
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                carousalSlider(context),
-
-                Positioned(
-                  bottom: -18.dp,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    height: 40.dp,
-                    decoration: BoxDecoration(
-                      color: objConstantColor.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(25.dp),
-                        topRight: Radius.circular(25.dp),
-                      ),
-                    ),
-                    child: Center(
-                      child: Container(
-                        width: 50.dp,
-                        height: 5.dp,
-                        decoration: BoxDecoration(
-                            color: Colors.black.withAlpha(50),
-                            borderRadius: BorderRadius.circular(20.dp)),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          /// 🔰 2. BODY CONTENT SECTION
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.dp),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            /// 🔰 1. CAROUSEL + TOP PART
+            SliverToBoxAdapter(
+              child: Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  SizedBox(height: 15.dp),
+                  carousalSlider(context),
 
-                  objCommonWidgets.customText(
-                    context, 'Microgreens', 12,
-                    Colors.black.withAlpha(130), objConstantFonts.montserratMedium,
-                  ),
-
-                  SizedBox(height: 5.dp),
-
-                  Row(
-                    children: [
-                      objCommonWidgets.customText(
-                        context,
-                        CodeReusability().cleanProductName(
-                            detailsScreenState.productData?.productName),
-                        20,
-                        Colors.black,
-                        objConstantFonts.montserratBold,
-                      ),
-                      const Spacer(),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          border: Border.all(width: 1.5.dp, color: Colors
-                              .green),
+                  Positioned(
+                    bottom: -18.dp,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 40.dp,
+                      decoration: BoxDecoration(
+                        color: objConstantColor.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(25.dp),
+                          topRight: Radius.circular(25.dp),
                         ),
-                        padding: EdgeInsets.all(2.8.dp),
+                      ),
+                      child: Center(
                         child: Container(
-                          width: 8.dp,
-                          height: 8.dp,
-                          decoration: const BoxDecoration(
-                            color: Colors.green,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-
-                  SizedBox(height: 15.dp),
-
-                  customSectionTitle(context, "About"),
-                  objCommonWidgets.customText(context,
-                      '${detailsScreenState.productData?.description}',
-                      10, Colors.black,
-                      objConstantFonts.montserratMedium,
-                      textAlign: TextAlign.justify),
-
-                  SizedBox(height: 20.dp),
-
-                  customSectionTitle(context, "Delivery Details"),
-                  SizedBox(height: 5.dp),
-                  expectedDelivery(context),
-                  SizedBox(height: 2.5.dp),
-                  homeAddress(context),
-
-                  SizedBox(height: 20.dp),
-
-                  customSectionTitle(context, "Price Details"),
-                  SizedBox(height: 5.dp),
-                  priceDetails(context),
-
-                  SizedBox(height: 15.dp),
-
-
-
-                  if (detailsScreenState.inCart == 0) ...{
-                    SizedBox(height: 5.dp),
-                    customSectionTitle(context, "Add to cart"),
-                    SizedBox(height: 5.dp),
-                    addCart(context),
-                  } else
-                    ...{
-                      SizedBox(height: 15.dp),
-                      buyNow(context)
-                    },
-
-                  SizedBox(height: 20.dp),
-                  customSectionTitle(context, "Nutritional Benefits"),
-                  SizedBox(height: 5.dp),
-                  productDetails(context),
-
-
-                  SizedBox(height: 20.dp),
-                  customSectionTitle(context, "Seller Details"),
-                  SizedBox(height: 5.dp),
-                  sellerDetails(context),
-
-                  SizedBox(height: 20.dp),
-                  customSectionTitle(context, "Ratings & Reviews"),
-                  SizedBox(height: 5.dp),
-                  ratingAndReviewDetails(context),
-
-
-                  SizedBox(height: 20.dp),
-                  Row(
-                    children: [
-                      customSectionTitle(context, "Similar Products"),
-                      const Spacer(),
-                      CupertinoButton(
-                          padding: EdgeInsets.zero, child: Container(
-                          padding: EdgeInsets.only(bottom: 0.5.dp),
-                          // 👈 space between text & underline
+                          width: 50.dp,
+                          height: 5.dp,
                           decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: objConstantColor.orange,
-                                width: 2.dp, // underline thickness
-                              ),
-                            ),
-                          ),
-                          child: objCommonWidgets.customText(
-                            context, 'See All', 11,
-                            objConstantColor.orange, objConstantFonts
-                              .montserratSemiBold,
-                          )
+                              color: Colors.black.withAlpha(50),
+                              borderRadius: BorderRadius.circular(20.dp)),
+                        ),
                       ),
-                          onPressed: () {})
-
-                    ],
+                    ),
                   ),
-
                 ],
               ),
             ),
-          ),
 
-          /// 🔰 3. SIMILAR PRODUCT GRID
-          similarProduct(context, homeScreenState, homeScreenNotifier),
+            /// 🔰 2. BODY CONTENT SECTION
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15.dp),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 15.dp),
+
+                    objCommonWidgets.customText(
+                      context, 'Microgreens', 12,
+                      Colors.black.withAlpha(130), objConstantFonts.montserratMedium,
+                    ),
+
+                    SizedBox(height: 5.dp),
+
+                    Row(
+                      children: [
+                        objCommonWidgets.customText(
+                          context,
+                          CodeReusability().cleanProductName(
+                              detailsScreenState.productData?.productName),
+                          20,
+                          Colors.black,
+                          objConstantFonts.montserratBold,
+                        ),
+                        const Spacer(),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            border: Border.all(width: 1.5.dp, color: Colors
+                                .green),
+                          ),
+                          padding: EdgeInsets.all(2.8.dp),
+                          child: Container(
+                            width: 8.dp,
+                            height: 8.dp,
+                            decoration: const BoxDecoration(
+                              color: Colors.green,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+
+                    SizedBox(height: 15.dp),
 
 
-        ],
+                    customSectionTitle(context, "About"),
+                    objCommonWidgets.customText(context,
+                        '${detailsScreenState.productData?.description}',
+                        10, Colors.black,
+                        objConstantFonts.montserratMedium,
+                        textAlign: TextAlign.justify),
+
+                    SizedBox(height: 10.dp),
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        customSectionTitle(context, "Quantity : "),
+                        objCommonWidgets.customText(context,
+                            '150 gm',
+                            13, Colors.black.withAlpha(150),
+                            objConstantFonts.montserratMedium,
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: 10.dp),
+
+                    customSectionTitle(context, "Delivery Details"),
+                    SizedBox(height: 5.dp),
+                    expectedDelivery(context),
+                    SizedBox(height: 2.5.dp),
+                    homeAddress(context),
+
+                    SizedBox(height: 20.dp),
+
+                    customSectionTitle(context, "Price Details"),
+                    SizedBox(height: 5.dp),
+                    priceDetails(context),
+
+                    SizedBox(height: 15.dp),
+
+
+
+                    if (detailsScreenState.inCart == 0) ...{
+                      SizedBox(height: 5.dp),
+                      customSectionTitle(context, "Add to cart"),
+                      SizedBox(height: 5.dp),
+                      addCart(context),
+                    } else
+                      ...{
+                        SizedBox(height: 15.dp),
+                        buyNow(context)
+                      },
+
+                    SizedBox(height: 20.dp),
+                    customSectionTitle(context, "Nutritional Benefits"),
+                    SizedBox(height: 5.dp),
+                    productDetails(context),
+
+
+                    SizedBox(height: 20.dp),
+                    customSectionTitle(context, "Seller Details"),
+                    SizedBox(height: 5.dp),
+                    sellerDetails(context),
+
+                    SizedBox(height: 20.dp),
+                    customSectionTitle(context, "Ratings & Reviews"),
+                    SizedBox(height: 5.dp),
+                    ratingAndReviewDetails(context),
+
+
+                    SizedBox(height: 20.dp),
+                    Row(
+                      children: [
+                        customSectionTitle(context, "Similar Products"),
+                        const Spacer(),
+                        CupertinoButton(
+                            padding: EdgeInsets.zero, child: Container(
+                            padding: EdgeInsets.only(bottom: 0.5.dp),
+                            // 👈 space between text & underline
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: objConstantColor.orange,
+                                  width: 2.dp, // underline thickness
+                                ),
+                              ),
+                            ),
+                            child: objCommonWidgets.customText(
+                              context, 'See All', 11,
+                              objConstantColor.orange, objConstantFonts
+                                .montserratSemiBold,
+                            )
+                        ),
+                            onPressed: () {})
+
+                      ],
+                    ),
+
+                  ],
+                ),
+              ),
+            ),
+
+            /// 🔰 3. SIMILAR PRODUCT GRID
+            similarProduct(context, homeScreenState, homeScreenNotifier),
+
+
+
+          ],
+        ),
       ),
     );
   }
@@ -416,9 +437,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   width: 25.dp,
                 ),
                 onPressed: () {
-                  ref
-                      .watch(MainScreenGlobalStateProvider.notifier)
-                      .callNavigation(ScreenName.home);
+                  Navigator.pop(context);
                 },
               ),
             ),
@@ -493,7 +512,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       width: double.infinity,
       padding: EdgeInsets.only(left: 15.dp, right: 15.dp, bottom: 10.dp, top: 5.dp),
       decoration: BoxDecoration(
-        color: Colors.black.withAlpha(10),
+        color: Colors.black.withAlpha(15),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(10.dp),
           bottomRight: Radius.circular(10.dp),
@@ -512,11 +531,11 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     objCommonWidgets.customText(context, 'Delivery Address',
-                        12, Colors.black,
+                        10, Colors.black,
                         objConstantFonts.montserratSemiBold),
 
                     (exactAddress.isNotEmpty) ? objCommonWidgets.customText(context, exactAddress,
-                        11, objConstantColor.orange,
+                        10, objConstantColor.orange,
                         objConstantFonts.montserratSemiBold) :
 
                     GestureDetector(
@@ -558,7 +577,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       width: double.infinity,
       padding: EdgeInsets.only(left: 15.dp, right: 15.dp, bottom: 5.dp, top: 10.dp),
       decoration: BoxDecoration(
-        color: Colors.black.withAlpha(10),
+        color: Colors.black.withAlpha(15),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(10.dp),
           topRight: Radius.circular(10.dp),
@@ -578,10 +597,10 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     objCommonWidgets.customText(context, DeliveryUtils.getExpectedDeliveryDate(5),
-                        12, Colors.black,
+                        10, Colors.black,
                         objConstantFonts.montserratSemiBold),
                     objCommonWidgets.customText(context, 'Order in ${TimerUtils.getRemainingTimeToMidnight()}',
-                        11, objConstantColor.orange,
+                        10, Colors.deepOrange,
                         objConstantFonts.montserratSemiBold),
                   ],
                 ),
@@ -595,13 +614,17 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
 
   Widget customSectionTitle(BuildContext context, String title) {
-    return objCommonWidgets.customText(
-      context, title, 16,
-      objConstantColor.black, objConstantFonts.montserratSemiBold,
+    return Padding(
+      padding: EdgeInsets.only(top: 15.dp),
+      child: objCommonWidgets.customText(
+        context, title, 14,
+        objConstantColor.black, objConstantFonts.montserratSemiBold,
+      ),
     );
   }
 
   Widget similarProduct(BuildContext context, HomeScreenGlobalState homeScreenState, HomeScreenGlobalStateNotifier homeScreenNotifier) {
+
     return Consumer(builder: (context, ref, _) {
       return NotificationListener<ScrollNotification>(
         onNotification: (scrollInfo) {
@@ -616,29 +639,32 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           return false;
         },
         child: SliverToBoxAdapter(
-          child: SizedBox(
-            height: 240.dp, // 👈 required fixed height
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: homeScreenState.productList.length +
-                  (homeScreenState.isLoading ? 1 : 0),
-              padding: EdgeInsets.symmetric(horizontal: 15.dp),
-              itemBuilder: (context, index) {
-                if (index == homeScreenState.productList.length) {
-                  return const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: CupertinoActivityIndicator(),
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 15.dp),
+            child: SizedBox(
+              height: 240.dp, // 👈 required fixed height
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: homeScreenState.productList.length +
+                    (homeScreenState.isLoading ? 1 : 0),
+                padding: EdgeInsets.symmetric(horizontal: 15.dp),
+                itemBuilder: (context, index) {
+                  if (index == homeScreenState.productList.length) {
+                    return const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: CupertinoActivityIndicator(),
+                    );
+                  }
+
+                  final product = homeScreenState.productList[index];
+
+                  return Container(
+                    width: 145.dp, // 👈 card width
+                    margin: EdgeInsets.only(right: 12.dp, bottom: 10.dp),
+                    child: _buildProductCard(product, index, homeScreenNotifier),
                   );
-                }
-
-                final product = homeScreenState.productList[index];
-
-                return Container(
-                  width: 145.dp, // 👈 card width
-                  margin: EdgeInsets.only(right: 12.dp, bottom: 10.dp),
-                  child: _buildProductCard(product, index, homeScreenNotifier),
-                );
-              },
+                },
+              ),
             ),
           ),
         ),
@@ -652,6 +678,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   Widget _buildProductCard(ProductData product, int index, HomeScreenGlobalStateNotifier notifier, ) {
     final GlobalKey sourceKey = GlobalKey();
 
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -664,8 +691,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         ref.read(MainScreenGlobalStateProvider.notifier)
             .updateSelectedProduct(savedProductDetails!);
 
-        ref.watch(MainScreenGlobalStateProvider.notifier).callNavigation(
-            ScreenName.productDetail);
+        notifier.callNavigateToDetailsScreen(context);
         Logger().log('### ----> Clicked $savedProductDetails');
 
         final productDetailsScreenNotifier = ref.read(productDetailScreenGlobalStateProvider.notifier);
@@ -836,9 +862,10 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                 notifier.callAddToCartAPI(
                                     context, product.productId, index, mainNotifier);
                               } else {
-                                ref.watch(MainScreenGlobalStateProvider.notifier)
-                                    .callNavigation(
-                                    ScreenName.cart);
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const MainScreen(module: ScreenName.cart)),
+                                );
                               }
                             });
                           },
@@ -1060,6 +1087,22 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       ),
                     ],
                   ),
+
+                  ...List.generate(
+                    6,
+                        (index) => Padding(
+                      padding: EdgeInsets.only(bottom: 8.dp),
+                      child: Container(
+                        height: 12.dp,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(4.dp),
+                        ),
+                      ),
+                    ),
+                  ),
+
                 ],
               ),
             ),
@@ -1220,9 +1263,14 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
             Column(
               children: [
-                objCommonWidgets.customText(
-                    context, 'Nourish Organics', 12, Colors.black,
-                    objConstantFonts.montserratSemiBold),
+                GestureDetector(
+                  onTap: () {
+                    ref.read(productDetailScreenGlobalStateProvider.notifier).callNavigateToSellerDetailsScreen(context);
+                  },
+                  child: objCommonWidgets.customText(
+                      context, 'Nourish Organics', 12, Colors.black,
+                      objConstantFonts.montserratSemiBold),
+                ),
                 Row(
                   children: [
                     Icon(Icons.verified_rounded,

@@ -254,8 +254,9 @@ class WishListScreenState extends ConsumerState<WishListScreen> {
             coverImage: product.coverImage!,
             inCart: item.inCart!,
             isWishlisted: 1);
-        ref.watch(MainScreenGlobalStateProvider.notifier).callNavigation(
-            ScreenName.productDetail);
+
+        notifier.callNavigateToDetailsScreen(context);
+
       },
       child: Stack(
         children: [

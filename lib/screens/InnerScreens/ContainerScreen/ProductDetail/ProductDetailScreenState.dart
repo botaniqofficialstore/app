@@ -1,4 +1,5 @@
 // ProductDetailScreenState.dart
+import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/SellerProfileScreen/SellerProfileScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../API/CommonAPI.dart';
@@ -13,6 +14,7 @@ import '../CartScreen/CartModel.dart';
 import '../WishListScreen/WishListModel.dart';
 import '../WishListScreen/WishListRepository.dart';
 import 'ProductDetailModel.dart';
+import 'ProductDetailScreen.dart';
 import 'ProductDetailsRepository.dart';
 
 
@@ -251,6 +253,36 @@ class ProductDetailScreenGlobalStateNotifier
       }
     });
   }
+
+  void callNavigateToDetailsScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) =>  ProductDetailScreen(),
+      ),
+    );
+  }
+
+  void callNavigateToSellerDetailsScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) =>  const SellerProfileScreen(),
+      ),
+    );
+  }
+
+  void callNavigateToCartScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) =>  ProductDetailScreen(),
+      ),
+    );
+  }
+
+
+
 }
 
 /// --- PROVIDER ---

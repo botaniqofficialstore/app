@@ -1,3 +1,4 @@
+import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/ProductDetail/ProductDetailScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../CodeReusable/CodeReusability.dart';
@@ -287,6 +288,15 @@ class HomeScreenGlobalStateNotifier extends StateNotifier<HomeScreenGlobalState>
         CustomToast.show(context, "${product.productName} added to cart successfully!");
       }
     }
+  }
+
+  void callNavigateToDetailsScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) =>  ProductDetailScreen(),
+      ),
+    );
   }
 
 

@@ -113,7 +113,7 @@ class ConstantAssests{
    String locTwo = '${commonIconsAssets}pin.png';
    String locThree = '${commonIconsAssets}locations.png';
    String locFour = '${commonIconsAssets}your-location.png';
-
+   String searching = '${commonIconsAssets}searching.png';
 
    ///Adds Assets
    String addImage6 = '${addsAssets}adds6.webp';

@@ -98,13 +98,13 @@ class CartScreenState extends ConsumerState<CartScreen> {
                                   Text(
                                     "Your cart is empty.",
                                     style: TextStyle(
-                                      color: objConstantColor.gray,
-                                      fontSize: 13.dp,
+                                      color: Colors.black.withAlpha(150),
+                                      fontSize: 10.dp,
                                       fontFamily: ConstantAssests.montserratSemiBold,
                                     ),
                                   ),
 
-                                  SizedBox(height: 20.dp),
+                                  SizedBox(height: 5.dp),
 
                                   CupertinoButton(padding: EdgeInsets.zero,
                                       child: Container(
@@ -112,10 +112,10 @@ class CartScreenState extends ConsumerState<CartScreen> {
                                             color: objConstantColor.orange,
                                             borderRadius: BorderRadius.circular(5.dp)
                                         ),
-                                        padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 15.dp),
+                                        padding: EdgeInsets.symmetric(vertical: 8.dp, horizontal: 15.dp),
                                         child: objCommonWidgets.customText(context,
                                             'Shop Now',
-                                            14, objConstantColor.white,
+                                            12, objConstantColor.white,
                                             objConstantFonts.montserratBold),
                                       ),
                                       onPressed: (){
@@ -464,13 +464,15 @@ class CartScreenState extends ConsumerState<CartScreen> {
                       ),
 
 
-                      Positioned(bottom: -11.dp,
+                      Positioned(
+                          bottom: -11.dp,
                           child: QuantityCounter(
                         count: count,
                         onChanged: (newCount) {
                           notifier.callUpdateCountAPI(context, productID, index, newCount);
                         },
-                      ))
+                      )
+                      )
 
 
                     ],
@@ -642,7 +644,7 @@ class QuantityCounter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 3.dp, horizontal: 10.dp),
+      padding: EdgeInsets.symmetric(vertical: 0.dp, horizontal: 0.dp),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(5.dp),
@@ -662,7 +664,7 @@ class QuantityCounter extends StatelessWidget {
             color: count > 1 ? Colors.black : Colors.black.withAlpha(100),
           ),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 13.dp),
+            padding: EdgeInsets.symmetric(horizontal: 8.dp),
             child: objCommonWidgets.customText(context, "$count", 14, Colors.black, objConstantFonts.montserratSemiBold)
           ),
           _buildBtn(
@@ -678,9 +680,9 @@ class QuantityCounter extends StatelessWidget {
   Widget _buildBtn({required IconData icon, required VoidCallback onTap, required Color color}) {
     return CupertinoButton(
       onPressed: onTap,
-      padding: EdgeInsets.zero,
+      padding: EdgeInsets.symmetric(vertical: 5.dp, horizontal: 5.dp),
       minimumSize: Size.zero,
-      child: Icon(icon, size: 16.dp, color: color),
+      child: Icon(icon, size: 18.dp, color: color),
     );
   }
 }

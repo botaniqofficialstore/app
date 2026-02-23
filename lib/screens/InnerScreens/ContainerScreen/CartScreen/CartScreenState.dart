@@ -151,50 +151,65 @@ class CartScreenGlobalStateNotifier extends StateNotifier<CartScreenGlobalState>
   }
 
   /// 🗑️ Remove Product from Cart
+  /// 🗑️ Optimized Remove (Background Processing)
   void callRemoveFromCart(BuildContext context, String productID, int index,
-      MainScreenGlobalStateNotifier notifier) {
-    if (!context.mounted) return;
+      MainScreenGlobalStateNotifier notifier, {int retryCount = 0}) {
+
+    final oldItems = [...state.cartItems];
+    final itemToRemove = oldItems[index];
+
+    // 1. Remove from UI immediately
+    final updatedList = List<CartItem>.from(state.cartItems);
+    updatedList.removeAt(index);
+    state = state.copyWith(cartItems: updatedList);
+
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
       if (isConnected) {
-        CommonWidgets().showLoadingBar(true, context);
         var prefs = await PreferencesManager.getInstance();
         String userID = prefs.getStringValue(PreferenceKeys.userID) ?? '';
 
-        Map<String, dynamic> requestBody = {
-          'userId': userID,
-          'productId': productID,
-        };
-
         CartRepository().callProductDeleteFromCartApi(
-            ConstantURLs.cartListUrl, requestBody,
+            ConstantURLs.cartListUrl,
+            {'userId': userID, 'productId': productID},
                 (statusCode, responseBody) async {
-              CartRemoveResponse response =
-              CartRemoveResponse.fromJson(responseBody);
               if (statusCode == 200) {
-                final updatedList = List<CartItem>.from(state.cartItems);
-                updatedList.removeAt(index);
-                notifier.callFooterCountGETAPI();
-
-                state = state.copyWith(cartItems: updatedList);
+                notifier.callFooterCountGETAPI(); // Update badge count
               } else {
-                Logger().log('###---> Response: $response');
+                // 2. Retry Logic
+                if (retryCount < 2) {
+                  callRemoveFromCart(context, productID, index, notifier, retryCount: retryCount + 1);
+                } else {
+                  // Revert UI on permanent failure
+                  state = state.copyWith(cartItems: oldItems);
+                  CodeReusability().showAlert(context, "Could not remove item. Please try again.");
+                }
               }
-              CommonWidgets().showLoadingBar(false, context);
-            });
+            }
+        );
       } else {
-        CodeReusability()
-            .showAlert(context, 'Please Check Your Internet Connection');
+        state = state.copyWith(cartItems: oldItems);
+        CodeReusability().showAlert(context, 'No Internet Connection');
       }
     });
   }
 
   /// 🔄 Update Count
+  /// 🔄 Optimized Update Count (Optimistic UI)
   void callUpdateCountAPI(
-      BuildContext context, String productID, int index, int count) {
-    if (!context.mounted) return;
+      BuildContext context, String productID, int index, int count, {int retryCount = 0}) {
+
+    // 1. Store the old count in case we need to revert on failure
+    final oldItems = [...state.cartItems];
+    final oldCount = oldItems[index].productCount;
+
+    // 2. Update UI Immediately (Optimistic Update)
+    final updatedList = List<CartItem>.from(state.cartItems);
+    updatedList[index] = updatedList[index].copyWith(productCount: count);
+    state = state.copyWith(cartItems: updatedList);
+
     CodeReusability().isConnectedToNetwork().then((isConnected) async {
       if (isConnected) {
-        CommonWidgets().showLoadingBar(true, context);
+        // No showLoadingBar here! We let it run in the background.
         var prefs = await PreferencesManager.getInstance();
         String userID = prefs.getStringValue(PreferenceKeys.userID) ?? '';
 
@@ -205,23 +220,26 @@ class CartScreenGlobalStateNotifier extends StateNotifier<CartScreenGlobalState>
         };
 
         CartRepository().callProductCountUpdateApi(
-            ConstantURLs.cartListUrl, requestBody,
+            ConstantURLs.cartListUrl,
+            requestBody,
                 (statusCode, responseBody) async {
-              CartUpdateResponse response =
-              CartUpdateResponse.fromJson(responseBody);
-              if (statusCode == 200) {
-                final updatedList = List<CartItem>.from(state.cartItems);
-                final updatedItem =
-                updatedList[index].copyWith(productCount: count);
-                updatedList[index] = updatedItem;
-
-                state = state.copyWith(cartItems: updatedList);
+              if (statusCode != 200) {
+                // 3. Handle Failure: Retry logic
+                if (retryCount < 2) {
+                  Logger().log('### API Failed, retrying... Attempt: ${retryCount + 1}');
+                  callUpdateCountAPI(context, productID, index, count, retryCount: retryCount + 1);
+                } else {
+                  // Revert to old state if all retries fail
+                  state = state.copyWith(cartItems: oldItems);
+                  CodeReusability().showAlert(context, 'Failed to update quantity. Please try again.');
+                }
               }
-              CommonWidgets().showLoadingBar(false, context);
-            });
+            }
+        );
       } else {
-        CodeReusability()
-            .showAlert(context, 'Please Check Your Internet Connection');
+        // Revert immediately if no internet
+        state = state.copyWith(cartItems: oldItems);
+        CodeReusability().showAlert(context, 'No Internet Connection');
       }
     });
   }

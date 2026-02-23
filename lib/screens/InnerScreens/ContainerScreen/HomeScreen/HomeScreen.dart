@@ -371,8 +371,8 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
         ref.read(MainScreenGlobalStateProvider.notifier)
             .updateSelectedProduct(savedProductDetails!);
 
-        ref.watch(MainScreenGlobalStateProvider.notifier).callNavigation(
-            ScreenName.productDetail);
+        notifier.callNavigateToDetailsScreen(context);
+
       },
       child: Stack(
         children: [

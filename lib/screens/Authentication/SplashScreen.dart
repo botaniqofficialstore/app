@@ -80,7 +80,7 @@ class _SplashScreenState extends State<SplashScreen>
 */
       /*if (isLoggedIn){
         Navigator.pushReplacement(
-          context,|
+          context,
           MaterialPageRoute(builder: (context) => const MainScreen()),
         );
       } else {

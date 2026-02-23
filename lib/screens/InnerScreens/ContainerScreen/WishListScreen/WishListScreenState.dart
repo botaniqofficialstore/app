@@ -8,6 +8,7 @@ import '../../../../Utility/PreferencesManager.dart';
 import '../../../../constants/Constants.dart';
 import '../../../commonViews/CustomToast.dart';
 import '../CartScreen/CartModel.dart';
+import '../ProductDetail/ProductDetailScreen.dart';
 import 'WishListModel.dart';
 import 'WishListRepository.dart';
 
@@ -175,6 +176,15 @@ class WishListScreenGlobalStateNotifier
     });
   }
 
+
+  void callNavigateToDetailsScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) =>  ProductDetailScreen(),
+      ),
+    );
+  }
 
 
 }

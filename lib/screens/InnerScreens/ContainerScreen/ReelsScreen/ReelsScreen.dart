@@ -8,6 +8,8 @@ import '../../../../Utility/NetworkImageLoader.dart';
 import '../../../../constants/ConstantVariables.dart';
 import '../../../../constants/Constants.dart';
 import '../../MainScreen/MainScreenState.dart';
+import '../ProductDetail/ProductDetailScreen.dart';
+import '../SellerProfileScreen/SellerProfileScreen.dart';
 import 'ReelsModel.dart';
 import 'ReelsScreenState.dart';
 
@@ -187,14 +189,14 @@ class ReelsScreenState extends ConsumerState<ReelsScreen> with TickerProviderSta
             right: 0,
             child: Center(
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: EdgeInsets.symmetric(horizontal: 10.dp, vertical: 6.dp),
                 decoration: BoxDecoration(color: Colors.black38, borderRadius: BorderRadius.circular(20)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    customText('2x Speed', 12, Colors.white, objConstantFonts.montserratSemiBold),
-                    SizedBox(width: 5.dp),
-                    Icon(Icons.fast_forward, color: Colors.white, size: 18.dp),
+                    objCommonWidgets.customText(context, '2x Speed', 10, Colors.white, objConstantFonts.montserratSemiBold),
+                    SizedBox(width: 2.4.dp),
+                    Icon(Icons.fast_forward, color: Colors.white, size: 15.dp),
                   ],
                 ),
               ),
@@ -203,7 +205,7 @@ class ReelsScreenState extends ConsumerState<ReelsScreen> with TickerProviderSta
 
         if (isInitialized)
           Positioned(
-            bottom: 4,
+            bottom: 0,
             left: 0,
             right: 0,
             child: _buildProgressBar(controller!),
@@ -242,8 +244,8 @@ class ReelsScreenState extends ConsumerState<ReelsScreen> with TickerProviderSta
   /// Using AnimatedContainer and standard Alignment to avoid ParentData error.
   Widget headerView(){
     return Positioned(
-      top: 0,
-      left: 0,
+      top: 10,
+      left: 3,
       right: 0,
       child: AnimatedOpacity(
         duration: const Duration(milliseconds: 300),
@@ -256,7 +258,7 @@ class ReelsScreenState extends ConsumerState<ReelsScreen> with TickerProviderSta
                 if (!_showReelsText)
                   CupertinoButton(
                     padding: EdgeInsets.zero,
-                    minSize: 0,
+                    minimumSize: Size.zero,
                     child: Image.asset(objConstantAssest.backIcon, color: Colors.white, width: 25.dp),
                     onPressed: () => ref.read(MainScreenGlobalStateProvider.notifier).callNavigation(ScreenName.home),
                   ),
@@ -281,7 +283,7 @@ class ReelsScreenState extends ConsumerState<ReelsScreen> with TickerProviderSta
 
   Widget optionsView(ReelData reel, int index){
     return Positioned(
-      right: 10,
+      right: 15,
       bottom: 120,
       child: AnimatedOpacity(
         duration: const Duration(milliseconds: 300),
@@ -290,6 +292,7 @@ class ReelsScreenState extends ConsumerState<ReelsScreen> with TickerProviderSta
           children: [
             CupertinoButton(
               padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
               child: Image.asset(reel.isLikedByUser ? objConstantAssest.likedIcon : objConstantAssest.disLikedIcon, width: 25.dp),
               onPressed: () {
                 if (reel.isLikedByUser){
@@ -306,12 +309,33 @@ class ReelsScreenState extends ConsumerState<ReelsScreen> with TickerProviderSta
                 }
               },
             ),
-            customText('${reel.totalLikes}', 13, Colors.white, objConstantFonts.montserratSemiBold),
-            SizedBox(height: 15.dp),
+            Padding(
+              padding: EdgeInsets.only(top: 2.5.dp, bottom: 15.dp),
+              child: objCommonWidgets.customText(context, '${reel.totalLikes}', 11, Colors.white, objConstantFonts.montserratSemiBold),
+            ),
+
             CupertinoButton(
               padding: EdgeInsets.zero,
-              child: Image.asset(objConstantAssest.shareIcon, width: 25.dp),
+              minimumSize: Size.zero,
+              child: Image.asset(objConstantAssest.searching, width: 27.dp, color: Colors.white,),
+              onPressed: () {
+                callNavigateToDetailsScreen(context);
+              },
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 2.5.dp, bottom: 15.dp),
+              child: objCommonWidgets.customText(context, '1.5k', 11, Colors.white, objConstantFonts.montserratSemiBold),
+            ),
+
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
+              child: Image.asset(objConstantAssest.shareIcon, width: 24.dp, color: Colors.white),
               onPressed: () => ref.read(reelsGlobalStateProvider.notifier).shareReel(context, reel),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 2.5.dp, bottom: 15.dp),
+              child: objCommonWidgets.customText(context, '1.5k', 11, Colors.white, objConstantFonts.montserratSemiBold),
             ),
           ],
         ),
@@ -357,18 +381,41 @@ class ReelsScreenState extends ConsumerState<ReelsScreen> with TickerProviderSta
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    customText('Nourish Organics', 14, Colors.white, objConstantFonts.montserratSemiBold),
                     GestureDetector(
-                      onTap: () => setState(() {
-                        _expandedCaptions.contains(index) ? _expandedCaptions.remove(index) : _expandedCaptions.add(index);
-                      }),
-                      child: Text(
-                        reel.caption,
-                        maxLines: _expandedCaptions.contains(index) ? 5 : 1,
-                        overflow: _expandedCaptions.contains(index) ? TextOverflow.visible : TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.white, fontSize: 11.dp),
+                      onTap: () => callNavigateToSellerDetailsScreen(context),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          objCommonWidgets.customText(context, 'Nourish Organics', 13, Colors.white, objConstantFonts.montserratSemiBold),
+                          SizedBox(width: 2.5.dp),
+                          Image.asset(objConstantAssest.verifiedIcon, width: 15.dp)
+                        ],
                       ),
                     ),
+                    GestureDetector(
+                      onTap: () => setState(() {
+                        _expandedCaptions.contains(index)
+                            ? _expandedCaptions.remove(index)
+                            : _expandedCaptions.add(index);
+                      }),
+                      child: AnimatedSize(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        alignment: Alignment.topLeft, // Ensures text expands downward/outward correctly
+                        child: Text(
+                          reel.caption,
+                          maxLines: _expandedCaptions.contains(index) ? 5 : 1,
+                          overflow: _expandedCaptions.contains(index)
+                              ? TextOverflow.visible
+                              : TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10.dp,
+                            fontFamily: objConstantFonts.montserratMedium,
+                          ),
+                        ),
+                      ),
+                    )
                   ],
                 ),
               ),
@@ -386,18 +433,45 @@ class ReelsScreenState extends ConsumerState<ReelsScreen> with TickerProviderSta
     return SliderTheme(
       data: SliderTheme.of(context).copyWith(
         trackHeight: 2.0,
-        thumbShape: RoundSliderThumbShape(enabledThumbRadius: _isDragging ? 6.0 : 0.0),
-        overlayShape: SliderComponentShape.noOverlay,
+        // We increase the thumb radius during dragging for better visual feedback
+        thumbShape: RoundSliderThumbShape(
+          enabledThumbRadius: _isDragging ? 7.0 : 3.0,
+          pressedElevation: 8.0,
+        ),
+        // This expands the touchable area without changing visible padding
+        overlayShape: const RoundSliderOverlayShape(overlayRadius: 0.0),
         activeTrackColor: Colors.white,
         inactiveTrackColor: Colors.white30,
+        thumbColor: Colors.white,
       ),
-      child: Slider(
-        value: currentVal.clamp(0.0, total > 0 ? total : 1.0),
-        min: 0.0,
-        max: total > 0 ? total : 1.0,
-        onChangeStart: (val) { setState(() { _isDragging = true; _dragValue = val; }); controller.pause(); },
-        onChanged: (val) { setState(() { _dragValue = val; }); controller.seekTo(Duration(milliseconds: val.toInt())); },
-        onChangeEnd: (val) { setState(() => _isDragging = false); controller.seekTo(Duration(milliseconds: val.toInt())); controller.play(); },
+      child: Container(
+        // This height ensures a larger vertical "hit target" for the finger
+        height: 10.dp,
+        width: double.infinity,
+        color: Colors.transparent, // Keeps it invisible but interactive
+        child: Slider(
+          value: currentVal.clamp(0.0, total > 0 ? total : 1.0),
+          min: 0.0,
+          max: total > 0 ? total : 1.0,
+          onChangeStart: (val) {
+            setState(() {
+              _isDragging = true;
+              _dragValue = val;
+            });
+            controller.pause();
+          },
+          onChanged: (val) {
+            setState(() {
+              _dragValue = val;
+            });
+            controller.seekTo(Duration(milliseconds: val.toInt()));
+          },
+          onChangeEnd: (val) {
+            setState(() => _isDragging = false);
+            controller.seekTo(Duration(milliseconds: val.toInt()));
+            controller.play();
+          },
+        ),
       ),
     );
   }
@@ -411,7 +485,7 @@ class ReelsScreenState extends ConsumerState<ReelsScreen> with TickerProviderSta
     xPos = xPos.clamp(15.0, screenWidth - previewWidth - 15.0);
 
     return Positioned(
-      bottom: 60.dp,
+      bottom: 40.dp,
       left: xPos,
       child: Column(
         children: [
@@ -452,7 +526,50 @@ class ReelsScreenState extends ConsumerState<ReelsScreen> with TickerProviderSta
   );
   Widget _buildFullShimmer() => Container(color: Colors.black, child: _buildPartialShimmer());
 
-  Widget _buildGradientOverlay() => Positioned.fill(child: IgnorePointer(child: Container(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black26, Colors.transparent, Colors.transparent, Colors.black54], stops: const [0, 0.2, 0.8, 1])))));
+  Widget _buildGradientOverlay() => Positioned.fill(child: IgnorePointer(child: Container(decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black26, Colors.transparent, Colors.transparent, Colors.black54], stops: [0, 0.2, 0.8, 1])))));
 
-  Widget customText(String text, int size, Color color, String font) => Text(text, style: TextStyle(color: color, fontSize: size.dp, fontFamily: font));
+
+  void callNavigateToDetailsScreen(BuildContext context) async {
+    pauseCurrentVideo();
+
+    await Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) => const ProductDetailScreen(),
+      ),
+    );
+
+    if (mounted) {
+      resumeCurrentVideo();
+    }
+  }
+
+  // Inside ReelsScreenState class in ReelsScreen.dart
+
+  void pauseCurrentVideo() {
+    _controllers[_focusedIndex]?.pause();
+  }
+
+  void resumeCurrentVideo() {
+    // Only resume if the user isn't currently dragging the seek bar
+    if (!_isDragging) {
+      _controllers[_focusedIndex]?.play();
+    }
+  }
+
+  void callNavigateToSellerDetailsScreen(BuildContext context) async {
+    pauseCurrentVideo();
+
+    await Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) =>  const SellerProfileScreen(),
+      ),
+    );
+
+    if (mounted) {
+      resumeCurrentVideo();
+    }
+  }
+
 }

@@ -8,7 +8,6 @@ import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/Location
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/OrderDetailsScreen/OrderDetailsScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/OrderHistoryScreen/OrderHistoryScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/OrderSummaryScreen/OrderSummaryScreen.dart';
-import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/ProductDetail/ProductDetailScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/ProfileScreen/ProfileScreen.dart';
 import 'package:botaniqmicrogreens/screens/InnerScreens/ContainerScreen/WishListScreen/WishListScreen.dart';
 import 'package:flutter/material.dart';
@@ -73,6 +72,10 @@ class MainScreenGlobalStateNotifier
     state = MainScreenGlobalState();
   }
 
+  void updateCurrentController(ScreenName module){
+    state = state.copyWith(currentModule: module);
+  }
+
   ///This method used to handle footer selection
   void setFooterSelection(int index) {
     ScreenName selectedModule;
@@ -109,8 +112,6 @@ class MainScreenGlobalStateNotifier
       return const ProfileScreen();
     } else if (state.currentModule == ScreenName.wishList) {
       return const WishListScreen();
-    } else if (state.currentModule == ScreenName.productDetail) {
-      return ProductDetailScreen();
     } else if (state.currentModule == ScreenName.orderSummary) {
       return const OrderSummaryScreen();
     } else if (state.currentModule == ScreenName.editProfile) {
@@ -141,8 +142,7 @@ class MainScreenGlobalStateNotifier
     if (module == ScreenName.cart ||
         module == ScreenName.reels ||
         module == ScreenName.orders ||
-        module == ScreenName.profile ||
-        module == ScreenName.productDetail) {
+        module == ScreenName.profile ) {
       onScreen = ScreenName.home;
     } else if (module == ScreenName.editProfile ||
         module == ScreenName.information ||
@@ -178,8 +178,6 @@ class MainScreenGlobalStateNotifier
   void callBackNavigationFromLocationScreen(){
     if (userFrom == ScreenName.home){
       callNavigation(ScreenName.home);
-    } else if (userFrom == ScreenName.productDetail) {
-      callNavigation(ScreenName.productDetail);
     } else if (userFrom == ScreenName.profile) {
       callNavigation(ScreenName.profile);
     } else{
@@ -207,7 +205,6 @@ class MainScreenGlobalStateNotifier
 
     if (currentModule == ScreenName.home ||
     currentModule == ScreenName.wishList ||
-    currentModule == ScreenName.productDetail ||
         currentModule == ScreenName.map ||
         currentModule == ScreenName.orders ||
         currentModule == ScreenName.orderDetails ||
