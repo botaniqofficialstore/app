@@ -5,7 +5,11 @@ import 'package:flutter_sizer/flutter_sizer.dart';
 import 'package:open_settings_plus/core/open_settings_plus.dart';
 import 'package:permission_handler/permission_handler.dart' as AppSettings;
 
+import '../Constants/Constants.dart';
 import '../Utility/LoadingBarOverlay.dart';
+import '../Utility/NetworkImageLoader.dart';
+import '../screens/InnerScreens/ContainerScreen/HomeScreen/HomeScreenModel.dart';
+import 'CodeReusability.dart';
 
 class CommonWidgets {
 
@@ -190,6 +194,193 @@ class CommonWidgets {
             child: objCommonWidgets.customText(context, 'Open Settings', 14, objConstantColor.navyBlue, objConstantFonts.montserratSemiBold),
           ),
         ],
+      ),
+    );
+  }
+
+
+  void showAddToCartSheet(BuildContext context, ProductData product, ValueChanged<int> addToCart) {
+    int quantity = 1; // Default starting quantity
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Container(
+              padding: EdgeInsets.all(20.dp),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.dp),
+                  topRight: Radius.circular(20.dp),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Handle bar for visual cue
+                  Center(
+                    child: Container(
+                      width: 40.dp,
+                      height: 4.dp,
+                      margin: EdgeInsets.only(bottom: 20.dp),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Product Image
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12.dp),
+                        child: SizedBox(
+                          height: 90.dp,
+                          width: 90.dp,
+                          child: NetworkImageLoader(
+                            imageUrl: '${ConstantURLs.baseUrl}${product.image}',
+                            placeHolder: objConstantAssest.placeHolder,
+                            size: 90.dp,
+                            imageSize: 90.dp,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 15.dp),
+
+                      // Product Details
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            objCommonWidgets.customText(
+                                context,
+                                CodeReusability().cleanProductName(product.productName),
+                                15, Colors.black, objConstantFonts.montserratSemiBold
+                            ),
+                            SizedBox(height: 4.dp),
+
+                            Row(
+                              children: [
+                                objCommonWidgets.customText(
+                                    context, "₹${product.productSellingPrice}",
+                                    16, Colors.black, objConstantFonts.montserratSemiBold
+                                ),
+                                SizedBox(width: 8.dp),
+                                Text(
+                                  "₹${product.productPrice}",
+                                  style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 15.dp,
+                                      decoration: TextDecoration.lineThrough,
+                                      fontFamily: objConstantFonts.montserratMedium
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 4.dp),
+                            objCommonWidgets.customText(
+                                context, "${product.gram}gm",
+                                13, Colors.black.withAlpha(150), objConstantFonts.montserratMedium
+                            ),
+                            SizedBox(height: 4.dp),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  Divider(height: 30.dp, thickness: 1),
+
+                  // Quantity Selector Row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      objCommonWidgets.customText(
+                          context, "Select Quantity",
+                          15, Colors.black, objConstantFonts.montserratSemiBold
+                      ),
+
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: objConstantColor.navyBlue.withOpacity(0.2)),
+                          borderRadius: BorderRadius.circular(8.dp),
+                        ),
+                        child: Row(
+                          children: [
+                            _quantityButton(Icons.remove, () {
+                              if (quantity > 1) setModalState(() => quantity--);
+                            }),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15.dp),
+                              child: objCommonWidgets.customText(
+                                  context, "$quantity",
+                                  16, Colors.black, objConstantFonts.montserratSemiBold
+                              ),
+                            ),
+                            _quantityButton(Icons.add, () {
+                              setModalState(() => quantity++);
+                            }),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 30.dp),
+
+                  // Final Add Button
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    child: Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(vertical: 13.dp),
+                      decoration: BoxDecoration(
+                          color: Colors.deepOrange,
+                          borderRadius: BorderRadius.circular(20.dp),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withAlpha(15),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            )
+                          ]
+                      ),
+                      child: Center(
+                        child: objCommonWidgets.customText(
+                            context, "Add to Cart",
+                            15, Colors.white, objConstantFonts.montserratSemiBold
+                        ),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      addToCart(quantity);
+                    },
+                  ),
+                  SizedBox(height: 10.dp),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _quantityButton(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(8.dp),
+        color: Colors.transparent,
+        child: Icon(icon, size: 20.dp, color: objConstantColor.navyBlue),
       ),
     );
   }

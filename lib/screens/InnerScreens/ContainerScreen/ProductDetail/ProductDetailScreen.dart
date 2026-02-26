@@ -44,7 +44,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   @override
   void initState() {
     super.initState();
-    Timer.periodic(Duration(seconds: 1), (timer) {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {}); // rebuilds widget every second
     });
     Future.microtask(() {
@@ -66,18 +66,21 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
   void scrollToTop() {
     _scrollController.animateTo(
-      0, // scroll offset (0 = top)
-      duration: Duration(milliseconds: 500),
+      0, duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
   }
 
+  @override
   @override
   Widget build(BuildContext context) {
     var detailsScreenState = ref.watch(productDetailScreenGlobalStateProvider);
     var homeScreenState = ref.watch(HomeScreenGlobalStateProvider);
     var homeScreenNotifier = ref.watch(HomeScreenGlobalStateProvider.notifier);
 
+    final double statusBarHeight = MediaQuery.of(context).padding.top;
+    // Increased height to accommodate the carousel comfortably
+    final double headerHeight = 310.dp + statusBarHeight;
 
     return Scaffold(
       key: _scaffoldKey,
@@ -87,206 +90,74 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         child: detailsScreenState.isLoading
             ? buildProductDetailShimmer(context)
             : CustomScrollView(
+          controller: _scrollController,
           slivers: [
-
-            /// 🔰 1. CAROUSEL + TOP PART
-            SliverToBoxAdapter(
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  carousalSlider(context),
-
-                  Positioned(
-                    bottom: -18.dp,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      height: 40.dp,
-                      decoration: BoxDecoration(
-                        color: objConstantColor.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(25.dp),
-                          topRight: Radius.circular(25.dp),
-                        ),
-                      ),
-                      child: Center(
-                        child: Container(
-                          width: 50.dp,
-                          height: 5.dp,
-                          decoration: BoxDecoration(
-                              color: Colors.black.withAlpha(50),
-                              borderRadius: BorderRadius.circular(20.dp)),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+            /// 🔥 HEADER (Carousel with Vanish Effect)
+            SliverAppBar(
+              expandedHeight: headerHeight,
+              collapsedHeight: statusBarHeight,
+              toolbarHeight: statusBarHeight,
+              pinned: true,
+              floating: false,
+              elevation: 0,
+              primary: false,
+              automaticallyImplyLeading: false,
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.white,
+              flexibleSpace: FlexibleSpaceBar(
+                collapseMode: CollapseMode.pin,
+                background: headerView(context),
               ),
             ),
-
+        
             /// 🔰 2. BODY CONTENT SECTION
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15.dp),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 15.dp),
-
-                    objCommonWidgets.customText(
-                      context, 'Microgreens', 12,
-                      Colors.black.withAlpha(130), objConstantFonts.montserratMedium,
-                    ),
-
-                    SizedBox(height: 5.dp),
-
-                    Row(
-                      children: [
-                        objCommonWidgets.customText(
-                          context,
-                          CodeReusability().cleanProductName(
-                              detailsScreenState.productData?.productName),
-                          20,
-                          Colors.black,
-                          objConstantFonts.montserratBold,
-                        ),
-                        const Spacer(),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            border: Border.all(width: 1.5.dp, color: Colors
-                                .green),
-                          ),
-                          padding: EdgeInsets.all(2.8.dp),
-                          child: Container(
-                            width: 8.dp,
-                            height: 8.dp,
-                            decoration: const BoxDecoration(
-                              color: Colors.green,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-
-                    SizedBox(height: 15.dp),
-
-
-                    customSectionTitle(context, "About"),
-                    objCommonWidgets.customText(context,
-                        '${detailsScreenState.productData?.description}',
-                        10, Colors.black,
-                        objConstantFonts.montserratMedium,
-                        textAlign: TextAlign.justify),
-
-                    SizedBox(height: 10.dp),
-
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        customSectionTitle(context, "Quantity : "),
-                        objCommonWidgets.customText(context,
-                            '150 gm',
-                            13, Colors.black.withAlpha(150),
-                            objConstantFonts.montserratMedium,
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: 10.dp),
-
-                    customSectionTitle(context, "Delivery Details"),
-                    SizedBox(height: 5.dp),
-                    expectedDelivery(context),
-                    SizedBox(height: 2.5.dp),
-                    homeAddress(context),
-
-                    SizedBox(height: 20.dp),
-
-                    customSectionTitle(context, "Price Details"),
-                    SizedBox(height: 5.dp),
-                    priceDetails(context),
-
-                    SizedBox(height: 15.dp),
-
-
-
-                    if (detailsScreenState.inCart == 0) ...{
-                      SizedBox(height: 5.dp),
-                      customSectionTitle(context, "Add to cart"),
-                      SizedBox(height: 5.dp),
-                      addCart(context),
-                    } else
-                      ...{
-                        SizedBox(height: 15.dp),
-                        buyNow(context)
-                      },
-
-                    SizedBox(height: 20.dp),
-                    customSectionTitle(context, "Nutritional Benefits"),
-                    SizedBox(height: 5.dp),
-                    productDetails(context),
-
-
-                    SizedBox(height: 20.dp),
-                    customSectionTitle(context, "Seller Details"),
-                    SizedBox(height: 5.dp),
-                    sellerDetails(context),
-
-                    SizedBox(height: 20.dp),
-                    customSectionTitle(context, "Ratings & Reviews"),
-                    SizedBox(height: 5.dp),
-                    ratingAndReviewDetails(context),
-
-
-                    SizedBox(height: 20.dp),
-                    Row(
-                      children: [
-                        customSectionTitle(context, "Similar Products"),
-                        const Spacer(),
-                        CupertinoButton(
-                            padding: EdgeInsets.zero, child: Container(
-                            padding: EdgeInsets.only(bottom: 0.5.dp),
-                            // 👈 space between text & underline
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                  color: objConstantColor.orange,
-                                  width: 2.dp, // underline thickness
-                                ),
-                              ),
-                            ),
-                            child: objCommonWidgets.customText(
-                              context, 'See All', 11,
-                              objConstantColor.orange, objConstantFonts
-                                .montserratSemiBold,
-                            )
-                        ),
-                            onPressed: () {})
-
-                      ],
-                    ),
-
-                  ],
-                ),
-              ),
-            ),
-
+            detailsView(context),
+        
             /// 🔰 3. SIMILAR PRODUCT GRID
             similarProduct(context, homeScreenState, homeScreenNotifier),
-
-
-
           ],
         ),
       ),
     );
   }
 
+  Widget headerView(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        // The Image Slider
+        carousalSlider(context),
 
 
-
+        // Bottom Rounded Corner "Cut-out"
+        Positioned(
+          bottom: 0.dp, // Slight overlap to prevent sub-pixel gaps
+          left: 0,
+          right: 0,
+          child: Container(
+            height: 50.dp,
+            decoration: BoxDecoration(
+              color: objConstantColor.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(30.dp),
+                topRight: Radius.circular(30.dp),
+              ),
+            ),
+            child: Center(
+              child: Container(
+                width: 50.dp,
+                height: 5.dp,
+                decoration: BoxDecoration(
+                  color: Colors.black.withAlpha(30),
+                  borderRadius: BorderRadius.circular(20.dp),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
   Widget carousalSlider(BuildContext context){
     var detailsScreenState = ref.watch(productDetailScreenGlobalStateProvider);
@@ -303,7 +174,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             return Image.network(
               imagePath,
               width: double.infinity,
-              height: 250.dp,
+              height: 320.dp,
               fit: BoxFit.fill,
               errorBuilder: (context, error, stackTrace) {
                 return Image.asset(
@@ -364,7 +235,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           child: SafeArea(
             child: Row(
               children: [
-            
+
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.4),
@@ -393,9 +264,9 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     },
                   ),
                 ),
-            
+
                 SizedBox(width: 10.dp),
-            
+
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.4),
@@ -407,12 +278,10 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     borderRadius: BorderRadius.circular(30),
                     child: const Icon(Icons.share, color: Colors.white),
                     onPressed: () {
-            
+
                     },
                   ),
                 ),
-            
-            
               ],
             ),
           ),
@@ -447,6 +316,163 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       ],
     );
   }
+
+
+  Widget detailsView(BuildContext context){
+    var detailsScreenState = ref.watch(productDetailScreenGlobalStateProvider);
+
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15.dp),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            objCommonWidgets.customText(
+              context, 'Microgreens', 12,
+              Colors.black.withAlpha(130), objConstantFonts.montserratMedium,
+            ),
+
+            SizedBox(height: 5.dp),
+
+            Row(
+              children: [
+                objCommonWidgets.customText(
+                  context,
+                  CodeReusability().cleanProductName(
+                      detailsScreenState.productData?.productName),
+                  20,
+                  Colors.black,
+                  objConstantFonts.montserratBold,
+                ),
+                const Spacer(),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    border: Border.all(width: 1.5.dp, color: Colors
+                        .green),
+                  ),
+                  padding: EdgeInsets.all(2.8.dp),
+                  child: Container(
+                    width: 8.dp,
+                    height: 8.dp,
+                    decoration: const BoxDecoration(
+                      color: Colors.green,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                )
+              ],
+            ),
+
+
+
+            customSectionTitle(context, "About"),
+            objCommonWidgets.customText(context,
+                '${detailsScreenState.productData?.description}',
+                10, Colors.black,
+                objConstantFonts.montserratMedium,
+                textAlign: TextAlign.justify),
+
+            SizedBox(height: 10.dp),
+
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                customSectionTitle(context, "Quantity : "),
+                objCommonWidgets.customText(context,
+                  '150 gm',
+                  13, Colors.black.withAlpha(150),
+                  objConstantFonts.montserratMedium,
+                ),
+              ],
+            ),
+
+            SizedBox(height: 10.dp),
+
+            customSectionTitle(context, "Delivery Details"),
+            SizedBox(height: 5.dp),
+            expectedDelivery(context),
+            SizedBox(height: 2.5.dp),
+            homeAddress(context),
+
+            SizedBox(height: 20.dp),
+
+            customSectionTitle(context, "Price Details"),
+            SizedBox(height: 5.dp),
+            priceDetails(context),
+
+            SizedBox(height: 15.dp),
+
+
+
+            if (detailsScreenState.inCart == 0) ...{
+              SizedBox(height: 5.dp),
+              customSectionTitle(context, "Add to cart"),
+              SizedBox(height: 5.dp),
+              addCart(context),
+            } else
+              ...{
+                SizedBox(height: 15.dp),
+                buyNow(context)
+              },
+
+            SizedBox(height: 20.dp),
+            customSectionTitle(context, "Nutritional Benefits"),
+            SizedBox(height: 5.dp),
+            productDetails(context),
+
+
+            SizedBox(height: 20.dp),
+            customSectionTitle(context, "Seller Details"),
+            SizedBox(height: 5.dp),
+            sellerDetails(context),
+
+            SizedBox(height: 20.dp),
+            customSectionTitle(context, "Ratings & Reviews"),
+            SizedBox(height: 5.dp),
+            ratingAndReviewDetails(context),
+
+
+            SizedBox(height: 20.dp),
+            Row(
+              children: [
+                customSectionTitle(context, "Similar Products"),
+                const Spacer(),
+                CupertinoButton(
+                    padding: EdgeInsets.zero, child: Container(
+                    padding: EdgeInsets.only(bottom: 0.5.dp),
+                    // 👈 space between text & underline
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: objConstantColor.orange,
+                          width: 2.dp, // underline thickness
+                        ),
+                      ),
+                    ),
+                    child: objCommonWidgets.customText(
+                      context, 'See All', 11,
+                      objConstantColor.orange, objConstantFonts
+                        .montserratSemiBold,
+                    )
+                ),
+                    onPressed: () {})
+
+              ],
+            ),
+
+          ],
+        ),
+      ),
+    );
+  }
+
+
+
+
+
+
 
 
   Widget priceDetails(BuildContext context){
@@ -795,7 +821,8 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 ),
 
 
-                Padding(padding: EdgeInsets.symmetric(horizontal: 10.dp),
+                Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10.dp),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -857,10 +884,10 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                           onPressed: () {
                             setState(() {
                               if (product.inCart == 0) {
-                                var mainNotifier = ref.watch(
-                                    MainScreenGlobalStateProvider.notifier);
-                                notifier.callAddToCartAPI(
-                                    context, product.productId, index, mainNotifier);
+                                objCommonWidgets.showAddToCartSheet(context, product,(itemCount){
+                                  var mainNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
+                                  notifier.callAddToCartAPI(context, product.productId, index, mainNotifier);
+                                });
                               } else {
                                 Navigator.pushReplacement(
                                   context,
@@ -992,7 +1019,6 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   ),
                   SizedBox(height: 8.dp),
 
-                  // 📌 Title + Verified
                   Row(
                     children: [
                       Expanded(
@@ -1641,6 +1667,7 @@ class ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     EdgeInsets.symmetric(horizontal: 16.dp, vertical: 6.dp),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         customSectionTitle(context, "Ratings & Reviews"),
 

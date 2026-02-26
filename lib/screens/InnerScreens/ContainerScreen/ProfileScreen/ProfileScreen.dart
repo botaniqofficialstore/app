@@ -24,7 +24,7 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      final profileScreenNotifier = ref.read(ProfileScreenGlobalStateProvider.notifier);
+      final profileScreenNotifier = ref.read(profileScreenGlobalStateProvider.notifier);
       profileScreenNotifier.updateUserDetails();
     });
   }
@@ -42,11 +42,9 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   ///Profile Screen
   Widget profileView(BuildContext context) {
-    final screenNotifier =
-    ref.read(ProfileScreenGlobalStateProvider.notifier);
-    final mainScreenNotifier =
-    ref.read(MainScreenGlobalStateProvider.notifier);
-    var userScreenState = ref.watch(ProfileScreenGlobalStateProvider);
+    final screenNotifier = ref.read(profileScreenGlobalStateProvider.notifier);
+    final mainScreenNotifier = ref.read(MainScreenGlobalStateProvider.notifier);
+    var userScreenState = ref.watch(profileScreenGlobalStateProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F4F4),

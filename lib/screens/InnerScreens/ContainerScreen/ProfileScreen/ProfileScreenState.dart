@@ -173,7 +173,7 @@ class ProfileScreenGlobalStateNotifier
 
 
 
-final ProfileScreenGlobalStateProvider = StateNotifierProvider.autoDispose<
+final profileScreenGlobalStateProvider = StateNotifierProvider.autoDispose<
     ProfileScreenGlobalStateNotifier, ProfileScreenGlobalState>((ref) {
   var notifier = ProfileScreenGlobalStateNotifier();
   return notifier;

@@ -80,7 +80,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final homeScreenState = ref.watch(HomeScreenGlobalStateProvider);
     final homeScreenNotifier = ref.watch(HomeScreenGlobalStateProvider.notifier);
-    final userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
+
 
     final double statusBarHeight = MediaQuery.of(context).padding.top;
     final double headerHeight = 150.dp + statusBarHeight;
@@ -98,117 +98,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
           controller: _scrollController,
           slivers: [
             /// 🔥 HEADER (Vanish Effect implementation)
-            SliverAppBar(
-              expandedHeight: headerHeight,
-              collapsedHeight: statusBarHeight, // Keeps space for the notch when collapsed
-              toolbarHeight: statusBarHeight,   // Ensures the "vanish" stops at the notch
-              pinned: true,                     // Keeps the "safe area" space fixed at the top
-              floating: false,
-              elevation: 0,
-              primary: false, // We handle the padding manually
-              automaticallyImplyLeading: false,
-              backgroundColor: Colors.white,    // Color when fully collapsed
-              surfaceTintColor: Colors.white,
-              flexibleSpace: FlexibleSpaceBar(
-                collapseMode: CollapseMode.pin,
-                background: Container(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color(0xFFFFA600),
-                        Color(0xFFFF6A00),
-                        Color(0xFFFF3D00),
-                        Color(0xFFFF3D00),
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(30.dp),
-                      bottomRight: Radius.circular(30.dp),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.only(top: statusBarHeight, left: 15.dp, right: 15.dp),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        /// Top Row
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                objCommonWidgets.customText(context, 'Good to see you again', 15, Colors.white, objConstantFonts.montserratBold),
-                                objCommonWidgets.customText(context, 'Let’s find something natural today.', 8, Colors.white, objConstantFonts.montserratSemiBold),
-                              ],
-                            ),
-                            CupertinoButton(
-                              padding: EdgeInsets.zero,
-                              child: Image.asset(objConstantAssest.wishlist, width: 25.dp, color: Colors.white),
-                              onPressed: () {
-                                userFrom = ScreenName.home;
-                                userScreenNotifier.callNavigation(ScreenName.wishList);
-                              },
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10.dp),
-                        /// Location
-                        GestureDetector(
-                          onTap: () {
-                            userFrom = ScreenName.home;
-                            userScreenNotifier.callNavigation(ScreenName.map);
-                          },
-                          child: exactAddress.isNotEmpty
-                              ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Icon(Icons.location_on, color: Colors.white, size: 18.dp),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      objCommonWidgets.customText(context, exactAddress.split(',').first, 12, Colors.white, objConstantFonts.montserratBold),
-
-                                      Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 100.dp,
-                                            child: Text(exactAddress.split(' ').sublist(1).join(' '), maxLines: 1, overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(color: Colors.white, fontSize: 9.dp, fontFamily: objConstantFonts.montserratMedium)),
-                                          ),
-                                          Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 20.dp),
-                                        ],
-                                      ),
-
-                                    ],
-                                  ),
-
-
-                                ],
-                              )
-                              : Container(
-                            padding: EdgeInsets.symmetric(vertical: 6.dp, horizontal: 7.dp),
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10.dp)),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.my_location_outlined, color: objConstantColor.orange, size: 15.dp),
-                                SizedBox(width: 4.dp),
-                                objCommonWidgets.customText(context, 'Update Location', 10, objConstantColor.orange, objConstantFonts.montserratBold),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 10.dp),
-                        CommonSearchField(controller: TextEditingController(), hintText: 'Search', onChanged: (value) {}),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            headerView(headerHeight, statusBarHeight),
 
             /// 🔥 BODY CONTENT
             SliverToBoxAdapter(
@@ -217,76 +107,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                 children: [
                   SizedBox(height: 15.dp),
                   /// Categories title
-                  Padding(
-                    padding: EdgeInsets.only(left: 15.dp),
-                    child: objCommonWidgets.customText(
-                      context,
-                      'Categories',
-                      13,
-                      objConstantColor.navyBlue,
-                      objConstantFonts.montserratSemiBold,
-                    ),
-                  ),
-                  /// Categories list
-                  Padding(
-                    padding: EdgeInsets.only(left: 15.dp, top: 5.dp),
-                    child: SizedBox(
-                      height: 45.dp,
-                      child: ListView.separated(
-                        padding: EdgeInsets.only(right: 10.dp),
-                        controller: categoryScrollController,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: productCategories.length,
-                        separatorBuilder: (_, __) => SizedBox(width: 10.dp),
-                        itemBuilder: (context, index) {
-                          final isSelected = homeScreenState.selectedIndex == index;
-                          return CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              homeScreenNotifier.updateSelectedIndex(index);
-                              categoryScrollController.animateTo(
-                                index * 60,
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeOut,
-                              );
-                            },
-                            child: Container(
-                              width: 40.dp,
-                              decoration: BoxDecoration(
-                                color: isSelected ? objConstantColor.yellow : objConstantColor.black.withAlpha(200),
-                                borderRadius: BorderRadius.circular(8.dp),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    productCategories[index]['image']!,
-                                    width: 20.dp,
-                                    height: 20.dp,
-                                    color: isSelected ? Colors.black : Colors.white,
-                                  ),
-                                  SizedBox(height: 2.dp),
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 5.dp),
-                                    child: Text(
-                                      productCategories[index]['title']!,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 10.dp,
-                                        color: isSelected ? Colors.black : Colors.white,
-                                        fontFamily: objConstantFonts.montserratSemiBold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
+                  filterView(),
                   SizedBox(height: 20.dp),
                   /// Banner
                   SizedBox(
@@ -316,10 +137,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
 
                   /// Product Grid
                   if (homeScreenState.isLoading && homeScreenState.productList.isEmpty) ...{
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 14.dp, vertical: 5.dp),
-                      child: buildProductShimmer(),
-                    )
+                     buildProductShimmer(),
                   } else ...{
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 14.dp),
@@ -352,6 +170,210 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget headerView(double headerHeight, double statusBarHeight){
+    final userScreenNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
+    final notifier = ref.watch(HomeScreenGlobalStateProvider.notifier);
+
+    return SliverAppBar(
+      expandedHeight: headerHeight,
+      collapsedHeight: statusBarHeight, // Keeps space for the notch when collapsed
+      toolbarHeight: statusBarHeight,   // Ensures the "vanish" stops at the notch
+      pinned: true,                     // Keeps the "safe area" space fixed at the top
+      floating: false,
+      elevation: 0,
+      primary: false, // We handle the padding manually
+      automaticallyImplyLeading: false,
+      backgroundColor: Colors.white,    // Color when fully collapsed
+      surfaceTintColor: Colors.white,
+      flexibleSpace: FlexibleSpaceBar(
+        collapseMode: CollapseMode.pin,
+        background: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [
+                Color(0xFFFFA600),
+                Color(0xFFFF6A00),
+                Color(0xFFFF3D00),
+                Color(0xFFFF3D00),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(30.dp),
+              bottomRight: Radius.circular(30.dp),
+            ),
+          ),
+          child: Padding(
+            padding: EdgeInsets.only(top: statusBarHeight, left: 15.dp, right: 15.dp),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// Top Row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        objCommonWidgets.customText(context, 'Good to see you again', 15, Colors.white, objConstantFonts.montserratBold),
+                        objCommonWidgets.customText(context, 'Let’s find something natural today.', 8, Colors.white, objConstantFonts.montserratSemiBold),
+                      ],
+                    ),
+                    CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      child: Image.asset(objConstantAssest.wishlist, width: 25.dp, color: Colors.white),
+                      onPressed: () {
+                        userFrom = ScreenName.home;
+                        userScreenNotifier.callNavigation(ScreenName.wishList);
+                      },
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10.dp),
+                /// Location
+                GestureDetector(
+                  onTap: () {
+                    userFrom = ScreenName.home;
+                    userScreenNotifier.callNavigation(ScreenName.map);
+                  },
+                  child: exactAddress.isNotEmpty
+                      ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.location_on, color: Colors.white, size: 18.dp),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          objCommonWidgets.customText(context, exactAddress.split(',').first, 12, Colors.white, objConstantFonts.montserratBold),
+
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 100.dp,
+                                child: Text(exactAddress.split(' ').sublist(1).join(' '), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(color: Colors.white, fontSize: 9.dp, fontFamily: objConstantFonts.montserratMedium)),
+                              ),
+                              Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 20.dp),
+                            ],
+                          ),
+
+                        ],
+                      ),
+
+
+                    ],
+                  ) : Container(
+                    padding: EdgeInsets.symmetric(vertical: 6.dp, horizontal: 7.dp),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10.dp)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.my_location_outlined, color: objConstantColor.orange, size: 15.dp),
+                        SizedBox(width: 4.dp),
+                        objCommonWidgets.customText(context, 'Update Location', 10, objConstantColor.orange, objConstantFonts.montserratBold),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10.dp),
+                CommonSearchField(
+                  controller: TextEditingController(),
+                  enabled: false,
+                  onTap: () {
+                    // Navigate to search screen
+                    notifier.callNavigateToSearchScreen(context);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget filterView(){
+    final homeScreenState = ref.watch(HomeScreenGlobalStateProvider);
+    final homeScreenNotifier = ref.watch(HomeScreenGlobalStateProvider.notifier);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: 15.dp),
+          child: objCommonWidgets.customText(
+            context,
+            'Categories',
+            13,
+            objConstantColor.navyBlue,
+            objConstantFonts.montserratSemiBold,
+          ),
+        ),
+        /// Categories list
+        Padding(
+          padding: EdgeInsets.only(left: 15.dp, top: 5.dp),
+          child: SizedBox(
+            height: 45.dp,
+            child: ListView.separated(
+              padding: EdgeInsets.only(right: 10.dp),
+              controller: categoryScrollController,
+              scrollDirection: Axis.horizontal,
+              itemCount: productCategories.length,
+              separatorBuilder: (_, __) => SizedBox(width: 10.dp),
+              itemBuilder: (context, index) {
+                final isSelected = homeScreenState.selectedIndex == index;
+                return CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    homeScreenNotifier.updateSelectedIndex(index);
+                    categoryScrollController.animateTo(
+                      index * 60,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOut,
+                    );
+                  },
+                  child: Container(
+                    width: 40.dp,
+                    decoration: BoxDecoration(
+                      color: isSelected ? objConstantColor.yellow : objConstantColor.black.withAlpha(200),
+                      borderRadius: BorderRadius.circular(8.dp),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          productCategories[index]['image']!,
+                          width: 20.dp,
+                          height: 20.dp,
+                          color: isSelected ? Colors.black : Colors.white,
+                        ),
+                        SizedBox(height: 2.dp),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 5.dp),
+                          child: Text(
+                            productCategories[index]['title']!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 10.dp,
+                              color: isSelected ? Colors.black : Colors.white,
+                              fontFamily: objConstantFonts.montserratSemiBold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        )
+      ],
     );
   }
 
@@ -471,7 +493,8 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
 
 
-                Padding(padding: EdgeInsets.symmetric(horizontal: 10.dp),
+                Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10.dp),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -531,18 +554,16 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                           )
                         ),
                         onPressed: () {
-                          setState(() {
                             if (product.inCart == 0) {
-                              var mainNotifier = ref.watch(
-                                  MainScreenGlobalStateProvider.notifier);
-                              notifier.callAddToCartAPI(
-                                  context, product.productId, index, mainNotifier);
+                              objCommonWidgets.showAddToCartSheet(context, product,(itemCount){
+                                var mainNotifier = ref.watch(MainScreenGlobalStateProvider.notifier);
+                                notifier.callAddToCartAPI(context, product.productId, index, mainNotifier);
+                              });
                             } else {
                               ref.watch(MainScreenGlobalStateProvider.notifier)
                                   .callNavigation(
                                   ScreenName.cart);
                             }
-                          });
                         },
                       ),
 
@@ -583,57 +604,71 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+
+
   Widget buildProductShimmer() {
-    return GridView.builder(
-      itemCount: 6, // Number of shimmer placeholders
-      padding: EdgeInsets.zero,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 0.75,
-      ),
-      itemBuilder: (context, index) {
-        return Shimmer.fromColors(
-          baseColor: Colors.grey.shade300,
-          highlightColor: Colors.grey.shade100,
-          child: Container(
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 14.dp, vertical: 5.dp),
+      child: GridView.builder(
+        itemCount: 6, // Number of shimmer placeholders
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: 0.65,
+        ),
+        itemBuilder: (context, index) {
+          return Container(
+            padding: EdgeInsets.symmetric(vertical: 10.dp, horizontal: 10.dp),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Image placeholder
-                Container(
-                  height: 120,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // Text placeholders
-                Container(
-                  height: 14,
-                  width: 100,
-                  color: Colors.grey,
-                ),
-                const SizedBox(height: 6),
-                Container(
-                  height: 14,
-                  width: 60,
-                  color: Colors.grey,
-                ),
+              borderRadius: BorderRadius.circular(10.dp),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withAlpha(25), blurRadius: 5, offset: const Offset(1, 1)),
               ],
             ),
-          ),
-        );
-      },
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey.shade300,
+              highlightColor: Colors.grey.shade100,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Image placeholder
+                  Container(
+                    height: 120.dp,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  SizedBox(height: 8.dp),
+                  // Text placeholders
+                  Container(
+                    height: 14.dp,
+                    width: 100.dp,
+                    color: Colors.black,
+                  ),
+                  SizedBox(height: 6.dp),
+                  Container(
+                    height: 14.dp,
+                    width: 60.dp,
+                    color: Colors.black,
+                  ),
+                  SizedBox(height: 13.dp),
+                  Container(
+                    height: 25.dp,
+                    color: Colors.black,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -735,72 +770,83 @@ class CommonSearchField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final Function(String)? onChanged;
+  final VoidCallback? onTap;
+  final bool enabled;
 
   const CommonSearchField({
     super.key,
     required this.controller,
     this.hintText = "search",
     this.onChanged,
+    this.onTap,
+    this.enabled = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 40.dp,
-      padding: EdgeInsets.symmetric(horizontal: 5.dp, vertical: 3.dp),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30.dp), // rounded corners
-        border: Border.all(
-          color: objConstantColor.navyBlue, // ✅ border color
-          width: 0.8,
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        height: 40.dp,
+        padding: EdgeInsets.symmetric(horizontal: 5.dp, vertical: 3.dp),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(30.dp),
+          border: Border.all(
+            color: objConstantColor.navyBlue,
+            width: 0.8,
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          // ✅ Custom image instead of icon
-          const SizedBox(width: 10),
-          Image.asset(
-            objConstantAssest.searchIcon, // change with your image path
-            width: 18.dp,
-            height: 18.dp,
-          ),
-          const SizedBox(width: 10),
-          // ✅ Expanded TextField
-          Expanded(
-              child: AnimatedTextField(
-                controller: controller,
-                textInputAction: TextInputAction.search,
-                keyboardType: TextInputType.text,
-                animationType: Animationtype.slide,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z ]")),
-                ],
-                style: TextStyle(
-                  color: objConstantColor.navyBlue,
-                  fontSize: 20.dp,
-                  fontFamily: ConstantAssests.montserratRegular,
-                ),
-                onChanged: onChanged,
-                animationDuration: const Duration(milliseconds: 1220),
-                hintTexts: const [
-                  ' Micro greens',
-                  'Hair Oil',
-                  'Body Lotion',
-                  'White Radish Micro greens',
-                  'Ayurvedic Products',
-                  'Saffron',
-                  'Protein Rich',
-                ],
-                decoration: const InputDecoration(
-                  isDense: true,
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
-                ),
+        child: Row(
+          children: [
+            const SizedBox(width: 10),
+            Image.asset(
+              objConstantAssest.searchIcon,
+              width: 18.dp,
+              height: 18.dp,
+            ),
+            const SizedBox(width: 10),
 
-              )
-          ),
-        ],
+            Expanded(
+              child: AbsorbPointer(   // 🔥 prevents typing
+                absorbing: !enabled,
+                child: AnimatedTextField(
+                  controller: controller,
+                  readOnly: !enabled,   // 🔥 disables keyboard
+                  enableInteractiveSelection: enabled,
+                  textInputAction: TextInputAction.search,
+                  keyboardType: TextInputType.text,
+                  animationType: Animationtype.slide,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z ]")),
+                  ],
+                  style: TextStyle(
+                    color: objConstantColor.navyBlue,
+                    fontSize: 20.dp,
+                    fontFamily: ConstantAssests.montserratRegular,
+                  ),
+                  onChanged: onChanged,
+                  animationDuration: const Duration(milliseconds: 1220),
+                  hintTexts: const [
+                    ' Micro greens',
+                    'Hair Oil',
+                    'Body Lotion',
+                    'White Radish Micro greens',
+                    'Ayurvedic Products',
+                    'Saffron',
+                    'Protein Rich',
+                  ],
+                  decoration: const InputDecoration(
+                    isDense: true,
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

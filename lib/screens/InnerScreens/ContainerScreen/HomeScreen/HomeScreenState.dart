@@ -9,6 +9,7 @@ import '../../../../constants/Constants.dart';
 import '../../../commonViews/CustomToast.dart';
 import '../../MainScreen/MainScreenState.dart';
 import '../CartScreen/CartModel.dart';
+import '../SearchProductListScreen/SearchProductListScreen.dart';
 import '../WishListScreen/WishListModel.dart';
 import '../WishListScreen/WishListRepository.dart';
 import 'HomeScreenModel.dart';
@@ -294,8 +295,33 @@ class HomeScreenGlobalStateNotifier extends StateNotifier<HomeScreenGlobalState>
     Navigator.push(
       context,
       CupertinoPageRoute(
-        builder: (_) =>  ProductDetailScreen(),
+        builder: (_) =>  const ProductDetailScreen(),
       ),
+    );
+  }
+
+  void callNavigateToSearchScreen(BuildContext context){
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, anim1, anim2) =>
+      const SearchProductListScreen(),
+      transitionBuilder: (context, anim1, anim2, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 1),
+            end: Offset.zero,
+          ).animate(
+            CurvedAnimation(
+              parent: anim1,
+              curve: Curves.easeOutCubic,
+            ),
+          ),
+          child: child,
+        );
+      },
     );
   }
 
